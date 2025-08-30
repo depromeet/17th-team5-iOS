@@ -38,14 +38,24 @@ extension TargetDependency.Feature.${NAME} {
 }"
 
 # RootFeature에 추가할 Dependency
-NEW_ROOT_DEPENDENCY="        .Feature.$LOWER_NAME.feature,"
+NEW_ROOT_DEPENDENCY="        .Feature.$NAME.feature,"
 
 echo "🔧 Dependency+Feature.swift에 새로운 의존성을 추가합니다..."
 
 # Feature Dependency 추가 (마지막 } 앞에 추가)
-sed -i '' "/^}$/i\\
-$NEW_DEPENDENCY
-" "$DEPENDENCY_FILE"
+# 더 정확한 패턴으로 수정
+sed -i '' '/^public extension TargetDependency\.Feature {$/,/^}$/{
+    /^}$/{
+        i\
+
+        i\
+    struct '"${NAME}"' {\
+        private static let name = "'"${NAME}"'Feature"\
+        public static let feature = featureDependency(target: name)\
+        public static let interface = featureInterfaceDependency(target: name)\
+    }
+    }
+}' "$DEPENDENCY_FILE"
 
 echo "🔧 RootFeature/Project.swift에 의존성을 추가합니다..."
 
