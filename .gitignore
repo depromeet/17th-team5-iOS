@@ -1,7 +1,7 @@
 ### macOS ###
 # General
-.DS_Store
 .AppleDouble
+**/.DS_Store
 .LSOverride
 
 # Icon must end with two
@@ -68,3 +68,4 @@ Derived/
 
 ### Tuist managed dependencies ###
 Tuist/.build
+
