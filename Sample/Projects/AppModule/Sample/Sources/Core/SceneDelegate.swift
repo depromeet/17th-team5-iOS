@@ -24,6 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 }
 
+// MARK: - Extension
 extension SceneDelegate {
     private func configureAppScene(_ scene: UIScene) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
