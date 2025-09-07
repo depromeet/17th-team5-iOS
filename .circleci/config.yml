@@ -40,3 +40,4 @@ workflows:
             branches:
               only: 
                 - main
+                - /feature\/IC-12\/.*/
