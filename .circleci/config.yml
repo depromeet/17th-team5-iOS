@@ -28,4 +28,6 @@ workflows:
       - build-ios:
           filters:
             branches:
-              only: IC-12/*
+              only: 
+                - main
+                - /feature\/IC-12\/.*/
