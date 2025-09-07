@@ -20,7 +20,7 @@ jobs:
           name: "Install dependencies"
           command: |
             cd Sample
-            make install
+            tuist install
       - run:
           name: "Generate Xcode project"
           command: |
