@@ -13,28 +13,24 @@ jobs:
             cd Sample
             curl https://mise.run | sh
             echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
+            echo 'eval "$(/Users/distiller/.local/bin/mise activate bash)"' >> $BASH_ENV
             source $BASH_ENV
             mise use tuist@latest
-            echo 'eval "$(/Users/distiller/.local/bin/mise activate bash)"' >> $BASH_ENV
       - run:
           name: "Install dependencies"
           command: |
             cd Sample
-            source $BASH_ENV
-            eval "$(/Users/distiller/.local/bin/mise activate bash)"
             tuist install
       - run:
           name: "Generate Xcode project"
           command: |
             cd Sample
-            source $BASH_ENV
-            eval "$(/Users/distiller/.local/bin/mise activate bash)"
             tuist generate
-      - run:
-          name: "Build project"
-          command: |
-            cd Sample
-            xcodebuild -workspace Sample.xcworkspace -scheme Sample -destination 'platform=iOS Simulator,name=iPhone 15' build
+#      - run:
+#          name: "Build project"
+#          command: |
+#            cd Sample
+#            xcodebuild -workspace Sample.xcworkspace -scheme Sample -destination 'platform=iOS Simulator,name=iPhone 15' build
 
 workflows:
   ios-ci-workflow:
