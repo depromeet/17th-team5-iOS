@@ -15,16 +15,20 @@ jobs:
             echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
             source $BASH_ENV
             mise use tuist@latest
-            eval "$(/Users/distiller/.local/bin/mise activate bash)"
+            echo 'eval "$(/Users/distiller/.local/bin/mise activate bash)"' >> $BASH_ENV
       - run:
           name: "Install dependencies"
           command: |
             cd Sample
+            source $BASH_ENV
+            eval "$(/Users/distiller/.local/bin/mise activate bash)"
             tuist install
       - run:
           name: "Generate Xcode project"
           command: |
             cd Sample
+            source $BASH_ENV
+            eval "$(/Users/distiller/.local/bin/mise activate bash)"
             tuist generate
       - run:
           name: "Build project"
