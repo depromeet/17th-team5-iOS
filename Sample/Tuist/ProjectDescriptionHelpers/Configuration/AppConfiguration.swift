@@ -34,17 +34,9 @@ public struct AppConfiguration {
         return SettingsDictionary().automaticCodeSigning(devTeam: "DD8KP9C4KQ")
     }
     
-    var setting: Settings {
-        return Settings.settings(
-            base: autoCodeSigning,
-            configurations: XCConfig.project
-        )
-    }
-    
     let commonSettings = Settings.settings(
         base: SettingsDictionary.debugSettings
             .configureAutoCodeSigning()
-            .configureVersioning()
             .configureTestability(),
         configurations: XCConfig.framework
     )

@@ -28,15 +28,6 @@ extension Scheme {
                 analyzeAction: .analyzeAction(configuration: developConfiguration)
             ),
             Scheme.scheme(
-                name: schemeName + "-Test",
-                shared: true,
-                buildAction: buildAction,
-                runAction: .runAction(configuration: testConfiguration),
-                archiveAction: .archiveAction(configuration: testConfiguration),
-                profileAction: .profileAction(configuration: testConfiguration),
-                analyzeAction: .analyzeAction(configuration: testConfiguration)
-            ),
-            Scheme.scheme(
                 name: schemeName + "-Production",
                 shared: true,
                 buildAction: buildAction,

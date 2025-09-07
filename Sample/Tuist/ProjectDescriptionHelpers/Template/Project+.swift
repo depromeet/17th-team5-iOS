@@ -24,7 +24,7 @@ extension Project {
             resources: [.glob(pattern: "Resources/**", excluding: [])],
             entitlements: configuration.entitlements,
             dependencies: dependencies,
-            settings: configuration.setting
+            settings: configuration.commonSettings
         )
         
         let appScheme = Scheme.configureAppScheme(
@@ -34,7 +34,7 @@ extension Project {
         return Project(
             name: configuration.projectName,
             organizationName: configuration.organizationName,
-            settings: configuration.setting,
+            settings: configuration.commonSettings,
             targets: [appTarget],
             schemes: appScheme
         )

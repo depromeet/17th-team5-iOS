@@ -25,12 +25,6 @@ public extension SettingsDictionary {
         return automaticCodeSigning(devTeam: "DD8KP9C4KQ")
     }
     
-    func configureVersioning() -> SettingsDictionary {
-        currentProjectVersion("1")
-            .marketingVersion("1.0.0")
-            .appleGenericVersioningSystem()
-    }
-    
     func configureTestability() -> SettingsDictionary {
         merging(["ENABLE_TESTABILITY": "YES"])
     }
