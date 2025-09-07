@@ -38,5 +38,4 @@ workflows:
       - build-ios:
           filters:
             branches:
-              only: 
-                - main
+              only: main
