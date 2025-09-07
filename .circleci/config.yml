@@ -14,8 +14,13 @@ jobs:
             curl https://mise.run | sh
             echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
             source $BASH_ENV
-            mise install tuist
-            mise global tuist latest
+            mise use tuist@latest
+            eval "$(/Users/distiller/.local/bin/mise activate bash)"
+      - run:
+          name: "Install dependencies"
+          command: |
+            cd Sample
+            make install
       - run:
           name: "Generate Xcode project"
           command: |
@@ -35,4 +40,3 @@ workflows:
             branches:
               only: 
                 - main
-                - /feature\/IC-12\/.*/
