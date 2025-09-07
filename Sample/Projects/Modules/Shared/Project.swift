@@ -12,6 +12,6 @@ let project = Project.configure(
     moduleType: .module(name: "Shared"),
     product: .staticFramework,
     dependencies: [
-        
+        .Library.swinject
     ]
 )
