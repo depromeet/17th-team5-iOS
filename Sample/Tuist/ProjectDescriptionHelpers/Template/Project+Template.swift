@@ -34,7 +34,7 @@ extension Project {
                 name: name,
                 organizationName: configuration.organizationName,
                 dependencies: dependencies,
-                settings: configuration.setting
+                settings: configuration.commonSettings
             )
             
         case let .module(name):

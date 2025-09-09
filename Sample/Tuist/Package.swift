@@ -7,9 +7,8 @@ import ProjectDescriptionHelpers
 
     let packageSettings = PackageSettings(
         productTypes: [
-            "SnapKit": .framework,
             "Alamofire": .framework,
-            "Then": .framework,
+            "Swinject": .framework,
         ],
         baseSettings: Settings.settings(configurations: XCConfig.framework)
     )
@@ -19,8 +18,7 @@ let package = Package(
     name: "TestProject",
     platforms: [.iOS(.v16)],
     dependencies: [
-        .package(url: "https://github.com/SnapKit/SnapKit.git", exact: "5.6.0"),
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: "5.7.1"),
-        .package(url: "https://github.com/devxoul/Then.git", exact: "3.0.0"),
+        .package(url: "https://github.com/Swinject/Swinject.git", exact: "2.10.0"),
     ]
 )
