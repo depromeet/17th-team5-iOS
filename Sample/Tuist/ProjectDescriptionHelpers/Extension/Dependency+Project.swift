@@ -60,7 +60,7 @@ public extension TargetDependency.Module {
     
     static let networker = dependency(
         target: "Networker",
-        path: .relativeToModule(path: "Networker")
+        path: .relativeToNetwork()
     )
 }
 

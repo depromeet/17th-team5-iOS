@@ -16,6 +16,10 @@ public extension ProjectDescription.Path {
         return .relativeToRoot("Projects/Domains/\(path)")
     }
     
+    static func relativeToNetwork() -> Self {
+        return .relativeToRoot("Projects/Data/Networker")
+    }
+    
     static func relativeToModule(path: String) -> Self {
         return .relativeToRoot("Projects/Modules/\(path)")
     }
