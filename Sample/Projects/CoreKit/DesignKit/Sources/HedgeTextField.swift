@@ -11,9 +11,10 @@ import SwiftUI
 public struct HedgeTextField: View {
     
     enum TextFieldState {
-        case idle
-        case focused
-        case unfocusedWithText
+        case idle   // 입력 X, 포커싱 X
+        case focusing   // 입력 X, 포커싱 O
+        case idleWithInput  // 입력 O, 포커싱 X
+        case focusingWithInput // 입력 O, 포커싱 O
     }
     
     @Binding var inputText: String
@@ -31,10 +32,12 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return label
-        case .focused:
+        case .focusing:
             return focusingLabel
-        case .unfocusedWithText:
-            return label
+        case .idleWithInput:
+            return focusingLabel
+        case .focusingWithInput:
+            return focusingLabel
         }
     }
     
@@ -42,10 +45,12 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return .body1Medium
-        case .focused:
+        case .focusing:
             return .label2Semibold
-        case .unfocusedWithText:
-            return .body1Medium
+        case .idleWithInput:
+            return .label2Semibold
+        case .focusingWithInput:
+            return .label2Semibold
         }
     }
     
@@ -53,10 +58,12 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return Color.hedgeUI.grey400
-        case .focused:
+        case .focusing:
             return Color.hedgeUI.grey500
-        case .unfocusedWithText:
-            return Color.hedgeUI.grey400
+        case .idleWithInput:
+            return Color.hedgeUI.grey500
+        case .focusingWithInput:
+            return Color.hedgeUI.grey500
         }
     }
     
@@ -64,15 +71,13 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return .clear
-        case .focused:
+        case .focusing:
             return Color.hedgeUI.brand500
-        case .unfocusedWithText:
+        case .idleWithInput:
             return .clear
+        case .focusingWithInput:
+            return Color.hedgeUI.brand500
         }
-    }
-    
-    private var shouldShowTextField: Bool {
-        return state == .focused || state == .unfocusedWithText
     }
     
     public init(
@@ -101,7 +106,7 @@ public struct HedgeTextField: View {
                     .foregroundStyle(textColor)
                     .scaleEffect()
                 
-                if state == .focused || state == .unfocusedWithText {
+                if state == .focusing || state == .idleWithInput || state == .focusingWithInput {
                     TextField(placeHolder, text: $inputText)
                         .tint(Color.hedgeUI.grey900)
                         .focused($textFieldFocused)
@@ -113,6 +118,7 @@ public struct HedgeTextField: View {
                             insertion: .opacity.combined(with: .offset(y: 5)),
                             removal: .opacity.combined(with: .offset(y: -5))
                         ))
+                        .allowsHitTesting(false)
                 }
             }
             .padding(.vertical, 14)
@@ -133,31 +139,33 @@ public struct HedgeTextField: View {
             focusedID = id
             
             withAnimation(.easeInOut(duration: 0.3)) {
-                state = .focused
+                if inputText.isEmpty {
+                    state = .focusing
+                } else {
+                    state = .focusingWithInput
+                }
             }
         }
         .onChange(of: focusedID) { newValue in
             DispatchQueue.main.async {
                 if id == newValue {
-                    // 이 필드가 선택되었을 때만 포커스
+                    if inputText.isEmpty {
+                        state = .focusing
+                    } else {
+                        state = .focusingWithInput
+                    }
+                    
                     textFieldFocused = true
                 } else {
-                    // 다른 필드가 선택되었을 때 포커스 해제
                     if inputText.isEmpty {
                         state = .idle
                     } else {
-                        state = .unfocusedWithText
+                        state = .idleWithInput
                     }
                     textFieldFocused = false
                 }
-            }
-        }
-        .onChange(of: inputText) { newValue in
-            // inputText가 변경될 때 상태 업데이트
-            if !newValue.isEmpty && state == .idle {
-                state = .unfocusedWithText
-            } else if newValue.isEmpty && state == .unfocusedWithText {
-                state = .idle
+                
+                print("\(id) = \(state)")
             }
         }
     }
