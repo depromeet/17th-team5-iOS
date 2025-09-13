@@ -15,7 +15,7 @@ import DesignKit
 
 @ViewAction(for: RetrospectSearchFeature.self)
 public struct RetrospectSearchView: View {
-    @Perception.Bindable public var store: StoreOf<RetrospectSearchFeature>
+    @Bindable public var store: StoreOf<RetrospectSearchFeature>
     
     public init(store: StoreOf<RetrospectSearchFeature>) {
         self.store = store
@@ -23,13 +23,11 @@ public struct RetrospectSearchView: View {
     
     public var body: some View {
         VStack(spacing: 0) {
-            WithPerceptionTracking {
-                navigationBar
-                guideText
-                searchTextField
-                retrospectTitle
-                Spacer()
-            }
+            navigationBar
+            guideText
+            searchTextField
+            retrospectTitle
+            Spacer()
         }
     }
     

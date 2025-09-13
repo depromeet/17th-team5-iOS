@@ -12,18 +12,18 @@ public struct AppConfiguration {
     
     public init() {}
     
-    let workspaceName = "Sample"
-    let projectName: String = "Sample"
-    let organizationName = "SampleCompany"
+    let workspaceName = "Hedge"
+    let projectName: String = "Hedge"
+    let organizationName = "HedgeCompany"
     let shortVersion: String = "1.0.0"
-    let bundleIdentifier: String = "com.test.sample"
-    let displayName: String = "트위스트"
+    let bundleIdentifier: String = "com.depromeet.hedge"
+    let displayName: String = "햇제"
     let destination: Set<Destination> = [.iPhone, .iPad]
     var entitlements: Entitlements? = nil
-    let deploymentTarget: DeploymentTargets = .iOS("16.0")
+    let deploymentTarget: DeploymentTargets = .iOS("17.0")
     
     public var configurationName: ConfigurationName {
-        return "TestProject"
+        return "Hedge"
     }
     
     var infoPlist: [String : Plist.Value] {
