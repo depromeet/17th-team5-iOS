@@ -17,7 +17,7 @@ import ProjectDescriptionHelpers
 
 let package = Package(
     name: "TestProject",
-    platforms: [.iOS(.v16)],
+    platforms: [.iOS(.v17)],
     dependencies: [
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: "5.7.1"),
         .package(url: "https://github.com/Swinject/Swinject.git", exact: "2.10.0"),

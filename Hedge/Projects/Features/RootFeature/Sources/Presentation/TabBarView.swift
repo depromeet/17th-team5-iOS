@@ -16,25 +16,23 @@ struct TabBarView: View {
     var store: StoreOf<TabBarFeature>
     
     var body: some View {
-        WithPerceptionTracking {
-            TabView {
-                IfLetStore(store.scope(state: \.homeState, action: \.delegate.homeAction)) { store in
-                    HomeView(store: store)
-                }
+        TabView {
+            IfLetStore(store.scope(state: \.homeState, action: \.delegate.homeAction)) { store in
+                HomeView(store: store)
+            }
+            .tabItem {
+                Image(systemName: "house")
+                Text("Home")
+            }
+            
+            SearchView()
                 .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
+                    Image(systemName: "magnifyingglass")
+                    Text("Search")
                 }
-                
-                SearchView()
-                    .tabItem {
-                        Image(systemName: "magnifyingglass")
-                        Text("Search")
-                    }
-            }
-            .onAppear {
-                send(.onAppear)
-            }
+        }
+        .onAppear {
+            send(.onAppear)
         }
     }
 }

@@ -122,7 +122,7 @@ public struct HedgeTextField: View {
         .onTapGesture {
             handleTap()
         }
-        .onChange(of: focusedID) { newValue in
+        .onChange(of: focusedID) { _, newValue in
             handleFocusChange(newValue)
         }
     }
