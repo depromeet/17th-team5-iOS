@@ -11,9 +11,10 @@ import SwiftUI
 public struct HedgeTextField: View {
     
     enum TextFieldState {
-        case idle
-        case focused
-        case unfocusedWithText
+        case idle   // 입력 X, 포커싱 X
+        case focusing   // 입력 X, 포커싱 O
+        case idleWithInput  // 입력 O, 포커싱 X
+        case focusingWithInput // 입력 O, 포커싱 O
     }
     
     @Binding var inputText: String
@@ -31,10 +32,8 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return label
-        case .focused:
+        case .focusing, .idleWithInput, .focusingWithInput:
             return focusingLabel
-        case .unfocusedWithText:
-            return label
         }
     }
     
@@ -42,10 +41,8 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return .body1Medium
-        case .focused:
+        case .focusing, .idleWithInput, .focusingWithInput:
             return .label2Semibold
-        case .unfocusedWithText:
-            return .body1Medium
         }
     }
     
@@ -53,26 +50,18 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return Color.hedgeUI.grey400
-        case .focused:
+        case .focusing, .idleWithInput, .focusingWithInput:
             return Color.hedgeUI.grey500
-        case .unfocusedWithText:
-            return Color.hedgeUI.grey400
         }
     }
     
     private var strokeColor: Color {
         switch state {
-        case .idle:
+        case .idle, .idleWithInput:
             return .clear
-        case .focused:
+        case .focusing, .focusingWithInput:
             return Color.hedgeUI.brand500
-        case .unfocusedWithText:
-            return .clear
         }
-    }
-    
-    private var shouldShowTextField: Bool {
-        return state == .focused || state == .unfocusedWithText
     }
     
     public init(
@@ -101,7 +90,7 @@ public struct HedgeTextField: View {
                     .foregroundStyle(textColor)
                     .scaleEffect()
                 
-                if state == .focused || state == .unfocusedWithText {
+                if state == .focusing || state == .idleWithInput || state == .focusingWithInput {
                     TextField(placeHolder, text: $inputText)
                         .tint(Color.hedgeUI.grey900)
                         .focused($textFieldFocused)
@@ -113,6 +102,7 @@ public struct HedgeTextField: View {
                             insertion: .opacity.combined(with: .offset(y: 5)),
                             removal: .opacity.combined(with: .offset(y: -5))
                         ))
+                        .allowsHitTesting(false)
                 }
             }
             .padding(.vertical, 14)
@@ -130,34 +120,28 @@ public struct HedgeTextField: View {
                 .animation(.easeInOut(duration: 0.3), value: state)
         )
         .onTapGesture {
-            focusedID = id
-            
-            withAnimation(.easeInOut(duration: 0.3)) {
-                state = .focused
-            }
+            handleTap()
         }
         .onChange(of: focusedID) { newValue in
-            DispatchQueue.main.async {
-                if id == newValue {
-                    // 이 필드가 선택되었을 때만 포커스
-                    textFieldFocused = true
-                } else {
-                    // 다른 필드가 선택되었을 때 포커스 해제
-                    if inputText.isEmpty {
-                        state = .idle
-                    } else {
-                        state = .unfocusedWithText
-                    }
-                    textFieldFocused = false
-                }
-            }
+            handleFocusChange(newValue)
         }
-        .onChange(of: inputText) { newValue in
-            // inputText가 변경될 때 상태 업데이트
-            if !newValue.isEmpty && state == .idle {
-                state = .unfocusedWithText
-            } else if newValue.isEmpty && state == .unfocusedWithText {
-                state = .idle
+    }
+    
+    private func handleTap() {
+        focusedID = id
+        
+        withAnimation(.easeInOut(duration: 0.3)) {
+            state = inputText.isEmpty ? .focusing : .focusingWithInput
+        }
+    }
+    
+    private func handleFocusChange(_ newValue: String?) {
+        DispatchQueue.main.async {
+            if id == newValue {
+                textFieldFocused = true
+            } else {
+                state = inputText.isEmpty ? .idle : .idleWithInput
+                textFieldFocused = false
             }
         }
     }
