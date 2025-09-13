@@ -25,10 +25,14 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
     }
     
     public func start() {
-        let retrospectView = RetrospectView(
+        let retrospectView = RetrospectSearchView(
             store: .init(
-                initialState: RetrospectFeature.State(),
-                reducer: { RetrospectFeature() }
+                initialState: RetrospectSearchFeature.State(),
+                reducer: {
+                    RetrospectSearchFeature(
+                        coordinator: self
+                    )
+                }
             )
         )
         
@@ -38,5 +42,9 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
             retrospectViewController,
             animated: true
         )
+    }
+    
+    public func popToPrev() {
+        navigationController.popViewController(animated: true)
     }
 }

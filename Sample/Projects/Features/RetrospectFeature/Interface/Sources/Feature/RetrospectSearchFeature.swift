@@ -13,16 +13,21 @@ import ComposableArchitecture
 import Core
 
 @Reducer
-public struct RetrospectFeature {
+public struct RetrospectSearchFeature {
+    private let coordinator: RetrospectCoordinator
     
-    public init() {}
+    public init(coordinator: RetrospectCoordinator) {
+        self.coordinator = coordinator
+    }
     
     @ObservableState
     public struct State: Equatable {
+        public var searchText: String = ""
         public init() {}
     }
     
-    public enum Action: FeatureAction, ViewAction {
+    public enum Action: FeatureAction, ViewAction, BindableAction {
+        case binding(BindingAction<State>)
         case view(View)
         case inner(InnerAction)
         case async(AsyncAction)
@@ -30,24 +35,31 @@ public struct RetrospectFeature {
         case delegate(DelegateAction)
     }
     
-    public enum View { }
+    public enum View {
+        case backButtonTapped
+    }
     public enum InnerAction { }
     public enum AsyncAction { }
     public enum ScopeAction { }
     public enum DelegateAction { }
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce(reducerCore)
     }
 }
 
-extension RetrospectFeature {
+extension RetrospectSearchFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,
         _ action: Action
     ) -> Effect<Action> {
         switch action {
+        case .binding(_):
+            return .none
+            
         case .view(let action):
             return viewCore(&state, action)
             
@@ -71,7 +83,9 @@ extension RetrospectFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
-            
+        case .backButtonTapped:
+            coordinator.popToPrev()
+            return .none
         }
     }
     
