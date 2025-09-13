@@ -34,7 +34,7 @@ public struct FontModel {
     init(
         font: HedgeFont.Pretendard,
         size: CGFloat,
-        lineHeight: CGFloat = 1.5
+        lineHeight: CGFloat = 1
     ) {
         self.font = font
         self.size = size
@@ -43,40 +43,40 @@ public struct FontModel {
 }
 
 public extension FontModel {
-    static var h1Semibold: FontModel { FontModel(font: .semiBold, size: 22) }
-    static var h1Medium: FontModel { FontModel(font: .medium, size: 22) }
-    static var h1Regular: FontModel { FontModel(font: .regular, size: 22) }
+    static var h1Semibold: FontModel { FontModel(font: .semiBold, size: 22, lineHeight: 1.36) }
+    static var h1Medium: FontModel { FontModel(font: .medium, size: 22, lineHeight: 1.36) }
+    static var h1Regular: FontModel { FontModel(font: .regular, size: 22, lineHeight: 1.36) }
     
-    static var h2Semibold: FontModel { FontModel(font: .semiBold, size: 18) }
-    static var h2Medium: FontModel { FontModel(font: .medium, size: 18) }
-    static var h2Regular: FontModel { FontModel(font: .regular, size: 18) }
+    static var h2Semibold: FontModel { FontModel(font: .semiBold, size: 18, lineHeight: 1.44) }
+    static var h2Medium: FontModel { FontModel(font: .medium, size: 18, lineHeight: 1.44) }
+    static var h2Regular: FontModel { FontModel(font: .regular, size: 18, lineHeight: 1.44) }
     
-    static var body1Semibold: FontModel { FontModel(font: .semiBold, size: 17) }
-    static var body1Medium: FontModel { FontModel(font: .medium, size: 17) }
-    static var body1Regular: FontModel { FontModel(font: .regular, size: 17) }
+    static var body1Semibold: FontModel { FontModel(font: .semiBold, size: 17, lineHeight: 1.47) }
+    static var body1Medium: FontModel { FontModel(font: .medium, size: 17, lineHeight: 1.47) }
+    static var body1Regular: FontModel { FontModel(font: .regular, size: 17, lineHeight: 1.47) }
     
-    static var body2Semibold: FontModel { FontModel(font: .semiBold, size: 16) }
-    static var body2Medium: FontModel { FontModel(font: .medium, size: 16) }
-    static var body2Regular: FontModel { FontModel(font: .regular, size: 16) }
+    static var body2Semibold: FontModel { FontModel(font: .semiBold, size: 16, lineHeight: 1.48) }
+    static var body2Medium: FontModel { FontModel(font: .medium, size: 16, lineHeight: 1.48) }
+    static var body2Regular: FontModel { FontModel(font: .regular, size: 16, lineHeight: 1.48) }
     
-    static var body3Semibold: FontModel { FontModel(font: .semiBold, size: 15) }
-    static var body3Medium: FontModel { FontModel(font: .medium, size: 15) }
-    static var body3Regular: FontModel { FontModel(font: .regular, size: 15) }
+    static var body3Semibold: FontModel { FontModel(font: .semiBold, size: 15, lineHeight: 1.46) }
+    static var body3Medium: FontModel { FontModel(font: .medium, size: 15, lineHeight: 1.46) }
+    static var body3Regular: FontModel { FontModel(font: .regular, size: 15, lineHeight: 1.46) }
     
-    static var label1Bold: FontModel { FontModel(font: .bold, size: 14) }
-    static var label1Medium: FontModel { FontModel(font: .medium, size: 14) }
-    static var label1Regular: FontModel { FontModel(font: .regular, size: 14) }
+    static var label1Bold: FontModel { FontModel(font: .bold, size: 14, lineHeight: 1.42) }
+    static var label1Medium: FontModel { FontModel(font: .medium, size: 14, lineHeight: 1.42) }
+    static var label1Regular: FontModel { FontModel(font: .regular, size: 14, lineHeight: 1.42) }
     
-    static var label2Medium: FontModel { FontModel(font: .medium, size: 13) }
-    static var label2Regular: FontModel { FontModel(font: .regular, size: 13) }
+    static var label2Medium: FontModel { FontModel(font: .medium, size: 13, lineHeight: 1.39) }
+    static var label2Regular: FontModel { FontModel(font: .regular, size: 13, lineHeight: 1.39) }
     
-    static var caption1Regular: FontModel { FontModel(font: .regular, size: 12) }
-    static var caption1Medium: FontModel { FontModel(font: .medium, size: 12) }
-    static var caption1Semibold: FontModel { FontModel(font: .semiBold, size: 12) }
+    static var caption1Regular: FontModel { FontModel(font: .regular, size: 12, lineHeight: 1.33) }
+    static var caption1Medium: FontModel { FontModel(font: .medium, size: 12, lineHeight: 1.33) }
+    static var caption1Semibold: FontModel { FontModel(font: .semiBold, size: 12, lineHeight: 1.33) }
     
-    static var caption2Regular: FontModel { FontModel(font: .regular, size: 11) }
-    static var caption2Medium: FontModel { FontModel(font: .medium, size: 11) }
-    static var caption2Semibold: FontModel { FontModel(font: .semiBold, size: 11) }
+    static var caption2Regular: FontModel { FontModel(font: .regular, size: 11, lineHeight: 1.27) }
+    static var caption2Medium: FontModel { FontModel(font: .medium, size: 11, lineHeight: 1.27) }
+    static var caption2Semibold: FontModel { FontModel(font: .semiBold, size: 11, lineHeight: 1.27) }
 }
 
 public struct HedgeFontModifier: ViewModifier {
