@@ -14,5 +14,6 @@ let project = Project.configure(
     dependencies: [
         .Core.designKit,
         .Domain.implement,
+        .Library.tca
     ]
 )

@@ -9,6 +9,7 @@ import ProjectDescriptionHelpers
         productTypes: [
             "Alamofire": .framework,
             "Swinject": .framework,
+            "ComposableArchitecture": .framework
         ],
         baseSettings: Settings.settings(configurations: XCConfig.framework)
     )
@@ -20,5 +21,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: "5.7.1"),
         .package(url: "https://github.com/Swinject/Swinject.git", exact: "2.10.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.22.2"),
     ]
 )
