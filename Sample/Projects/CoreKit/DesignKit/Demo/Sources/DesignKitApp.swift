@@ -52,16 +52,26 @@ struct ContentView: View {
                             }
                         }
                         
+                        
+                    }
+                    
+                    Section("Components") {
+                        NavigationLink(destination: ButtonsView()) {
+                            HStack {
+                                Text("Buttons")
+                            }
+                        }
+                        
                         NavigationLink(destination: SegmentView()) {
                             HStack {
                                 Text("Segments")
                             }
                         }
-                    }
-                    
-                    NavigationLink(destination: ButtonsView()) {
-                        HStack {
-                            Text("Buttons")
+                        
+                        NavigationLink(destination: TextFieldView()) {
+                            HStack {
+                                Text("TextFieldViews")
+                            }
                         }
                     }
                 }
