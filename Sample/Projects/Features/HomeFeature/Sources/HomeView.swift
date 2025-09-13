@@ -21,13 +21,14 @@ public struct HomeView: View {
     }
     
     public var body: some View {
-        ZStack {
-            Button {
-                send(.retrospectTapped)
-            } label: {
-                Text("회고")
+        WithPerceptionTracking {
+            ZStack {
+                Button {
+                    send(.retrospectTapped)
+                } label: {
+                    Text("회고")
+                }
             }
-
         }
     }
 }

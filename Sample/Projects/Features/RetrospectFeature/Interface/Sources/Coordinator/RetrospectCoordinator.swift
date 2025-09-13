@@ -10,4 +10,6 @@ import Foundation
 
 import Core
 
-public protocol RetrospectCoordinator: Coordinator { }
+public protocol RetrospectCoordinator: Coordinator {
+    func popToPrev()
+}

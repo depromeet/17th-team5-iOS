@@ -54,7 +54,7 @@ public struct HedgeSearchTextField: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.hedgeUI.backgroundWhite)
+                .fill(Color.hedgeUI.grey100)
         )
     }
 }
