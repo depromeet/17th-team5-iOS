@@ -38,6 +38,12 @@ struct ContentView: View {
                             Text("Icons")
                         }
                     }
+                    
+                    NavigationLink(destination: ButtonsView()) {
+                        HStack {
+                            Text("Buttons")
+                        }
+                    }
                 }
             }
             .navigationTitle("DesignKit Demo")
