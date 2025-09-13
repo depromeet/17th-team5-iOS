@@ -32,11 +32,7 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return label
-        case .focusing:
-            return focusingLabel
-        case .idleWithInput:
-            return focusingLabel
-        case .focusingWithInput:
+        case .focusing, .idleWithInput, .focusingWithInput:
             return focusingLabel
         }
     }
@@ -45,11 +41,7 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return .body1Medium
-        case .focusing:
-            return .label2Semibold
-        case .idleWithInput:
-            return .label2Semibold
-        case .focusingWithInput:
+        case .focusing, .idleWithInput, .focusingWithInput:
             return .label2Semibold
         }
     }
@@ -58,24 +50,16 @@ public struct HedgeTextField: View {
         switch state {
         case .idle:
             return Color.hedgeUI.grey400
-        case .focusing:
-            return Color.hedgeUI.grey500
-        case .idleWithInput:
-            return Color.hedgeUI.grey500
-        case .focusingWithInput:
+        case .focusing, .idleWithInput, .focusingWithInput:
             return Color.hedgeUI.grey500
         }
     }
     
     private var strokeColor: Color {
         switch state {
-        case .idle:
+        case .idle, .idleWithInput:
             return .clear
-        case .focusing:
-            return Color.hedgeUI.brand500
-        case .idleWithInput:
-            return .clear
-        case .focusingWithInput:
+        case .focusing, .focusingWithInput:
             return Color.hedgeUI.brand500
         }
     }
@@ -136,36 +120,28 @@ public struct HedgeTextField: View {
                 .animation(.easeInOut(duration: 0.3), value: state)
         )
         .onTapGesture {
-            focusedID = id
-            
-            withAnimation(.easeInOut(duration: 0.3)) {
-                if inputText.isEmpty {
-                    state = .focusing
-                } else {
-                    state = .focusingWithInput
-                }
-            }
+            handleTap()
         }
         .onChange(of: focusedID) { newValue in
-            DispatchQueue.main.async {
-                if id == newValue {
-                    if inputText.isEmpty {
-                        state = .focusing
-                    } else {
-                        state = .focusingWithInput
-                    }
-                    
-                    textFieldFocused = true
-                } else {
-                    if inputText.isEmpty {
-                        state = .idle
-                    } else {
-                        state = .idleWithInput
-                    }
-                    textFieldFocused = false
-                }
-                
-                print("\(id) = \(state)")
+            handleFocusChange(newValue)
+        }
+    }
+    
+    private func handleTap() {
+        focusedID = id
+        
+        withAnimation(.easeInOut(duration: 0.3)) {
+            state = inputText.isEmpty ? .focusing : .focusingWithInput
+        }
+    }
+    
+    private func handleFocusChange(_ newValue: String?) {
+        DispatchQueue.main.async {
+            if id == newValue {
+                textFieldFocused = true
+            } else {
+                state = inputText.isEmpty ? .idle : .idleWithInput
+                textFieldFocused = false
             }
         }
     }
