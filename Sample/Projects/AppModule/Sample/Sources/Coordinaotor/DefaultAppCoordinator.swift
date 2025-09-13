@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 import Core
+import RootFeature
 
 final class DefaultAppCoordinator: AppCoordinator {
     var navigationController: UINavigationController
@@ -21,14 +22,9 @@ final class DefaultAppCoordinator: AppCoordinator {
     }
     
     func start() {
-        // TODO: 시작
-    }
-    
-    func showLoginFlow() {
-        // TODO: 로그인 플로우 이동
-    }
-    
-    func showMainFlow() {
-        // TODO: 메인 플로우 이동
+        let rootCoordinator = DefaultRootCoordinator(
+            navigationController: navigationController
+        )
+        rootCoordinator.start()
     }
 }
