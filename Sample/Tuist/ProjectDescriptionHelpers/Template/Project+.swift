@@ -69,6 +69,7 @@ extension Project {
         let frameworkTarget = createFrameworkTarget(
             name: name,
             configuration: configuration,
+            hasResources: hasResources,
             product: product,
             dependencies: hasInterface ? [.target(name: "\(name)Interface")] : dependencies
         )
@@ -99,7 +100,7 @@ extension Project {
             organizationName: configuration.organizationName,
             settings: configuration.commonSettings,
             targets: targets,
-            schemes: schemes
+            schemes: schemes,
         )
     }
     
@@ -196,6 +197,7 @@ extension Project {
     private static func createFrameworkTarget(
         name: String,
         configuration: AppConfiguration,
+        hasResources: Bool = false,
         product: Product,
         dependencies: [TargetDependency]
     ) -> Target {
@@ -207,6 +209,7 @@ extension Project {
             deploymentTargets: configuration.deploymentTarget,
             infoPlist: .default,
             sources: ["Sources/**"],
+            resources: hasResources ? [.glob(pattern: "Resources/**", excluding: [])] : [],
             dependencies: dependencies
         )
     }
