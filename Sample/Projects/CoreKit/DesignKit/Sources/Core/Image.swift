@@ -20,6 +20,8 @@ extension HedgeUI where Base == Image {
     public static var chevronRightTightThickSmall: Image { asset(#function) }
     public static var close: Image { asset(#function) }
     public static var closeThick: Image { asset(#function) }
+    public static var search: Image { asset(#function) }
+    public static var closeFill: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {

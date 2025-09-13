@@ -73,6 +73,12 @@ struct ContentView: View {
                                 Text("TextFieldViews")
                             }
                         }
+                        
+                        NavigationLink(destination: SearchTextFieldView()) {
+                            HStack {
+                                Text("SearchTextField")
+                            }
+                        }
                     }
                 }
             }
