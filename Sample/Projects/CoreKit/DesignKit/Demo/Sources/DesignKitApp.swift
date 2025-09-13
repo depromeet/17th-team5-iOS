@@ -52,6 +52,12 @@ struct ContentView: View {
                             }
                         }
                     }
+                    
+                    NavigationLink(destination: ButtonsView()) {
+                        HStack {
+                            Text("Buttons")
+                        }
+                    }
                 }
             }
         }
