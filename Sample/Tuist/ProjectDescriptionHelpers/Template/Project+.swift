@@ -100,7 +100,7 @@ extension Project {
             organizationName: configuration.organizationName,
             settings: configuration.commonSettings,
             targets: targets,
-            schemes: schemes,
+            schemes: schemes
         )
     }
     
