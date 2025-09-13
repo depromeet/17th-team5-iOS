@@ -51,6 +51,12 @@ struct ContentView: View {
                                 Text("Icons")
                             }
                         }
+                        
+                        NavigationLink(destination: SegmentView()) {
+                            HStack {
+                                Text("Segments")
+                            }
+                        }
                     }
                 }
             }
