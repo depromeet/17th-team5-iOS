@@ -69,6 +69,7 @@ public extension FontModel {
     
     static var label2Medium: FontModel { FontModel(font: .medium, size: 13, lineHeight: 1.39) }
     static var label2Regular: FontModel { FontModel(font: .regular, size: 13, lineHeight: 1.39) }
+    static var label2Semibold: FontModel { FontModel(font: .semiBold, size: 13, lineHeight: 1.39) }
     
     static var caption1Regular: FontModel { FontModel(font: .regular, size: 12, lineHeight: 1.33) }
     static var caption1Medium: FontModel { FontModel(font: .medium, size: 12, lineHeight: 1.33) }
