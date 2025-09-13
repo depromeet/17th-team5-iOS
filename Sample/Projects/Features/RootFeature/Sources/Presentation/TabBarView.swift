@@ -8,14 +8,22 @@
 
 import SwiftUI
 
+import ComposableArchitecture
+import HomeFeature
+
+@ViewAction(for: TabBarFeature.self)
 struct TabBarView: View {
+    var store: StoreOf<TabBarFeature>
+    
     var body: some View {
         TabView {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
-                }
+            IfLetStore(store.scope(state: \.homeState, action: \.delegate.homeAction)) { store in
+                HomeView(store: store)
+            }
+            .tabItem {
+                Image(systemName: "house")
+                Text("Home")
+            }
             
             SearchView()
                 .tabItem {
@@ -23,23 +31,11 @@ struct TabBarView: View {
                     Text("Search")
                 }
         }
-    }
-}
-
-// 각 탭의 View들
-struct HomeView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Home View")
-                    .font(.largeTitle)
-                    .padding()
-            }
-            .navigationTitle("Home")
+        .onAppear {
+            send(.onAppear)
         }
     }
 }
-
 struct SearchView: View {
     var body: some View {
         NavigationView {
@@ -49,32 +45,6 @@ struct SearchView: View {
                     .padding()
             }
             .navigationTitle("Search")
-        }
-    }
-}
-
-struct FavoritesView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Favorites View")
-                    .font(.largeTitle)
-                    .padding()
-            }
-            .navigationTitle("Favorites")
-        }
-    }
-}
-
-struct ProfileView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Profile View")
-                    .font(.largeTitle)
-                    .padding()
-            }
-            .navigationTitle("Profile")
         }
     }
 }

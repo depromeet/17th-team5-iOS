@@ -9,7 +9,11 @@
 import UIKit
 import SwiftUI
 
+import ComposableArchitecture
+
 import Core
+import RetrospectFeature
+import RetrospectFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     public var navigationController: UINavigationController
@@ -23,8 +27,22 @@ public final class DefaultRootCoordinator: RootCoordinator {
     }
     
     public func start() {
-        let tabView = TabBarView()
+        let tabView = TabBarView(
+            store: .init(
+                initialState: TabBarFeature.State(),
+                reducer: {
+                    TabBarFeature(coordinator: self)
+                }
+            )
+        )
+        
         let viewController = UIHostingController(rootView: tabView)
         navigationController.viewControllers = [viewController]
+    }
+    
+    public func pushToRetrospect() {
+        let retrospectCoordinator = DefaultRetrospectCoordinator(navigationController: self.navigationController)
+        
+        retrospectCoordinator.start()
     }
 }

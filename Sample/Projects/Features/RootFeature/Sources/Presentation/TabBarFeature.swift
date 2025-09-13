@@ -1,6 +1,6 @@
 //
-//  HomeFeature.swift
-//  HomeFeature
+//  TabBarFeature.swift
+//  RootFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
@@ -9,14 +9,19 @@
 import ComposableArchitecture
 
 import Core
+import HomeFeatureInterface
 
 @Reducer
-public struct HomeFeature {
+public struct TabBarFeature {
+    private let coordinator: RootCoordinator
     
-    public init() {}
+    public init(coordinator: RootCoordinator) {
+        self.coordinator = coordinator
+    }
     
     @ObservableState
     public struct State: Equatable {
+        var homeState: HomeFeature.State?
         public init() {}
     }
     
@@ -29,21 +34,25 @@ public struct HomeFeature {
     }
     
     public enum View {
-        case retrospectTapped
+        case onAppear
     }
     public enum InnerAction { }
     public enum AsyncAction { }
     public enum ScopeAction { }
+    @CasePathable
     public enum DelegateAction {
-        case pushToRetrospect
+        case homeAction(HomeFeature.Action)
     }
     
     public var body: some Reducer<State, Action> {
         Reduce(reducerCore)
+            .ifLet(\.homeState, action: \.delegate.homeAction) {
+                HomeFeature()
+            }
     }
 }
 
-extension HomeFeature {
+extension TabBarFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,
@@ -73,8 +82,9 @@ extension HomeFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
-        case .retrospectTapped:
-            return .send(.delegate(.pushToRetrospect))
+        case .onAppear:
+            state.homeState = HomeFeature.State()
+            return .none
         }
     }
     
@@ -114,7 +124,10 @@ extension HomeFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToRetrospect:
+        case .homeAction(.delegate(.pushToRetrospect)):
+            coordinator.pushToRetrospect()
+            return .none
+        default:
             return .none
         }
     }

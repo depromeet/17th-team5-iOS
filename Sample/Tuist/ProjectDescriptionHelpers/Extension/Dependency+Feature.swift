@@ -8,14 +8,20 @@
 import ProjectDescription
 
 public extension TargetDependency.Feature {
-    struct Main {
-        private static let name = "MainFeature"
+    struct Root {
+        private static let name = "RootFeature"
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }
     
-    struct Root {
-        private static let name = "RootFeature"
+    struct Home {
+        private static let name = "HomeFeature"
+        public static let feature = featureDependency(target: name)
+        public static let interface = featureInterfaceDependency(target: name)
+    }
+    
+    struct Retrospect {
+        private static let name = "RetrospectFeature"
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }

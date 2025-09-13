@@ -1,17 +1,19 @@
 //
-//  HomeFeature.swift
-//  HomeFeature
+//  RetrospectFeature.swift
+//  RetrospectFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
 //
+
+import Foundation
 
 import ComposableArchitecture
 
 import Core
 
 @Reducer
-public struct HomeFeature {
+public struct RetrospectFeature {
     
     public init() {}
     
@@ -28,22 +30,18 @@ public struct HomeFeature {
         case delegate(DelegateAction)
     }
     
-    public enum View {
-        case retrospectTapped
-    }
+    public enum View { }
     public enum InnerAction { }
     public enum AsyncAction { }
     public enum ScopeAction { }
-    public enum DelegateAction {
-        case pushToRetrospect
-    }
+    public enum DelegateAction { }
     
     public var body: some Reducer<State, Action> {
         Reduce(reducerCore)
     }
 }
 
-extension HomeFeature {
+extension RetrospectFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,
@@ -73,8 +71,7 @@ extension HomeFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
-        case .retrospectTapped:
-            return .send(.delegate(.pushToRetrospect))
+            
         }
     }
     
@@ -114,8 +111,7 @@ extension HomeFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToRetrospect:
-            return .none
+            
         }
     }
 }

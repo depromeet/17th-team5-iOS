@@ -8,10 +8,4 @@
 
 import Foundation
 
-public protocol AppCoordinator: Coordinator {
-    /// LoginFlow로 이동
-    func showLoginFlow()
-    
-    /// MainFlow로 이동
-    func showMainFlow()
-}
+public protocol AppCoordinator: Coordinator {}
