@@ -8,13 +8,13 @@
 
 import SwiftUI
 
-struct HedgeNavigationBar: View {
+public struct HedgeNavigationBar: View {
     
     let buttonText: String
     let onLeftButtonTap: (() -> Void)?
     let onRightButtonTap: (() -> Void)?
     
-    init(
+    public init(
         buttonText: String,
         onLeftButtonTap: (() -> Void)? = nil,
         onRightButtonTap: (() -> Void)? = nil
@@ -24,7 +24,7 @@ struct HedgeNavigationBar: View {
         self.onRightButtonTap = onRightButtonTap
     }
     
-    var body: some View {
+    public var body: some View {
         HStack {
             Button {
                 onLeftButtonTap?()
