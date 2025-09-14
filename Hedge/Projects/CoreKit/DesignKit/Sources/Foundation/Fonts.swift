@@ -9,10 +9,8 @@
 import Foundation
 import SwiftUICore
 
-import Swinject
-
 public struct HedgeFont {
-    enum Pretendard: String, CaseIterable {
+    public enum Pretendard: String, CaseIterable {
         case thin = "Pretendard-Thin"
         case extraLight = "Pretendard-ExtraLight"
         case light = "Pretendard-Light"
@@ -109,20 +107,7 @@ public extension View {
     }
 }
 
-extension HedgeFont: Assembly {
-    
-    public func assemble(container: Container) {
-        Pretendard.allCases.forEach { font in
-            guard let fontURL = fontURL(for: font) else {
-                fatalError("❌ 폰트 파일을 찾을 수 없음: \(font.rawValue)")
-            }
-            CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
-        }
-    }
-    
-    private func fontURL(for font: Pretendard) -> URL? {
-        return Bundle.module.url(forResource: font.rawValue, withExtension: "otf")
-    }
+extension HedgeFont {
     
     public static func registerFonts() {
         Pretendard.allCases.forEach { font in
@@ -131,5 +116,9 @@ extension HedgeFont: Assembly {
             }
             CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
         }
+    }
+    
+    public func fontURL(for font: Pretendard) -> URL? {
+        return Bundle.module.url(forResource: font.rawValue, withExtension: "otf")
     }
 }

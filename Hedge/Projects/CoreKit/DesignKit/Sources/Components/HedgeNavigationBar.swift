@@ -29,7 +29,7 @@ public struct HedgeNavigationBar: View {
             Button {
                 onLeftButtonTap?()
             } label: {
-                Image(.chevronLeftThickSmall)
+                Image.hedgeUI.chevronLeftThickSmall
             }
             .frame(width: 40, height: 40)
             
