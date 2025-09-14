@@ -9,8 +9,6 @@ import SwiftUI
 
 import DesignKit
 
-import Shared
-
 @main
 struct DesignKitApp: App {
     
