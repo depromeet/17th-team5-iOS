@@ -9,8 +9,15 @@ import SwiftUI
 
 import DesignKit
 
+import Shared
+
 @main
 struct DesignKitApp: App {
+    
+    init() {
+        HedgeFont.registerFonts()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

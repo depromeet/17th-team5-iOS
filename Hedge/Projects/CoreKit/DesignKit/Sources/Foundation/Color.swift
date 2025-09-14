@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 
 extension HedgeUI where Base == Color {
+    // MARK: - Base Color
     public static var grey100: Color { asset(#function) }
     public static var grey200: Color { asset(#function) }
     public static var grey300: Color { asset(#function) }
@@ -31,8 +32,39 @@ extension HedgeUI where Base == Color {
     
     public static var backgroundGrey: Color { asset(#function) }
     public static var backgroundWhite: Color { asset(#function) }
+    public static var backgroundSecondary: Color { asset(#function) }
     
     public static var brand500: Color { asset(#function) }
+    
+    public static var purple700: Color { asset(#function) }
+    
+    // MARK: - Semantic
+    
+    // MARK: Text
+    public static var textTitle: Color { grey900 }
+    public static var textPrimary: Color { grey800 }
+    public static var textSecondary: Color { grey600 }
+    public static var textAlternative: Color { grey500 }
+    public static var textAssistive: Color { grey400 }
+    public static var textDisabled: Color { grey300 }
+    public static var textWhite: Color { backgroundWhite }
+    
+    // MARK: Trade
+    public static var tradeBuy: Color { red500 }
+    public static var tradeSell: Color { blue500 }
+    
+    // MARK: Feedback
+    public static var feedbackError: Color { red700 }
+    public static var feedbackAI: Color { purple700 }
+    
+    // MARK: Brand
+    public static var brandPrimary: Color { grey900 }
+    public static var brandSecondary: Color { grey100 }
+    public static var brandDisabled: Color { grey300 }
+    
+    // MARK: Neutral
+    public static var neutralBgDefault: Color { backgroundWhite }
+    public static var neutralBgSecondary: Color { backgroundSecondary }
 }
 
 extension HedgeUI where Base == Color {

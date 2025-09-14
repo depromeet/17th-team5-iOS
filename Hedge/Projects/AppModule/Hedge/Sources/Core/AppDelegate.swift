@@ -9,10 +9,11 @@
 import Foundation
 import UIKit
 
-import Umbrella
-
 import Swinject
+
+import DesignKit
 import Shared
+import Umbrella
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,7 +33,8 @@ extension AppDelegate {
     private func registerDependencies() {
         DIContainer.register(assemblies: [
             DataAssembly(),
-            DomainAssembly()
+            DomainAssembly(),
+            HedgeFont()
         ])
     }
 }
