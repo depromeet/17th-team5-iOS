@@ -114,7 +114,7 @@ public struct HedgeTextField: View {
             builder.fieldType = config.fieldType
             return builder
         }
-
+        
         public func build() -> HedgeTextField {
             HedgeTextField(
                 placeHolder: placeHolder,
@@ -168,16 +168,16 @@ public struct HedgeTextField: View {
                     TextField(placeHolder, text: $inputText) { isEditing in
                         if isEditing { handleTap() }
                     }
-                        .tint(Color.hedgeUI.grey900)
-                        .focused($textFieldFocused)
-                        .font(.body1Semibold)
-                        .foregroundStyle(Color.hedgeUI.brand500)
-                        .frame(height: 25)
-                        .keyboardType(.numberPad)
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .offset(y: 5)),
-                            removal: .opacity.combined(with: .offset(y: -5))
-                        ))
+                    .tint(Color.hedgeUI.grey900)
+                    .focused($textFieldFocused)
+                    .font(.body1Semibold)
+                    .foregroundStyle(Color.hedgeUI.brand500)
+                    .frame(height: 25)
+                    .keyboardType(.numberPad)
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .offset(y: 5)),
+                        removal: .opacity.combined(with: .offset(y: -5))
+                    ))
                 }
             }
             .padding(.vertical, 14)
@@ -217,6 +217,101 @@ public struct HedgeTextField: View {
         }
     }
     
+    private func handleInput(isFocus: Bool, _ input: String) -> String {
+        if isFocus {
+            return numbersOnly(input)
+        } else {
+            switch fieldType {
+            case .buyPrice, .sellPrice:
+                return formatPrice(input)
+            case .quantity:
+                return formatQuantity(input)
+            case .tradeDate:
+                return formatTradeDate(input)
+            }
+        }
+    }
+    
+    private func numbersOnly(_ input: String) -> String {
+        return String(input.filter { $0.isNumber })
+    }
+    
+    private func formatPrice(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard !numbers.isEmpty else { return "" }
+        
+        // 숫자를 Decimal로 변환
+        if let decimal = Decimal(string: numbers) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = ","
+            formatter.usesGroupingSeparator = true
+            
+            let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
+            
+            // SegmentControl의 선택에 따라 suffix 추가
+            let suffix = selectedIndex == 0 ? "원" : "$"
+            return "\(formattedNumber)\(suffix)"
+        }
+        
+        return numbers
+    }
+    
+    private func formatQuantity(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard !numbers.isEmpty else { return "" }
+        
+        // 숫자를 Decimal로 변환
+        if let decimal = Decimal(string: numbers) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = ","
+            formatter.usesGroupingSeparator = true
+            
+            let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
+            return "\(formattedNumber)주"
+        }
+        
+        return numbers
+    }
+    
+    private func formatTradeDate(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard numbers.count >= 8 else { return numbers }
+        
+        // YYYYMMDD 형식으로 변환
+        let year = String(numbers.prefix(4))
+        let month = String(numbers.dropFirst(4).prefix(2))
+        let day = String(numbers.dropFirst(6).prefix(2))
+        
+        // 유효한 날짜인지 확인
+        if isValidDate(year: year, month: month, day: day) {
+            return "\(year)년 \(month)월 \(day)일"
+        }
+        
+        return numbers
+    }
+    
+    private func isValidDate(year: String, month: String, day: String) -> Bool {
+        guard let yearInt = Int(year),
+              let monthInt = Int(month),
+              let dayInt = Int(day) else { return false }
+        
+        // 기본 유효성 검사
+        guard yearInt >= 0000 && yearInt <= 9999,
+              monthInt >= 1 && monthInt <= 12,
+              dayInt >= 1 && dayInt <= 31 else { return false }
+        
+        // 실제 날짜 유효성 검사
+        let calendar = Calendar.current
+        var dateComponents = DateComponents()
+        dateComponents.year = yearInt
+        dateComponents.month = monthInt
+        dateComponents.day = dayInt
+        
+        return calendar.date(from: dateComponents) != nil
+    }
+    
     private func handleFocusChange(_ newValue: String?) {
         DispatchQueue.main.async {
             if id == newValue {
@@ -225,10 +320,12 @@ public struct HedgeTextField: View {
                 state = inputText.isEmpty ? .idle : .idleWithInput
                 textFieldFocused = false
             }
+            
+            inputText = handleInput(isFocus: id == newValue, inputText)
         }
     }
 }
-
+ 
 // #Preview {
 //     HedgeTextField.builder()
 //         .configuration(.init(fieldType: .buyPrice))
