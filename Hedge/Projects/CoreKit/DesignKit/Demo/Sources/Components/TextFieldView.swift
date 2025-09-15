@@ -11,42 +11,46 @@ import SwiftUI
 import DesignKit
 
 struct TextFieldView: View {
+    @State private var buyPrice = ""
     @State private var sellPrice = ""
     @State private var quantity = ""
-    @State private var totalAmount = ""
-    @State var id: String = ""
+    @State private var tradeDate = ""
     @State var focusedID: String? = nil
+    
+    // Configuration 모델
+    private let buyPriceConfig = HedgeTextFieldConfiguration(fieldType: .buyPrice)
+    private let sellPriceConfig = HedgeTextFieldConfiguration(fieldType: .sellPrice)
+    private let quantityConfig = HedgeTextFieldConfiguration(fieldType: .quantity)
+    private let tradeDateConfig = HedgeTextFieldConfiguration(fieldType: .tradeDate)
     
     var body: some View {
         VStack(spacing: 16) {
-            HedgeTextField(
-                placeHolder: "1주당 가격",
-                label: "매도가",
-                focusingLabel: "매도가 입력",
-                id: .constant("1"),
-                focusedID: $focusedID,
-                inputText: $sellPrice
-            )
+            HedgeTextField.builder()
+                .configuration(buyPriceConfig)
+                .focusedID($focusedID)
+                .inputText($buyPrice)
+                .build()
             
-            HedgeTextField(
-                placeHolder: "수량",
-                label: "수량",
-                focusingLabel: "수량 입력",
-                id: .constant("2"),
-                focusedID: $focusedID,
-                inputText: $quantity
-            )
+            HedgeTextField.builder()
+                .configuration(sellPriceConfig)
+                .focusedID($focusedID)
+                .inputText($sellPrice)
+                .build()
             
-            HedgeTextField(
-                placeHolder: "총 금액",
-                label: "총 금액",
-                focusingLabel: "총 금액 입력",
-                id: .constant("3"),
-                focusedID: $focusedID,
-                inputText: $totalAmount
-            )
+            HedgeTextField.builder()
+                .configuration(quantityConfig)
+                .focusedID($focusedID)
+                .inputText($quantity)
+                .build()
+            
+            HedgeTextField.builder()
+                .configuration(tradeDateConfig)
+                .focusedID($focusedID)
+                .inputText($tradeDate)
+                .build()
         }
         .padding()
+        .background(Color.hedgeUI.backgroundGrey)
     }
 }
 
