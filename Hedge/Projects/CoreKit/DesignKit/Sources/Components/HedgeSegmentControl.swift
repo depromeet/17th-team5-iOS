@@ -42,6 +42,7 @@ public struct HedgeSegmentControl: View {
                 )
             }
         }
+        .fixedSize()
     }
 }
 
