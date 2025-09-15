@@ -12,18 +12,21 @@ import SwiftUI
 public struct HedgeTextFieldConfiguration {
     public let placeHolder: String
     public let label: String
-    public let identifier: String
+    public let fieldType: HedgeTextField.FieldType
     
     // MARK: - Convenience Initializers
     public init(
-        fieldType: FieldType,
+        fieldType: HedgeTextField.FieldType,
         placeHolder: String? = nil,
         label: String? = nil
     ) {
         self.placeHolder = placeHolder ?? fieldType.placeHolder
         self.label = label ?? fieldType.label
-        self.identifier = fieldType.rawValue
+        self.fieldType = fieldType
     }
+}
+
+public struct HedgeTextField: View {
     
     public enum FieldType: String {
         case buyPrice = "buyPrice"      // 매수가
@@ -55,9 +58,6 @@ public struct HedgeTextFieldConfiguration {
             }
         }
     }
-}
-
-public struct HedgeTextField: View {
     
     enum TextFieldState {
         case idle   // 입력 X, 포커싱 X
@@ -77,17 +77,19 @@ public struct HedgeTextField: View {
     
     @Binding private var inputText: String
     @Binding private var focusedID: String?
-    @Binding private var id: String
     
     @State private var state: TextFieldState = .idle
+    @State private var selectedIndex: Int = 0
     
     private let placeHolder: String
+    private var id: String
+    private var fieldType: FieldType
     
     // MARK: - Builder Pattern
     public struct Builder {
         private var placeHolder: String = ""
         private var label: String = ""
-        private var id: Binding<String> = .constant("")
+        private var fieldType: FieldType = .buyPrice
         private var focusedID: Binding<String?> = .constant(nil)
         private var inputText: Binding<String> = .constant("")
         
@@ -109,7 +111,7 @@ public struct HedgeTextField: View {
             var builder = self
             builder.placeHolder = config.placeHolder
             builder.label = config.label
-            builder.id = .constant(config.identifier)
+            builder.fieldType = config.fieldType
             return builder
         }
 
@@ -117,7 +119,8 @@ public struct HedgeTextField: View {
             HedgeTextField(
                 placeHolder: placeHolder,
                 label: label,
-                id: id,
+                id: fieldType.rawValue,
+                fieldType: fieldType,
                 focusedID: focusedID,
                 inputText: inputText
             )
@@ -133,13 +136,15 @@ public struct HedgeTextField: View {
     private init(
         placeHolder: String,
         label: String,
-        id: Binding<String>,
+        id: String,
+        fieldType: FieldType,
         focusedID: Binding<String?>,
         inputText: Binding<String>
     ) {
         self.placeHolder = placeHolder
         self.text = label
-        self._id = id
+        self.id = id
+        self.fieldType = fieldType
         self._focusedID = focusedID
         self._inputText = inputText
     }
@@ -159,8 +164,10 @@ public struct HedgeTextField: View {
                     .foregroundStyle(textColor)
                     .scaleEffect()
                 
-                if state == .focusing || state == .idleWithInput || state == .focusingWithInput {
-                    TextField(placeHolder, text: $inputText)
+                if state != .idle {
+                    TextField(placeHolder, text: $inputText) { isEditing in
+                        if isEditing { handleTap() }
+                    }
                         .tint(Color.hedgeUI.grey900)
                         .focused($textFieldFocused)
                         .font(.body1Semibold)
@@ -171,12 +178,17 @@ public struct HedgeTextField: View {
                             insertion: .opacity.combined(with: .offset(y: 5)),
                             removal: .opacity.combined(with: .offset(y: -5))
                         ))
-                        .allowsHitTesting(false)
                 }
             }
             .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, alignment: .leading)
             
-            Spacer()
+            if fieldType == .buyPrice || fieldType == .sellPrice {
+                HedgeSegmentControl(selectedIndex: $selectedIndex, items: ["원", "$"])
+                    .onChange(of: selectedIndex) {
+                        handleTap()
+                    }
+            }
         }
         .padding(.leading, 20)
         .padding(.trailing, 16)
@@ -197,6 +209,7 @@ public struct HedgeTextField: View {
     }
     
     private func handleTap() {
+        if let focusedID, focusedID == id { return }
         focusedID = id
         
         withAnimation(.easeInOut(duration: 0.3)) {
@@ -215,3 +228,12 @@ public struct HedgeTextField: View {
         }
     }
 }
+
+// #Preview {
+//     HedgeTextField.builder()
+//         .configuration(.init(fieldType: .buyPrice))
+//         .focusedID(.constant(nil))
+//         .inputText(.constant(""))
+//         .build()
+//         .background(Color.red)
+// }
