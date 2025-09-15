@@ -8,6 +8,55 @@
 
 import SwiftUI
 
+// MARK: - Configuration Model
+public struct HedgeTextFieldConfiguration {
+    public let placeHolder: String
+    public let label: String
+    public let identifier: String
+    
+    // MARK: - Convenience Initializers
+    public init(
+        fieldType: FieldType,
+        placeHolder: String? = nil,
+        label: String? = nil
+    ) {
+        self.placeHolder = placeHolder ?? fieldType.placeHolder
+        self.label = label ?? fieldType.label
+        self.identifier = fieldType.rawValue
+    }
+    
+    public enum FieldType: String {
+        case buyPrice = "buyPrice"      // 매수가
+        case sellPrice = "sellPrice"    // 매도가
+        case quantity = "quantity"      // 거래량
+        case tradeDate = "tradeDate"    // 거래날짜
+        
+        public var label: String {
+            switch self {
+            case .buyPrice:
+                return "매수가"
+            case .sellPrice:
+                return "매도가"
+            case .quantity:
+                return "거래량"
+            case .tradeDate:
+                return "거래날짜"
+            }
+        }
+        
+        public var placeHolder: String {
+            switch self {
+            case .buyPrice, .sellPrice:
+                return "1주당 가격"
+            case .quantity:
+                return "주"
+            case .tradeDate:
+                return "YYYYMMDD"
+            }
+        }
+    }
+}
+
 public struct HedgeTextField: View {
     
     enum TextFieldState {
@@ -15,69 +64,89 @@ public struct HedgeTextField: View {
         case focusing   // 입력 X, 포커싱 O
         case idleWithInput  // 입력 O, 포커싱 X
         case focusingWithInput // 입력 O, 포커싱 O
+        
+        var isFocused: Bool {
+            switch self {
+            case .focusing, .focusingWithInput: return true
+            case .idle, .idleWithInput: return false
+            }
+        }
     }
-    
-    @Binding var inputText: String
-    @Binding var focusedID: String?
-    @Binding var id: String
-    private let placeHolder: String
     
     @FocusState private var textFieldFocused: Bool
+    
+    @Binding private var inputText: String
+    @Binding private var focusedID: String?
+    @Binding private var id: String
+    
     @State private var state: TextFieldState = .idle
-    @State private var fontStyle: FontModel = .body1Medium
-    @State private var label: String
-    @State private var focusingLabel: String
     
-    private var text: String {
-        switch state {
-        case .idle:
-            return label
-        case .focusing, .idleWithInput, .focusingWithInput:
-            return focusingLabel
+    private let placeHolder: String
+    
+    // MARK: - Builder Pattern
+    public struct Builder {
+        private var placeHolder: String = ""
+        private var label: String = ""
+        private var id: Binding<String> = .constant("")
+        private var focusedID: Binding<String?> = .constant(nil)
+        private var inputText: Binding<String> = .constant("")
+        
+        public init() {}
+        
+        public func focusedID(_ binding: Binding<String?>) -> Builder {
+            var builder = self
+            builder.focusedID = binding
+            return builder
+        }
+        
+        public func inputText(_ binding: Binding<String>) -> Builder {
+            var builder = self
+            builder.inputText = binding
+            return builder
+        }
+        
+        public func configuration(_ config: HedgeTextFieldConfiguration) -> Builder {
+            var builder = self
+            builder.placeHolder = config.placeHolder
+            builder.label = config.label
+            builder.id = .constant(config.identifier)
+            return builder
+        }
+
+        public func build() -> HedgeTextField {
+            HedgeTextField(
+                placeHolder: placeHolder,
+                label: label,
+                id: id,
+                focusedID: focusedID,
+                inputText: inputText
+            )
         }
     }
     
-    private var textFont: FontModel {
-        switch state {
-        case .idle:
-            return .body1Medium
-        case .focusing, .idleWithInput, .focusingWithInput:
-            return .label2Semibold
-        }
-    }
+    // MARK: - Computed Properties
+    private var text: String
+    private var textFont: FontModel { state == .idle ? .body1Medium : .label2Semibold }
+    private var textColor: Color { state == .idle ? Color.hedgeUI.grey400 : Color.hedgeUI.grey500 }
+    private var strokeColor: Color { state.isFocused ? Color.hedgeUI.brand500 : .clear }
     
-    private var textColor: Color {
-        switch state {
-        case .idle:
-            return Color.hedgeUI.grey400
-        case .focusing, .idleWithInput, .focusingWithInput:
-            return Color.hedgeUI.grey500
-        }
-    }
-    
-    private var strokeColor: Color {
-        switch state {
-        case .idle, .idleWithInput:
-            return .clear
-        case .focusing, .focusingWithInput:
-            return Color.hedgeUI.brand500
-        }
-    }
-    
-    public init(
+    private init(
         placeHolder: String,
         label: String,
-        focusingLabel: String,
         id: Binding<String>,
         focusedID: Binding<String?>,
         inputText: Binding<String>
     ) {
         self.placeHolder = placeHolder
-        self.label = label
-        self.focusingLabel = focusingLabel
+        self.text = label
         self._id = id
         self._focusedID = focusedID
         self._inputText = inputText
+    }
+    
+    // MARK: - Static Factory Method
+    public static func builder() -> Builder {
+        Builder()
     }
     
     public var body: some View {
@@ -112,7 +181,7 @@ public struct HedgeTextField: View {
         .padding(.leading, 20)
         .padding(.trailing, 16)
         .frame(height: 75)
-        .background(Color.brown.opacity(0.3))
+        .background(Color.hedgeUI.neutralBgDefault)
         .cornerRadius(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
