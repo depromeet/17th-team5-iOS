@@ -17,34 +17,24 @@ struct TextFieldView: View {
     @State private var tradeDate = ""
     @State var focusedID: String? = nil
     
-    // Configuration 모델
-    private let buyPriceConfig = HedgeTextFieldConfiguration(fieldType: .buyPrice)
-    private let sellPriceConfig = HedgeTextFieldConfiguration(fieldType: .sellPrice)
-    private let quantityConfig = HedgeTextFieldConfiguration(fieldType: .quantity)
-    private let tradeDateConfig = HedgeTextFieldConfiguration(fieldType: .tradeDate)
-    
     var body: some View {
         VStack(spacing: 16) {
-            HedgeTextField.builder()
-                .configuration(buyPriceConfig)
+            HedgeTextField.builder(.buyPrice)
                 .focusedID($focusedID)
                 .inputText($buyPrice)
                 .build()
             
-            HedgeTextField.builder()
-                .configuration(sellPriceConfig)
+            HedgeTextField.builder(.sellPrice)
                 .focusedID($focusedID)
                 .inputText($sellPrice)
                 .build()
             
-            HedgeTextField.builder()
-                .configuration(quantityConfig)
+            HedgeTextField.builder(.quantity)
                 .focusedID($focusedID)
                 .inputText($quantity)
                 .build()
             
-            HedgeTextField.builder()
-                .configuration(tradeDateConfig)
+            HedgeTextField.builder(.tradeDate)
                 .focusedID($focusedID)
                 .inputText($tradeDate)
                 .build()

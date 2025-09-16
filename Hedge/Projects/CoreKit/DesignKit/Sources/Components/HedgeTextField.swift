@@ -8,24 +8,6 @@
 
 import SwiftUI
 
-// MARK: - Configuration Model
-public struct HedgeTextFieldConfiguration {
-    public let placeHolder: String
-    public let label: String
-    public let fieldType: HedgeTextField.FieldType
-    
-    // MARK: - Convenience Initializers
-    public init(
-        fieldType: HedgeTextField.FieldType,
-        placeHolder: String? = nil,
-        label: String? = nil
-    ) {
-        self.placeHolder = placeHolder ?? fieldType.placeHolder
-        self.label = label ?? fieldType.label
-        self.fieldType = fieldType
-    }
-}
-
 public struct HedgeTextField: View {
     
     public enum FieldType: String {
@@ -87,42 +69,45 @@ public struct HedgeTextField: View {
     
     // MARK: - Builder Pattern
     public struct Builder {
-        private var placeHolder: String = ""
-        private var label: String = ""
-        private var fieldType: FieldType = .buyPrice
-        private var focusedID: Binding<String?> = .constant(nil)
-        private var inputText: Binding<String> = .constant("")
+        private var configuration: Configuration
         
-        public init() {}
+        private struct Configuration {
+            var fieldType: FieldType
+            var focusedID: Binding<String?> = .constant(nil)
+            var inputText: Binding<String> = .constant("")
+            var label: String { fieldType.label }
+            var placeHolder: String { fieldType.placeHolder }
+            var id: String { fieldType.rawValue }
+            
+            init(fieldType: FieldType) {
+                self.fieldType = fieldType
+            }
+        }
+        
+        public init(fieldType: FieldType) {
+            self.configuration = Configuration(fieldType: fieldType)
+        }
         
         public func focusedID(_ binding: Binding<String?>) -> Builder {
             var builder = self
-            builder.focusedID = binding
+            builder.configuration.focusedID = binding
             return builder
         }
         
         public func inputText(_ binding: Binding<String>) -> Builder {
             var builder = self
-            builder.inputText = binding
-            return builder
-        }
-        
-        public func configuration(_ config: HedgeTextFieldConfiguration) -> Builder {
-            var builder = self
-            builder.placeHolder = config.placeHolder
-            builder.label = config.label
-            builder.fieldType = config.fieldType
+            builder.configuration.inputText = binding
             return builder
         }
         
         public func build() -> HedgeTextField {
             HedgeTextField(
-                placeHolder: placeHolder,
-                label: label,
-                id: fieldType.rawValue,
-                fieldType: fieldType,
-                focusedID: focusedID,
-                inputText: inputText
+                placeHolder: configuration.placeHolder,
+                label: configuration.label,
+                id: configuration.id,
+                fieldType: configuration.fieldType,
+                focusedID: configuration.focusedID,
+                inputText: configuration.inputText
             )
         }
     }
@@ -150,8 +135,8 @@ public struct HedgeTextField: View {
     }
     
     // MARK: - Static Factory Method
-    public static func builder() -> Builder {
-        Builder()
+    public static func builder(_ fieldType: FieldType) -> Builder {
+        return Builder(fieldType: fieldType)
     }
     
     public var body: some View {
