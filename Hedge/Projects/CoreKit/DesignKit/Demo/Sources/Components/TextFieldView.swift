@@ -18,9 +18,7 @@ struct TextFieldView: View {
     @State var focusedID: String? = nil
     
     var body: some View {
-        VStack(
-            spacing: 16
-        ) {
+        VStack(spacing: 16) {
             HedgeTextField(
                 inputText: $buyPrice,
                 focusedID: $focusedID
@@ -46,9 +44,7 @@ struct TextFieldView: View {
             .type(.tradeDate)
         }
         .padding()
-        .background(
-            Color.hedgeUI.backgroundGrey
-        )
+        .background(Color.hedgeUI.backgroundGrey)
     }
 }
 
