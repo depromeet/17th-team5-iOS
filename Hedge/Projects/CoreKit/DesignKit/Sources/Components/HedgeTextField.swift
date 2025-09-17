@@ -17,7 +17,7 @@ public struct HedgeTextField: View {
     @State private var selectedIndex: Int = 0
     
     private var id: String = HedgeTextFieldType.buyPrice.rawValue
-    private var fieldType: HedgeTextFieldType = .buyPrice
+    private var type: HedgeTextFieldType = .buyPrice
     
     public init(
         inputText: Binding<String>,
@@ -32,13 +32,13 @@ public struct HedgeTextField: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 
-                Text(fieldType.text)
+                Text(type.text)
                     .font(state.textFont)
                     .foregroundStyle(state.textColor)
                     .scaleEffect()
                 
                 if state != .idle {
-                    TextField(fieldType.placeHolder, text: $inputText) { isEditing in
+                    TextField(type.placeHolder, text: $inputText) { isEditing in
                         if isEditing { handleTap() }
                     }
                     .tint(Color.hedgeUI.grey900)
@@ -56,7 +56,7 @@ public struct HedgeTextField: View {
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            if fieldType == .buyPrice || fieldType == .sellPrice {
+            if type == .buyPrice || type == .sellPrice {
                 HedgeSegmentControl(selectedIndex: $selectedIndex, items: ["원", "$"])
                     .onChange(of: selectedIndex) {
                         handleTap()
@@ -83,7 +83,7 @@ public struct HedgeTextField: View {
     
     public func type(_ type: HedgeTextFieldType) -> HedgeTextField {
         var hedgeTextField = self
-        hedgeTextField.fieldType = type
+        hedgeTextField.type = type
         hedgeTextField.id = type.rawValue
         return hedgeTextField
     }
@@ -147,7 +147,7 @@ private extension HedgeTextField {
         if isFocus {
             return numbersOnly(input)
         } else {
-            switch fieldType {
+            switch type {
             case .buyPrice, .sellPrice:
                 return formatPrice(input)
             case .quantity:
