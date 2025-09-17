@@ -10,74 +10,133 @@ import SwiftUI
 
 public struct HedgeTextField: View {
     
+    public enum FieldType: String {
+        case buyPrice = "buyPrice"      // 매수가
+        case sellPrice = "sellPrice"    // 매도가
+        case quantity = "quantity"      // 거래량
+        case tradeDate = "tradeDate"    // 거래날짜
+        
+        public var label: String {
+            switch self {
+            case .buyPrice:
+                return "매수가"
+            case .sellPrice:
+                return "매도가"
+            case .quantity:
+                return "거래량"
+            case .tradeDate:
+                return "거래날짜"
+            }
+        }
+        
+        public var placeHolder: String {
+            switch self {
+            case .buyPrice, .sellPrice:
+                return "1주당 가격"
+            case .quantity:
+                return "주"
+            case .tradeDate:
+                return "YYYYMMDD"
+            }
+        }
+    }
+    
     enum TextFieldState {
         case idle   // 입력 X, 포커싱 X
         case focusing   // 입력 X, 포커싱 O
         case idleWithInput  // 입력 O, 포커싱 X
         case focusingWithInput // 입력 O, 포커싱 O
+        
+        var isFocused: Bool {
+            switch self {
+            case .focusing, .focusingWithInput: return true
+            case .idle, .idleWithInput: return false
+            }
+        }
     }
-    
-    @Binding var inputText: String
-    @Binding var focusedID: String?
-    @Binding var id: String
-    private let placeHolder: String
     
     @FocusState private var textFieldFocused: Bool
+    
+    @Binding private var inputText: String
+    @Binding private var focusedID: String?
+    
     @State private var state: TextFieldState = .idle
-    @State private var fontStyle: FontModel = .body1Medium
-    @State private var label: String
-    @State private var focusingLabel: String
+    @State private var selectedIndex: Int = 0
     
-    private var text: String {
-        switch state {
-        case .idle:
-            return label
-        case .focusing, .idleWithInput, .focusingWithInput:
-            return focusingLabel
+    private let placeHolder: String
+    private var id: String
+    private var fieldType: FieldType
+    
+    // MARK: - Builder Pattern
+    public struct Builder {
+        private var configuration: Configuration
+        
+        private struct Configuration {
+            var fieldType: FieldType
+            var focusedID: Binding<String?> = .constant(nil)
+            var inputText: Binding<String> = .constant("")
+            var label: String { fieldType.label }
+            var placeHolder: String { fieldType.placeHolder }
+            var id: String { fieldType.rawValue }
+            
+            init(fieldType: FieldType) {
+                self.fieldType = fieldType
+            }
+        }
+        
+        public init(fieldType: FieldType) {
+            self.configuration = Configuration(fieldType: fieldType)
+        }
+        
+        public func focusedID(_ binding: Binding<String?>) -> Builder {
+            var builder = self
+            builder.configuration.focusedID = binding
+            return builder
+        }
+        
+        public func inputText(_ binding: Binding<String>) -> Builder {
+            var builder = self
+            builder.configuration.inputText = binding
+            return builder
+        }
+        
+        public func build() -> HedgeTextField {
+            HedgeTextField(
+                placeHolder: configuration.placeHolder,
+                label: configuration.label,
+                id: configuration.id,
+                fieldType: configuration.fieldType,
+                focusedID: configuration.focusedID,
+                inputText: configuration.inputText
+            )
         }
     }
     
-    private var textFont: FontModel {
-        switch state {
-        case .idle:
-            return .body1Medium
-        case .focusing, .idleWithInput, .focusingWithInput:
-            return .label2Semibold
-        }
-    }
+    // MARK: - Computed Properties
+    private var text: String
+    private var textFont: FontModel { state == .idle ? .body1Medium : .label2Semibold }
+    private var textColor: Color { state == .idle ? Color.hedgeUI.grey400 : Color.hedgeUI.grey500 }
+    private var strokeColor: Color { state.isFocused ? Color.hedgeUI.brand500 : .clear }
     
-    private var textColor: Color {
-        switch state {
-        case .idle:
-            return Color.hedgeUI.grey400
-        case .focusing, .idleWithInput, .focusingWithInput:
-            return Color.hedgeUI.grey500
-        }
-    }
-    
-    private var strokeColor: Color {
-        switch state {
-        case .idle, .idleWithInput:
-            return .clear
-        case .focusing, .focusingWithInput:
-            return Color.hedgeUI.brand500
-        }
-    }
-    
-    public init(
+    private init(
         placeHolder: String,
         label: String,
-        focusingLabel: String,
-        id: Binding<String>,
+        id: String,
+        fieldType: FieldType,
         focusedID: Binding<String?>,
         inputText: Binding<String>
     ) {
         self.placeHolder = placeHolder
-        self.label = label
-        self.focusingLabel = focusingLabel
-        self._id = id
+        self.text = label
+        self.id = id
+        self.fieldType = fieldType
         self._focusedID = focusedID
         self._inputText = inputText
+    }
+    
+    // MARK: - Static Factory Method
+    public static func builder(_ fieldType: FieldType) -> Builder {
+        return Builder(fieldType: fieldType)
     }
     
     public var body: some View {
@@ -90,29 +149,36 @@ public struct HedgeTextField: View {
                     .foregroundStyle(textColor)
                     .scaleEffect()
                 
-                if state == .focusing || state == .idleWithInput || state == .focusingWithInput {
-                    TextField(placeHolder, text: $inputText)
-                        .tint(Color.hedgeUI.grey900)
-                        .focused($textFieldFocused)
-                        .font(.body1Semibold)
-                        .foregroundStyle(Color.hedgeUI.brand500)
-                        .frame(height: 25)
-                        .keyboardType(.numberPad)
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .offset(y: 5)),
-                            removal: .opacity.combined(with: .offset(y: -5))
-                        ))
-                        .allowsHitTesting(false)
+                if state != .idle {
+                    TextField(placeHolder, text: $inputText) { isEditing in
+                        if isEditing { handleTap() }
+                    }
+                    .tint(Color.hedgeUI.grey900)
+                    .focused($textFieldFocused)
+                    .font(.body1Semibold)
+                    .foregroundStyle(Color.hedgeUI.brand500)
+                    .frame(height: 25)
+                    .keyboardType(.numberPad)
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .offset(y: 5)),
+                        removal: .opacity.combined(with: .offset(y: -5))
+                    ))
                 }
             }
             .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, alignment: .leading)
             
-            Spacer()
+            if fieldType == .buyPrice || fieldType == .sellPrice {
+                HedgeSegmentControl(selectedIndex: $selectedIndex, items: ["원", "$"])
+                    .onChange(of: selectedIndex) {
+                        handleTap()
+                    }
+            }
         }
         .padding(.leading, 20)
         .padding(.trailing, 16)
         .frame(height: 75)
-        .background(Color.brown.opacity(0.3))
+        .background(Color.hedgeUI.neutralBgDefault)
         .cornerRadius(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
@@ -128,11 +194,107 @@ public struct HedgeTextField: View {
     }
     
     private func handleTap() {
+        if let focusedID, focusedID == id { return }
         focusedID = id
         
         withAnimation(.easeInOut(duration: 0.3)) {
             state = inputText.isEmpty ? .focusing : .focusingWithInput
         }
+    }
+    
+    private func handleInput(isFocus: Bool, _ input: String) -> String {
+        if isFocus {
+            return numbersOnly(input)
+        } else {
+            switch fieldType {
+            case .buyPrice, .sellPrice:
+                return formatPrice(input)
+            case .quantity:
+                return formatQuantity(input)
+            case .tradeDate:
+                return formatTradeDate(input)
+            }
+        }
+    }
+    
+    private func numbersOnly(_ input: String) -> String {
+        return String(input.filter { $0.isNumber })
+    }
+    
+    private func formatPrice(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard !numbers.isEmpty else { return "" }
+        
+        // 숫자를 Decimal로 변환
+        if let decimal = Decimal(string: numbers) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = ","
+            formatter.usesGroupingSeparator = true
+            
+            let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
+            
+            // SegmentControl의 선택에 따라 suffix 추가
+            let suffix = selectedIndex == 0 ? "원" : "$"
+            return "\(formattedNumber)\(suffix)"
+        }
+        
+        return numbers
+    }
+    
+    private func formatQuantity(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard !numbers.isEmpty else { return "" }
+        
+        // 숫자를 Decimal로 변환
+        if let decimal = Decimal(string: numbers) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = ","
+            formatter.usesGroupingSeparator = true
+            
+            let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
+            return "\(formattedNumber)주"
+        }
+        
+        return numbers
+    }
+    
+    private func formatTradeDate(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard numbers.count >= 8 else { return numbers }
+        
+        // YYYYMMDD 형식으로 변환
+        let year = String(numbers.prefix(4))
+        let month = String(numbers.dropFirst(4).prefix(2))
+        let day = String(numbers.dropFirst(6).prefix(2))
+        
+        // 유효한 날짜인지 확인
+        if isValidDate(year: year, month: month, day: day) {
+            return "\(year)년 \(month)월 \(day)일"
+        }
+        
+        return numbers
+    }
+    
+    private func isValidDate(year: String, month: String, day: String) -> Bool {
+        guard let yearInt = Int(year),
+              let monthInt = Int(month),
+              let dayInt = Int(day) else { return false }
+        
+        // 기본 유효성 검사
+        guard yearInt >= 0000 && yearInt <= 9999,
+              monthInt >= 1 && monthInt <= 12,
+              dayInt >= 1 && dayInt <= 31 else { return false }
+        
+        // 실제 날짜 유효성 검사
+        let calendar = Calendar.current
+        var dateComponents = DateComponents()
+        dateComponents.year = yearInt
+        dateComponents.month = monthInt
+        dateComponents.day = dayInt
+        
+        return calendar.date(from: dateComponents) != nil
     }
     
     private func handleFocusChange(_ newValue: String?) {
@@ -143,6 +305,17 @@ public struct HedgeTextField: View {
                 state = inputText.isEmpty ? .idle : .idleWithInput
                 textFieldFocused = false
             }
+            
+            inputText = handleInput(isFocus: id == newValue, inputText)
         }
     }
 }
+ 
+// #Preview {
+//     HedgeTextField.builder()
+//         .configuration(.init(fieldType: .buyPrice))
+//         .focusedID(.constant(nil))
+//         .inputText(.constant(""))
+//         .build()
+//         .background(Color.red)
+// }
