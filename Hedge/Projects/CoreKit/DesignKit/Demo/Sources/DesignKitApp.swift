@@ -73,9 +73,9 @@ struct ContentView: View {
                             }
                         }
                         
-                        NavigationLink(destination: TextFieldView()) {
+                        NavigationLink(destination: TradeTextFieldView()) {
                             HStack {
-                                Text("TextFieldViews")
+                                Text("TradeTextFieldViews")
                             }
                         }
                         

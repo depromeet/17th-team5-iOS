@@ -1,5 +1,5 @@
 //
-//  TextFieldView.swift
+//  TradeTextFieldView.swift
 //  DesignKitDemo
 //
 //  Created by 이중엽 on 9/14/25.
@@ -10,7 +10,7 @@ import SwiftUI
 
 import DesignKit
 
-struct TextFieldView: View {
+struct TradeTextFieldView: View {
     @State private var buyPrice = ""
     @State private var sellPrice = ""
     @State private var quantity = ""
@@ -19,25 +19,25 @@ struct TextFieldView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            HedgeTextField(
+            HedgeTradeTextField(
                 inputText: $buyPrice,
                 focusedID: $focusedID
             )
             .type(.buyPrice)
             
-            HedgeTextField(
+            HedgeTradeTextField(
                 inputText: $sellPrice,
                 focusedID: $focusedID
             )
             .type(.sellPrice)
             
-            HedgeTextField(
+            HedgeTradeTextField(
                 inputText: $quantity,
                 focusedID: $focusedID
             )
             .type(.quantity)
             
-            HedgeTextField(
+            HedgeTradeTextField(
                 inputText: $tradeDate,
                 focusedID: $focusedID
             )
@@ -49,5 +49,5 @@ struct TextFieldView: View {
 }
 
 #Preview {
-    TextFieldView()
+    TradeTextFieldView()
 }

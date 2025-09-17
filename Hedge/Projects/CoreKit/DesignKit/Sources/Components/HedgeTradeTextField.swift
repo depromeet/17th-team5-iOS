@@ -1,5 +1,5 @@
 //
-//  HedgeTextField.swift
+//  HedgeTradeTextField.swift
 //  DesignKit
 //
 //  Created by 이중엽 on 9/13/25.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public struct HedgeTextField: View {
+public struct HedgeTradeTextField: View {
     
     @FocusState private var textFieldFocused: Bool
     @Binding private var inputText: String
@@ -81,7 +81,7 @@ public struct HedgeTextField: View {
         }
     }
     
-    public func type(_ type: HedgeTextFieldType) -> HedgeTextField {
+    public func type(_ type: HedgeTextFieldType) -> HedgeTradeTextField {
         var hedgeTextField = self
         hedgeTextField.type = type
         hedgeTextField.id = type.rawValue
@@ -89,7 +89,7 @@ public struct HedgeTextField: View {
     }
 }
 
-extension HedgeTextField {
+extension HedgeTradeTextField {
     public enum HedgeTextFieldType: String {
         case buyPrice = "buyPrice"
         case sellPrice = "sellPrice"
@@ -133,7 +133,7 @@ extension HedgeTextField {
     }
 }
 
-private extension HedgeTextField {
+private extension HedgeTradeTextField {
     func handleTap() {
         if let focusedID, focusedID == id { return }
         focusedID = id
@@ -253,6 +253,6 @@ private extension HedgeTextField {
 }
 
 #Preview {
-    HedgeTextField(inputText: .constant(""), focusedID: .constant(nil))
+    HedgeTradeTextField(inputText: .constant(""), focusedID: .constant(nil))
         .type(.tradeDate)
 }
