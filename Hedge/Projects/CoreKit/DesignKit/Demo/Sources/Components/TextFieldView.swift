@@ -18,29 +18,37 @@ struct TextFieldView: View {
     @State var focusedID: String? = nil
     
     var body: some View {
-        VStack(spacing: 16) {
-            HedgeTextField.builder(.buyPrice)
-                .focusedID($focusedID)
-                .inputText($buyPrice)
-                .build()
+        VStack(
+            spacing: 16
+        ) {
+            HedgeTextField(
+                inputText: $buyPrice,
+                focusedID: $focusedID
+            )
+            .type(.buyPrice)
             
-            HedgeTextField.builder(.sellPrice)
-                .focusedID($focusedID)
-                .inputText($sellPrice)
-                .build()
+            HedgeTextField(
+                inputText: $sellPrice,
+                focusedID: $focusedID
+            )
+            .type(.sellPrice)
             
-            HedgeTextField.builder(.quantity)
-                .focusedID($focusedID)
-                .inputText($quantity)
-                .build()
+            HedgeTextField(
+                inputText: $quantity,
+                focusedID: $focusedID
+            )
+            .type(.quantity)
             
-            HedgeTextField.builder(.tradeDate)
-                .focusedID($focusedID)
-                .inputText($tradeDate)
-                .build()
+            HedgeTextField(
+                inputText: $tradeDate,
+                focusedID: $focusedID
+            )
+            .type(.tradeDate)
         }
         .padding()
-        .background(Color.hedgeUI.backgroundGrey)
+        .background(
+            Color.hedgeUI.backgroundGrey
+        )
     }
 }
 
