@@ -34,7 +34,7 @@ extension StockSearchTarget: TargetType {
     }
     
     var header: Alamofire.HTTPHeaders {
-        return .defaultHeader
+        return [:]
     }
     
     var method: Alamofire.HTTPMethod {
