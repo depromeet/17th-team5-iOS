@@ -15,6 +15,7 @@ struct TradeTextFieldView: View {
     @State private var sellPrice = ""
     @State private var quantity = ""
     @State private var tradeDate = ""
+    @State private var yield = ""
     @State var focusedID: String? = nil
     
     var body: some View {
@@ -42,6 +43,12 @@ struct TradeTextFieldView: View {
                 focusedID: $focusedID
             )
             .type(.tradeDate)
+            
+            HedgeTradeTextField(
+                inputText: $yield,
+                focusedID: $focusedID
+            )
+            .type(.yield)
         }
         .padding()
         .background(Color.hedgeUI.backgroundGrey)

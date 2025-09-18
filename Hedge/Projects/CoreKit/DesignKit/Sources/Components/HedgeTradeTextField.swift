@@ -56,8 +56,8 @@ public struct HedgeTradeTextField: View {
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            if type == .buyPrice || type == .sellPrice {
-                HedgeSegmentControl(selectedIndex: $selectedIndex, items: ["원", "$"])
+            if let segmentItems = type.segmentItems {
+                HedgeSegmentControl(selectedIndex: $selectedIndex, items: segmentItems)
                     .onChange(of: selectedIndex) {
                         handleTap()
                     }
@@ -95,6 +95,7 @@ extension HedgeTradeTextField {
         case sellPrice = "sellPrice"
         case quantity = "quantity"
         case tradeDate = "tradeDate"
+        case yield = "yield"
         
         var text: String {
             switch self {
@@ -102,6 +103,7 @@ extension HedgeTradeTextField {
             case .sellPrice: return "매도가"
             case .quantity: return "거래량"
             case .tradeDate: return "거래날짜"
+            case .yield: return "수익률"
             }
         }
         
@@ -110,6 +112,15 @@ extension HedgeTradeTextField {
             case .buyPrice, .sellPrice: return "1주당 가격"
             case .quantity: return "주"
             case .tradeDate: return "YYYYMMDD"
+            case .yield: return "수익률"
+            }
+        }
+        
+        var segmentItems: [String]? {
+            switch self {
+            case .buyPrice, .sellPrice: return ["원", "$"]
+            case .yield: return ["+", "-"]
+            default: return nil
             }
         }
     }
@@ -154,6 +165,8 @@ private extension HedgeTradeTextField {
                 return formatQuantity(input)
             case .tradeDate:
                 return formatTradeDate(input)
+            case .yield:
+                return formatYield(input)
             }
         }
     }
@@ -218,6 +231,25 @@ private extension HedgeTradeTextField {
         return numbers
     }
     
+    func formatYield(_ input: String) -> String {
+        let numbers = numbersOnly(input)
+        guard !numbers.isEmpty else { return "" }
+        
+        // 숫자를 Decimal로 변환
+        if let decimal = Decimal(string: numbers) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = ","
+            formatter.usesGroupingSeparator = true
+            
+            let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
+            let sign = type.segmentItems?[selectedIndex] ?? "+"
+            return "\(sign)\(formattedNumber)%"
+        }
+        
+        return numbers
+    }
+    
     func isValidDate(year: String, month: String, day: String) -> Bool {
         guard let yearInt = Int(year),
               let monthInt = Int(month),
@@ -254,5 +286,5 @@ private extension HedgeTradeTextField {
 
 #Preview {
     HedgeTradeTextField(inputText: .constant(""), focusedID: .constant(nil))
-        .type(.tradeDate)
+        .type(.yield)
 }
