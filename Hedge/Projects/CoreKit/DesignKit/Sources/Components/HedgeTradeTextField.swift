@@ -8,6 +8,12 @@
 
 import SwiftUI
 
+/// 거래 관련 텍스트 필드 컴포넌트
+/// 
+/// 사용 가능한 modifier:
+/// - `.type(_:)` - 텍스트 필드 타입 설정 (buyPrice, sellPrice, quantity, tradeDate, yield)
+/// 
+/// 매수가, 매도가, 거래량, 거래날짜, 수익률 등의 거래 관련 데이터를 입력받는 텍스트 필드입니다.
 public struct HedgeTradeTextField: View {
     
     @FocusState private var textFieldFocused: Bool
@@ -81,6 +87,9 @@ public struct HedgeTradeTextField: View {
         }
     }
     
+    /// 텍스트 필드의 타입을 설정합니다.
+    /// - Parameter type: 텍스트 필드 타입 (buyPrice, sellPrice, quantity, tradeDate, yield)
+    /// - Returns: 설정된 타입의 HedgeTradeTextField
     public func type(_ type: HedgeTextFieldType) -> HedgeTradeTextField {
         var hedgeTextField = self
         hedgeTextField.type = type
@@ -90,6 +99,12 @@ public struct HedgeTradeTextField: View {
 }
 
 extension HedgeTradeTextField {
+    /// 거래 텍스트 필드의 타입을 정의하는 enum
+    /// - `buyPrice`: 매수가 입력 필드
+    /// - `sellPrice`: 매도가 입력 필드
+    /// - `quantity`: 거래량 입력 필드
+    /// - `tradeDate`: 거래날짜 입력 필드
+    /// - `yield`: 수익률 입력 필드
     public enum HedgeTextFieldType: String {
         case buyPrice = "buyPrice"
         case sellPrice = "sellPrice"
@@ -125,6 +140,11 @@ extension HedgeTradeTextField {
         }
     }
     
+    /// 거래 텍스트 필드의 상태를 정의하는 enum
+    /// - `idle`: 기본 상태 (포커스되지 않음, 입력 없음)
+    /// - `focusing`: 포커스된 상태 (입력 없음)
+    /// - `idleWithInput`: 기본 상태 (포커스되지 않음, 입력 있음)
+    /// - `focusingWithInput`: 포커스된 상태 (입력 있음)
     public enum HedgeTextFieldState {
         case idle
         case focusing

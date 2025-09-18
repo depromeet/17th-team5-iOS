@@ -8,6 +8,11 @@
 
 import SwiftUI
 
+/// 액션 버튼 컴포넌트
+/// 
+/// 사용 가능한 modifier:
+/// - `.size(_:)` - 버튼 크기 설정 (large, medium, small, tiny)
+/// - `.color(_:)` - 버튼 색상 설정 (primary, secondary)
 public struct HedgeActionButton: View {
     @Environment(\.isEnabled) private var isEnabled: Bool
     
@@ -41,12 +46,18 @@ public struct HedgeActionButton: View {
         .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius))
     }
     
+    /// 버튼의 크기를 설정합니다.
+    /// - Parameter size: 버튼 크기 (large, medium, small, tiny)
+    /// - Returns: 설정된 크기의 HedgeActionButton
     public func size(_ size: HedgeActionButtonSize) -> HedgeActionButton {
         var button = self
         button.size = size
         return button
     }
     
+    /// 버튼의 색상을 설정합니다.
+    /// - Parameter color: 버튼 색상 (primary, secondary)
+    /// - Returns: 설정된 색상의 HedgeActionButton
     public func color(_ color: HedgeActionButtonColor) -> HedgeActionButton {
         var button = self
         button.color = color
@@ -55,6 +66,11 @@ public struct HedgeActionButton: View {
 }
 
 extension HedgeActionButton {
+    /// 액션 버튼의 크기를 정의하는 enum
+    /// - `large`: 큰 크기 버튼
+    /// - `medium`: 중간 크기 버튼
+    /// - `small`: 작은 크기 버튼
+    /// - `tiny`: 매우 작은 크기 버튼
     public enum HedgeActionButtonSize {
         case large
         case medium
@@ -114,6 +130,9 @@ extension HedgeActionButton {
         }
     }
 
+    /// 액션 버튼의 색상을 정의하는 enum
+    /// - `primary`: 주요 액션 버튼 색상 (브랜드 컬러)
+    /// - `secondary`: 보조 액션 버튼 색상 (회색 계열)
     public enum HedgeActionButtonColor {
         case primary
         case secondary
