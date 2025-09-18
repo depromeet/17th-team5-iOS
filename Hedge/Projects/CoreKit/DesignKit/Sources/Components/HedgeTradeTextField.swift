@@ -1,5 +1,5 @@
 //
-//  HedgeTextField.swift
+//  HedgeTradeTextField.swift
 //  DesignKit
 //
 //  Created by 이중엽 on 9/13/25.
@@ -8,135 +8,23 @@
 
 import SwiftUI
 
-public struct HedgeTextField: View {
-    
-    public enum FieldType: String {
-        case buyPrice = "buyPrice"      // 매수가
-        case sellPrice = "sellPrice"    // 매도가
-        case quantity = "quantity"      // 거래량
-        case tradeDate = "tradeDate"    // 거래날짜
-        
-        public var label: String {
-            switch self {
-            case .buyPrice:
-                return "매수가"
-            case .sellPrice:
-                return "매도가"
-            case .quantity:
-                return "거래량"
-            case .tradeDate:
-                return "거래날짜"
-            }
-        }
-        
-        public var placeHolder: String {
-            switch self {
-            case .buyPrice, .sellPrice:
-                return "1주당 가격"
-            case .quantity:
-                return "주"
-            case .tradeDate:
-                return "YYYYMMDD"
-            }
-        }
-    }
-    
-    enum TextFieldState {
-        case idle   // 입력 X, 포커싱 X
-        case focusing   // 입력 X, 포커싱 O
-        case idleWithInput  // 입력 O, 포커싱 X
-        case focusingWithInput // 입력 O, 포커싱 O
-        
-        var isFocused: Bool {
-            switch self {
-            case .focusing, .focusingWithInput: return true
-            case .idle, .idleWithInput: return false
-            }
-        }
-    }
+public struct HedgeTradeTextField: View {
     
     @FocusState private var textFieldFocused: Bool
-    
     @Binding private var inputText: String
     @Binding private var focusedID: String?
-    
-    @State private var state: TextFieldState = .idle
+    @State private var state: HedgeTextFieldState = .idle
     @State private var selectedIndex: Int = 0
     
-    private let placeHolder: String
-    private var id: String
-    private var fieldType: FieldType
+    private var id: String = HedgeTextFieldType.buyPrice.rawValue
+    private var type: HedgeTextFieldType = .buyPrice
     
-    // MARK: - Builder Pattern
-    public struct Builder {
-        private var configuration: Configuration
-        
-        private struct Configuration {
-            var fieldType: FieldType
-            var focusedID: Binding<String?> = .constant(nil)
-            var inputText: Binding<String> = .constant("")
-            var label: String { fieldType.label }
-            var placeHolder: String { fieldType.placeHolder }
-            var id: String { fieldType.rawValue }
-            
-            init(fieldType: FieldType) {
-                self.fieldType = fieldType
-            }
-        }
-        
-        public init(fieldType: FieldType) {
-            self.configuration = Configuration(fieldType: fieldType)
-        }
-        
-        public func focusedID(_ binding: Binding<String?>) -> Builder {
-            var builder = self
-            builder.configuration.focusedID = binding
-            return builder
-        }
-        
-        public func inputText(_ binding: Binding<String>) -> Builder {
-            var builder = self
-            builder.configuration.inputText = binding
-            return builder
-        }
-        
-        public func build() -> HedgeTextField {
-            HedgeTextField(
-                placeHolder: configuration.placeHolder,
-                label: configuration.label,
-                id: configuration.id,
-                fieldType: configuration.fieldType,
-                focusedID: configuration.focusedID,
-                inputText: configuration.inputText
-            )
-        }
-    }
-    
-    // MARK: - Computed Properties
-    private var text: String
-    private var textFont: FontModel { state == .idle ? .body1Medium : .label2Semibold }
-    private var textColor: Color { state == .idle ? Color.hedgeUI.grey400 : Color.hedgeUI.grey500 }
-    private var strokeColor: Color { state.isFocused ? Color.hedgeUI.brand500 : .clear }
-    
-    private init(
-        placeHolder: String,
-        label: String,
-        id: String,
-        fieldType: FieldType,
-        focusedID: Binding<String?>,
-        inputText: Binding<String>
+    public init(
+        inputText: Binding<String>,
+        focusedID: Binding<String?>
     ) {
-        self.placeHolder = placeHolder
-        self.text = label
-        self.id = id
-        self.fieldType = fieldType
-        self._focusedID = focusedID
         self._inputText = inputText
-    }
-    
-    // MARK: - Static Factory Method
-    public static func builder(_ fieldType: FieldType) -> Builder {
-        return Builder(fieldType: fieldType)
+        self._focusedID = focusedID
     }
     
     public var body: some View {
@@ -144,13 +32,13 @@ public struct HedgeTextField: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 
-                Text(text)
-                    .font(textFont)
-                    .foregroundStyle(textColor)
+                Text(type.text)
+                    .font(state.textFont)
+                    .foregroundStyle(state.textColor)
                     .scaleEffect()
                 
                 if state != .idle {
-                    TextField(placeHolder, text: $inputText) { isEditing in
+                    TextField(type.placeHolder, text: $inputText) { isEditing in
                         if isEditing { handleTap() }
                     }
                     .tint(Color.hedgeUI.grey900)
@@ -168,7 +56,7 @@ public struct HedgeTextField: View {
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            if fieldType == .buyPrice || fieldType == .sellPrice {
+            if type == .buyPrice || type == .sellPrice {
                 HedgeSegmentControl(selectedIndex: $selectedIndex, items: ["원", "$"])
                     .onChange(of: selectedIndex) {
                         handleTap()
@@ -182,7 +70,7 @@ public struct HedgeTextField: View {
         .cornerRadius(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(strokeColor, lineWidth: 1.5)
+                .stroke(state.strokeColor, lineWidth: 1.5)
                 .animation(.easeInOut(duration: 0.3), value: state)
         )
         .onTapGesture {
@@ -193,7 +81,60 @@ public struct HedgeTextField: View {
         }
     }
     
-    private func handleTap() {
+    public func type(_ type: HedgeTextFieldType) -> HedgeTradeTextField {
+        var hedgeTextField = self
+        hedgeTextField.type = type
+        hedgeTextField.id = type.rawValue
+        return hedgeTextField
+    }
+}
+
+extension HedgeTradeTextField {
+    public enum HedgeTextFieldType: String {
+        case buyPrice = "buyPrice"
+        case sellPrice = "sellPrice"
+        case quantity = "quantity"
+        case tradeDate = "tradeDate"
+        
+        var text: String {
+            switch self {
+            case .buyPrice: return "매수가"
+            case .sellPrice: return "매도가"
+            case .quantity: return "거래량"
+            case .tradeDate: return "거래날짜"
+            }
+        }
+        
+        var placeHolder: String {
+            switch self {
+            case .buyPrice, .sellPrice: return "1주당 가격"
+            case .quantity: return "주"
+            case .tradeDate: return "YYYYMMDD"
+            }
+        }
+    }
+    
+    public enum HedgeTextFieldState {
+        case idle
+        case focusing
+        case idleWithInput
+        case focusingWithInput
+        
+        var isFocused: Bool {
+            switch self {
+            case .focusing, .focusingWithInput: return true
+            case .idle, .idleWithInput: return false
+            }
+        }
+        
+        var textFont: FontModel { self == .idle ? .body1Medium : .label2Semibold }
+        var textColor: Color { self == .idle ? Color.hedgeUI.grey400 : Color.hedgeUI.grey500 }
+        var strokeColor: Color { self.isFocused ? Color.hedgeUI.brand500 : .clear }
+    }
+}
+
+private extension HedgeTradeTextField {
+    func handleTap() {
         if let focusedID, focusedID == id { return }
         focusedID = id
         
@@ -202,11 +143,11 @@ public struct HedgeTextField: View {
         }
     }
     
-    private func handleInput(isFocus: Bool, _ input: String) -> String {
+    func handleInput(isFocus: Bool, _ input: String) -> String {
         if isFocus {
             return numbersOnly(input)
         } else {
-            switch fieldType {
+            switch type {
             case .buyPrice, .sellPrice:
                 return formatPrice(input)
             case .quantity:
@@ -217,11 +158,11 @@ public struct HedgeTextField: View {
         }
     }
     
-    private func numbersOnly(_ input: String) -> String {
+    func numbersOnly(_ input: String) -> String {
         return String(input.filter { $0.isNumber })
     }
     
-    private func formatPrice(_ input: String) -> String {
+    func formatPrice(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard !numbers.isEmpty else { return "" }
         
@@ -242,7 +183,7 @@ public struct HedgeTextField: View {
         return numbers
     }
     
-    private func formatQuantity(_ input: String) -> String {
+    func formatQuantity(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard !numbers.isEmpty else { return "" }
         
@@ -260,7 +201,7 @@ public struct HedgeTextField: View {
         return numbers
     }
     
-    private func formatTradeDate(_ input: String) -> String {
+    func formatTradeDate(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard numbers.count >= 8 else { return numbers }
         
@@ -277,7 +218,7 @@ public struct HedgeTextField: View {
         return numbers
     }
     
-    private func isValidDate(year: String, month: String, day: String) -> Bool {
+    func isValidDate(year: String, month: String, day: String) -> Bool {
         guard let yearInt = Int(year),
               let monthInt = Int(month),
               let dayInt = Int(day) else { return false }
@@ -297,7 +238,7 @@ public struct HedgeTextField: View {
         return calendar.date(from: dateComponents) != nil
     }
     
-    private func handleFocusChange(_ newValue: String?) {
+    func handleFocusChange(_ newValue: String?) {
         DispatchQueue.main.async {
             if id == newValue {
                 textFieldFocused = true
@@ -310,12 +251,8 @@ public struct HedgeTextField: View {
         }
     }
 }
- 
-// #Preview {
-//     HedgeTextField.builder()
-//         .configuration(.init(fieldType: .buyPrice))
-//         .focusedID(.constant(nil))
-//         .inputText(.constant(""))
-//         .build()
-//         .background(Color.red)
-// }
+
+#Preview {
+    HedgeTradeTextField(inputText: .constant(""), focusedID: .constant(nil))
+        .type(.tradeDate)
+}
