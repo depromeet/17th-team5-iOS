@@ -85,7 +85,7 @@ struct ContentView: View {
                             }
                         }
                         
-                        NavigationLink(destination: TextButtonView()) {
+                        NavigationLink(destination: ButtonView()) {
                             HStack {
                                 Text("TextButtons")
                             }

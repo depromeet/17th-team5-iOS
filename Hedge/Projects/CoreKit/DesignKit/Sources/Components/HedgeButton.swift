@@ -1,5 +1,5 @@
 //
-//  HedgeTextButton.swift
+//  HedgeButton.swift
 //  DesignKit
 //
 //  Created by 이중엽 on 9/18/25.
@@ -12,13 +12,15 @@ import SwiftUI
 /// 
 /// 사용 가능한 modifier:
 /// - `.size(_:)` - 버튼 크기 설정 (large, medium, small)
-/// - `.icon(_:)` - 아이콘 표시 여부 설정 (on, off)
+/// - `.icon(_:)` - 아이콘 설정 (Image 직접 전달 또는 HedgeButtonIcon enum 사용)
 /// - `.state(_:)` - 버튼 상태 설정 (active, disabled)
-public struct HedgeTextButton: View {
+/// - `.style(_:)` - 버튼 스타일 설정 (ghost 등)
+public struct HedgeButton: View {
     
-    private var size: HedgeTextButtonSize
-    private var icon: HedgeTextButtonIcon
-    private var state: HedgeTextButtonState
+    private var size: HedgeButtonSize
+    private var icon: HedgeButtonIcon
+    private var state: HedgeButtonState
+    private var style: HedgeButtonStyle
     private var title: String
     private var onTapped: () -> Void
     
@@ -27,8 +29,9 @@ public struct HedgeTextButton: View {
         _ onTapped: @escaping () -> Void
     ) {
         self.size = .large
-        self.icon = .on
+        self.icon = .off
         self.state = .active
+        self.style = .ghost
         self.title = title
         self.onTapped = onTapped
     }
@@ -42,8 +45,8 @@ public struct HedgeTextButton: View {
                     .foregroundStyle(state.foregroundColor)
                     .font(size.textFont)
                 
-                if icon == .on {
-                    Image(.chevronRightSmall)
+                if case .on(let image) = icon {
+                    image
                         .resizable()
                         .renderingMode(.template)
                         .foregroundColor(state.foregroundColor)
@@ -54,38 +57,57 @@ public struct HedgeTextButton: View {
         .disabled(state == .disabled)
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
+        .background(style.backgroundColor)
     }
     
     /// 버튼의 크기를 설정합니다.
     /// - Parameter size: 버튼 크기 (large, medium, small)
     /// - Returns: 설정된 크기의 HedgeTextButton
-    public func size(_ size: HedgeTextButtonSize) -> HedgeTextButton {
+    public func size(_ size: HedgeButtonSize) -> HedgeButton {
         var hedgeTextButton = self
         hedgeTextButton.size = size
         return hedgeTextButton
     }
     
-    /// 버튼의 아이콘 표시 여부를 설정합니다.
-    /// - Parameter icon: 아이콘 표시 여부 (on, off)
-    /// - Returns: 설정된 아이콘의 HedgeTextButton
-    public func icon(_ icon: HedgeTextButtonIcon) -> HedgeTextButton {
+    /// 버튼의 아이콘을 HedgeButtonIcon enum으로 설정합니다.
+    /// - Parameter icon: 아이콘 설정 (.on(image: Image) 또는 .off)
+    /// - Returns: 아이콘이 설정된 HedgeButton
+    public func icon(_ icon: HedgeButtonIcon) -> HedgeButton {
         var hedgeTextButton = self
         hedgeTextButton.icon = icon
+        return hedgeTextButton
+    }
+    
+    /// 버튼에 아이콘을 Image로 직접 설정합니다.
+    /// - Parameter image: 표시할 아이콘 이미지
+    /// - Returns: 아이콘이 설정된 HedgeButton
+    public func icon(_ image: Image) -> HedgeButton {
+        var hedgeTextButton = self
+        hedgeTextButton.icon = .on(image: image)
         return hedgeTextButton
     }
     
     /// 버튼의 상태를 설정합니다.
     /// - Parameter state: 버튼 상태 (active, disabled)
     /// - Returns: 설정된 상태의 HedgeTextButton
-    public func state(_ state: HedgeTextButtonState) -> HedgeTextButton {
+    public func state(_ state: HedgeButtonState) -> HedgeButton {
         var hedgeTextButton = self
         hedgeTextButton.state = state
         return hedgeTextButton
     }
+    
+    /// 버튼의 스타일을 설정합니다.
+    /// - Parameter style: 버튼 스타일 (ghost 등)
+    /// - Returns: 스타일이 설정된 HedgeButton
+    public func style(_ style: HedgeButtonStyle) -> HedgeButton {
+        var hedgeTextButton = self
+        hedgeTextButton.style = style
+        return hedgeTextButton
+    }
 }
 
-extension HedgeTextButton {
-    public enum HedgeTextButtonSize {
+extension HedgeButton {
+    public enum HedgeButtonSize {
         case large
         case medium
         case small
@@ -113,12 +135,15 @@ extension HedgeTextButton {
         }
     }
     
-    public enum HedgeTextButtonIcon {
-        case on
+    /// 버튼 아이콘 설정을 위한 enum
+    /// - `on(image: Image)`: 아이콘을 표시하며, 연관값으로 표시할 Image를 받음
+    /// - `off`: 아이콘을 표시하지 않음
+    public enum HedgeButtonIcon {
+        case on(image: Image)
         case off
     }
     
-    public enum HedgeTextButtonState {
+    public enum HedgeButtonState {
         case active
         case disabled
         
@@ -131,10 +156,35 @@ extension HedgeTextButton {
             }
         }
     }
+    
+    /// 버튼 스타일을 정의하는 enum
+    /// - `ghost`: 투명한 배경의 고스트 버튼 스타일
+    public enum HedgeButtonStyle {
+        case ghost
+        
+        var backgroundColor: Color {
+            switch self {
+            case .ghost:
+                return .clear
+            }
+        }
+    }
 }
 
 #Preview {
-    HedgeTextButton("Text") {
-        print("클릭")
+    VStack(spacing: 20) {
+        HedgeButton("Text") {
+            print("클릭")
+        }
+        
+        HedgeButton("Text with Icon") {
+            print("클릭")
+        }
+        .icon(Image.hedgeUI.chevronRightSmall)
+        
+        HedgeButton("Custom Icon") {
+            print("클릭")
+        }
+        .icon(Image(systemName: "heart.fill"))
     }
 }
