@@ -11,10 +11,15 @@ import Foundation
 import ComposableArchitecture
 
 import Core
+import Shared
+
+import StockDomainInterface
 
 @Reducer
 public struct RetrospectSearchFeature {
     private let coordinator: RetrospectCoordinator
+    
+    private let fetchStockSearchUseCase = DIContainer.resolve(FetchStockSearchUseCase.self)
     
     public init(coordinator: RetrospectCoordinator) {
         self.coordinator = coordinator
@@ -40,7 +45,9 @@ public struct RetrospectSearchFeature {
         case backButtonTapped
     }
     public enum InnerAction { }
-    public enum AsyncAction { }
+    public enum AsyncAction {
+        case fetchStockSearch(String)
+    }
     public enum ScopeAction { }
     public enum DelegateAction { }
     
@@ -85,7 +92,7 @@ extension RetrospectSearchFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .none
+            return .send(.async(.fetchStockSearch("팔란티어")))
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
@@ -108,7 +115,15 @@ extension RetrospectSearchFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-            
+        case .fetchStockSearch(let text):
+            return .run { send in
+                do {
+                    let response = try await fetchStockSearchUseCase.execute(text: text)
+                    Log.debug("result: \(response)")
+                } catch {
+                    
+                }
+            }
         }
     }
     

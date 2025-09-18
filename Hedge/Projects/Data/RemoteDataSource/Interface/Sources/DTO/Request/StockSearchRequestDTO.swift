@@ -10,4 +10,8 @@ import Foundation
 
 public struct StockSearchRequestDTO: Encodable {
     let query: String
+    
+    public init(query: String) {
+        self.query = query
+    }
 }

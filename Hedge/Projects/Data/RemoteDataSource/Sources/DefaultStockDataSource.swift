@@ -11,6 +11,7 @@ import Foundation
 import Alamofire
 
 import Networker
+import RemoteDataSourceInterface
 
 public struct DefaultStockSearchDataSource: StockDataSource {
     private let provider: Provider
@@ -30,7 +31,7 @@ enum StockSearchTarget {
 
 extension StockSearchTarget: TargetType {
     var baseURL: String {
-        return Configuration.baseURL
+        return Configuration.baseURL + "/api/v1/stock"
     }
     
     var header: Alamofire.HTTPHeaders {
@@ -47,7 +48,7 @@ extension StockSearchTarget: TargetType {
     var path: String {
         switch self {
         case .search:
-            return ""
+            return "/search"
         }
     }
     

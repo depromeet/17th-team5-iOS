@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 public struct HedgeFont {
     public enum Pretendard: String, CaseIterable {

@@ -8,6 +8,8 @@
 
 import Foundation
 
+import StockDomainInterface
+
 public struct StockSearchResponseDTO: Decodable {
     public let code: String
     public let message: String
@@ -18,4 +20,14 @@ public struct StockSearchDataResponseDTO: Decodable {
     public let symbol: String
     public let title: String
     public let market: String
+}
+
+extension StockSearchDataResponseDTO {
+    public func toDomain() -> StockSearch {
+        return StockSearch(
+            symbol: symbol,
+            title: title,
+            market: market
+        )
+    }
 }
