@@ -13,13 +13,13 @@ import Alamofire
 import Shared
 
 // MARK: - Interface
-public protocol Provider {
+public protocol ProviderProtocol {
     func request<T: Decodable>(_ urlConvertible: URLRequestConvertible) async throws -> T
     func request(_ urlConvertible: URLRequestConvertible) async throws
 }
 
 // MARK: - Impl
-public struct DefaultProvider: Provider {
+public struct Provider: ProviderProtocol {
     private let session: Session
     
     public init(session: Session) {
@@ -32,7 +32,7 @@ public struct DefaultProvider: Provider {
         configuration.timeoutIntervalForRequest = 5
         configuration.timeoutIntervalForResource = 5
         let session = Session(configuration: configuration)
-        return DefaultProvider(session: session)
+        return Provider(session: session)
     }()
     
     public func request<T: Decodable>(_ urlConvertible: URLRequestConvertible) async throws -> T {

@@ -29,6 +29,9 @@ public struct RetrospectSearchView: View {
             retrospectTitle
             Spacer()
         }
+        .onAppear {
+            send(.onAppear)
+        }
     }
     
     private var navigationBar: some View {

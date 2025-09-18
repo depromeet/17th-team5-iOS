@@ -36,6 +36,7 @@ public struct RetrospectSearchFeature {
     }
     
     public enum View {
+        case onAppear
         case backButtonTapped
     }
     public enum InnerAction { }
@@ -83,6 +84,8 @@ extension RetrospectSearchFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
+        case .onAppear:
+            return .none
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
