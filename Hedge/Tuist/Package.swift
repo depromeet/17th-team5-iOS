@@ -10,7 +10,7 @@ import ProjectDescriptionHelpers
             "Alamofire": .framework,
             "Swinject": .framework,
             "ComposableArchitecture": .framework,
-            "KingFisher": .framework
+            "Kingfisher": .framework
         ],
         baseSettings: Settings.settings(configurations: XCConfig.framework)
     )
