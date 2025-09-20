@@ -27,6 +27,7 @@ public struct RetrospectSearchView: View {
             guideText
             searchTextField
             retrospectTitle
+            stockListView
             Spacer()
         }
         .onAppear {
