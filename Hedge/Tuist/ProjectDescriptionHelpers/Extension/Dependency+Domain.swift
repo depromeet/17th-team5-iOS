@@ -8,8 +8,8 @@
 import ProjectDescription
 
 public extension TargetDependency.Domain {
-    struct Sample {
-        private static let name = "SampleDomain"
+    struct Stock {
+        private static let name = "StockDomain"
         public static let implement = domainDependency(target: name)
         public static let interface = domainInterfaceDependency(target: name)
     }

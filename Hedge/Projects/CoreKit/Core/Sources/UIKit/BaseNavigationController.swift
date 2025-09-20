@@ -9,9 +9,14 @@
 import Foundation
 import UIKit
 
-public class BaseNavigationController: UINavigationController {
+public class BaseNavigationController: UINavigationController, UIGestureRecognizerDelegate {
     public override func viewDidLoad() {
         super.viewDidLoad()
         self.isNavigationBarHidden = true
+        interactivePopGestureRecognizer?.delegate = self
+    }
+    
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 
 import Swinject
 import DesignKit
-import SwiftUICore
+import SwiftUI
 
 extension HedgeFont: @retroactive Assembly {
     
