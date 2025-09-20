@@ -25,6 +25,9 @@ extension HedgeUI where Base == Image {
     public static var arrowRightThin: Image { asset(#function) }
     public static var arrowRightThick: Image { asset(#function) }
     
+    public static var toastWarn: Image { asset(#function) }
+    public static var toastCheck: Image { asset(#function) }
+
     // MARK: Size 30
     public static var error: Image { asset(#function) }
     
@@ -40,10 +43,8 @@ extension HedgeUI where Base == Image {
 
 extension HedgeUI where Base == UIImage {
     private static func asset(_ name: String) -> UIImage {
-        guard let image = UIImage(named: name, in: .module, with: nil) else {
-            assertionFailure("can't find image asset: \(name)")
-            return UIImage()
-        }
-        return image
+        let img = UIImage(named: name, in: .module, with: nil) ?? UIImage(named: name)
+        return img ?? UIImage(systemName: "questionmark.circle")! // fallback
     }
 }
+
