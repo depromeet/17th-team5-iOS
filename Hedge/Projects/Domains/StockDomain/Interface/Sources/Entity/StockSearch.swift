@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct StockSearch {
+public struct StockSearch: Equatable, Hashable {
     public let symbol: String
     public let title: String
     public let market: String

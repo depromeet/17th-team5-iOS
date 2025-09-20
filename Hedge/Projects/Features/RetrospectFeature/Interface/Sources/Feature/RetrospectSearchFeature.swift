@@ -28,6 +28,7 @@ public struct RetrospectSearchFeature {
     @ObservableState
     public struct State: Equatable {
         public var searchText: String = ""
+        public var stocks: [StockSearch] = []
         public init() {}
     }
     
@@ -44,7 +45,10 @@ public struct RetrospectSearchFeature {
         case onAppear
         case backButtonTapped
     }
-    public enum InnerAction { }
+    public enum InnerAction {
+        case fetchStockSuccess([StockSearch])
+        case failure(Error)
+    }
     public enum AsyncAction {
         case fetchStockSearch(String)
     }
@@ -105,7 +109,13 @@ extension RetrospectSearchFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
+        case .fetchStockSuccess(let response):
+            state.stocks = response
+            return .none
             
+        case .failure(let error):
+            Log.debug("error")
+            return .none
         }
     }
     
@@ -119,9 +129,9 @@ extension RetrospectSearchFeature {
             return .run { send in
                 do {
                     let response = try await fetchStockSearchUseCase.execute(text: text)
-                    Log.debug("result: \(response)")
+                    await send(.inner(.fetchStockSuccess(response)))
                 } catch {
-                    
+                    await send(.inner(.failure(error)))
                 }
             }
         }
