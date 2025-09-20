@@ -8,6 +8,9 @@
 
 import SwiftUI
 
+/// 검색 텍스트 필드 컴포넌트
+/// 
+/// 검색 아이콘과 텍스트 입력 필드, 그리고 텍스트 삭제 버튼을 포함한 검색 전용 텍스트 필드입니다.
 public struct HedgeSearchTextField: View {
     @FocusState private var isFocused
     @Binding private var text: String

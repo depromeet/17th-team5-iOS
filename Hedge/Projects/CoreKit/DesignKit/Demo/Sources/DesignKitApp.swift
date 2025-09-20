@@ -61,7 +61,7 @@ struct ContentView: View {
                     }
                     
                     Section("Components") {
-                        NavigationLink(destination: ButtonsView()) {
+                        NavigationLink(destination: ActionButtonView()) {
                             HStack {
                                 Text("Buttons")
                             }
@@ -85,7 +85,13 @@ struct ContentView: View {
                             }
                         }
                         
-                        NavigationLink(destination: ButtonView()) {
+                        NavigationLink(destination: BottomCTAButtonView()) {
+                            HStack {
+                                Text("Bottom CTA Button")
+                            }
+                        }
+                        
+                        NavigationLink(destination: ActionButtonView()) {
                             HStack {
                                 Text("TextButtons")
                             }

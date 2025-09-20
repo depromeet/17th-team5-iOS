@@ -8,6 +8,9 @@
 
 import SwiftUI
 
+/// 세그먼트 컨트롤 컴포넌트
+/// 
+/// 여러 옵션 중 하나를 선택할 수 있는 세그먼트 컨트롤입니다.
 public struct HedgeSegmentControl: View {
     @Binding private var selectedIndex: Int
     private let items: [String]

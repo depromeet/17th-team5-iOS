@@ -1,31 +1,17 @@
 //
-//  TestProject.swift
-//  TestProject
+//  BottomCTAButtonView.swift
+//  DesignKit
 //
-//  Created by Junyoung on 1/8/25.
+//  Created by Junyoung on 1/9/25.
+//  Copyright © 2025 SampleCompany. All rights reserved.
 //
 
 import SwiftUI
 import DesignKit
 
-@main
-struct TestProject: App {
-    init() {
-        HedgeFont.registerFonts()
-    }
-    
-    var body: some Scene {
-        WindowGroup {
-            HedgeBottomCTATestView()
-        }
-    }
-}
-
-struct HedgeBottomCTATestView: View {
+struct BottomCTAButtonView: View {
     @State private var selectedStyle: Int = 0
     @State private var selectedBackground: Int = 0
-    @State private var showText: Bool = false
-    @State private var textContent: String = "추가 정보"
     
     var body: some View {
         ZStack {
@@ -35,19 +21,6 @@ struct HedgeBottomCTATestView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    // 제목
-                    VStack(spacing: 8) {
-                        Text("HedgeBottomCTAButton")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                        Text("테스트 뷰")
-                            .font(.title2)
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                    .padding(.top, 20)
-                    
                     // 스타일 선택
                     VStack(alignment: .leading, spacing: 12) {
                         Text("스타일 선택")
@@ -72,24 +45,6 @@ struct HedgeBottomCTATestView: View {
                             Text("Transparent").tag(1)
                         }
                         .pickerStyle(.segmented)
-                    }
-                    
-                    // 텍스트 옵션
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("텍스트 옵션")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        
-                        HStack {
-                            Toggle("텍스트 표시", isOn: $showText)
-                                .foregroundColor(.white)
-                            
-                            if showText {
-                                TextField("텍스트 내용", text: $textContent)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .frame(maxWidth: 200)
-                            }
-                        }
                     }
                     
                     // 미리보기 영역
@@ -121,7 +76,7 @@ struct HedgeBottomCTATestView: View {
                         
                         VStack(spacing: 16) {
                             // One Button + White Gradient
-                            HedgeBottomCTAButton(showText ? textContent : nil)
+                            HedgeBottomCTAButton("텍스트 없음")
                                 .bg(.whiteGradient)
                                 .style(.oneButton(
                                     title: "확인",
@@ -129,7 +84,7 @@ struct HedgeBottomCTATestView: View {
                                 ))
                             
                             // One Button + Transparent
-                            HedgeBottomCTAButton(showText ? textContent : nil)
+                            HedgeBottomCTAButton("텍스트 없음")
                                 .bg(.transparent)
                                 .style(.oneButton(
                                     title: "취소",
@@ -137,7 +92,7 @@ struct HedgeBottomCTATestView: View {
                                 ))
                             
                             // Two Button + White Gradient
-                            HedgeBottomCTAButton(showText ? textContent : nil)
+                            HedgeBottomCTAButton("텍스트 없음")
                                 .bg(.whiteGradient)
                                 .style(.twoButton(
                                     leftTitle: "취소",
@@ -147,7 +102,7 @@ struct HedgeBottomCTATestView: View {
                                 ))
                             
                             // Two Button + Transparent
-                            HedgeBottomCTAButton(showText ? textContent : nil)
+                            HedgeBottomCTAButton("텍스트 없음")
                                 .bg(.transparent)
                                 .style(.twoButton(
                                     leftTitle: "이전",
@@ -155,36 +110,23 @@ struct HedgeBottomCTATestView: View {
                                     leftOnTapped: { print("Two Button - 이전") },
                                     rightOnTapped: { print("Two Button - 다음") }
                                 ))
-                        }
-                    }
-                    
-                    // 그라디언트 효과 비교
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("그라디언트 효과 비교")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        
-                        VStack(spacing: 8) {
-                            Text("White Gradient")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
                             
-                            HedgeBottomCTAButton("그라디언트 효과")
+                            // 텍스트가 있는 경우
+                            HedgeBottomCTAButton("추가 정보")
                                 .bg(.whiteGradient)
                                 .style(.oneButton(
-                                    title: "확인",
-                                    onTapped: { print("Gradient - 확인") }
+                                    title: "완료",
+                                    onTapped: { print("One Button with Text - 완료") }
                                 ))
                             
-                            Text("Transparent")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            
-                            HedgeBottomCTAButton("투명 배경")
+                            // 텍스트가 있는 Two Button
+                            HedgeBottomCTAButton("주의사항")
                                 .bg(.transparent)
-                                .style(.oneButton(
-                                    title: "확인",
-                                    onTapped: { print("Transparent - 확인") }
+                                .style(.twoButton(
+                                    leftTitle: "나중에",
+                                    rightTitle: "지금",
+                                    leftOnTapped: { print("Two Button with Text - 나중에") },
+                                    rightOnTapped: { print("Two Button with Text - 지금") }
                                 ))
                         }
                     }
@@ -193,13 +135,13 @@ struct HedgeBottomCTATestView: View {
                 .padding(.bottom, 100) // 하단 CTA 버튼을 위한 여백
             }
             
-            // 하단 고정 CTA 버튼 (실시간 미리보기)
+            // 하단 고정 CTA 버튼
             VStack {
                 Spacer()
                 
                 if selectedStyle == 0 {
                     // One Button
-                    HedgeBottomCTAButton(showText ? textContent : nil)
+                    HedgeBottomCTAButton("텍스트 없음")
                         .bg(selectedBackground == 0 ? .whiteGradient : .transparent)
                         .style(.oneButton(
                             title: "확인",
@@ -207,7 +149,7 @@ struct HedgeBottomCTATestView: View {
                         ))
                 } else {
                     // Two Button
-                    HedgeBottomCTAButton(showText ? textContent : nil)
+                    HedgeBottomCTAButton("텍스트 없음")
                         .bg(selectedBackground == 0 ? .whiteGradient : .transparent)
                         .style(.twoButton(
                             leftTitle: "취소",
@@ -218,9 +160,13 @@ struct HedgeBottomCTATestView: View {
                 }
             }
         }
+        .navigationTitle("Bottom CTA Button")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    HedgeBottomCTATestView()
+    NavigationView {
+        BottomCTAButtonView()
+    }
 }

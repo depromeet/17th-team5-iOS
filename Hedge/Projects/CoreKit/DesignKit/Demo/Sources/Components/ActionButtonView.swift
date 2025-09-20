@@ -1,5 +1,5 @@
 //
-//  ButtonsView.swift
+//  ActionButtonView.swift
 //  DesignKit
 //
 //  Created by Junyoung on 9/13/25.
@@ -9,7 +9,7 @@
 import SwiftUI
 import DesignKit
 
-struct ButtonsView: View {
+struct ActionButtonView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -140,5 +140,5 @@ struct ButtonsView: View {
 }
 
 #Preview {
-    ButtonsView()
+    ActionButtonView()
 }

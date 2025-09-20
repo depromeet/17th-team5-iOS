@@ -8,6 +8,9 @@
 
 import SwiftUI
 
+/// 네비게이션 바 컴포넌트
+/// 
+/// 좌측 뒤로가기 버튼과 우측 액션 버튼을 포함한 네비게이션 바입니다.
 public struct HedgeNavigationBar: View {
     
     let buttonText: String
