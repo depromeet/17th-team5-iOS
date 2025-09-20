@@ -9,21 +9,22 @@
 import SwiftUI
 import DesignKit
 
-struct TradeHistoryInputView: View {
+public struct TradeHistoryInputView: View {
     
     let image: Image
-    let StockTitle: String
+    let stockTitle: String
     let description: String
     
     @State var tradingPrice: String = ""
     @State var tradingQuantity: String = ""
     @State var tradingDate: String = ""
-    @State var focuedID: String? = nil
+    @State var yield: String = ""
+    @State var focusedID: String? = nil
     @State var isYieldInputVisible: Bool = false
     
     // 첫 번째 구분선 색상 (buy/SellPrice와 quantity 사이)
     private var firstDividerColor: Color {
-        guard let focuedID = focuedID else { return Color.hedgeUI.grey200 }
+        guard let focuedID = focusedID else { return Color.hedgeUI.grey200 }
         
         if focuedID == HedgeTradeTextField.HedgeTextFieldType.buyPrice.rawValue ||
             focuedID == HedgeTradeTextField.HedgeTextFieldType.sellPrice.rawValue ||
@@ -35,7 +36,7 @@ struct TradeHistoryInputView: View {
     
     // 두 번째 구분선 색상 (quantity와 tradeDate 사이)
     private var secondDividerColor: Color {
-        guard let focuedID = focuedID else { return Color.hedgeUI.grey200 }
+        guard let focuedID = focusedID else { return Color.hedgeUI.grey200 }
         
         if focuedID == HedgeTradeTextField.HedgeTextFieldType.quantity.rawValue ||
            focuedID == HedgeTradeTextField.HedgeTextFieldType.tradeDate.rawValue {
@@ -44,10 +45,19 @@ struct TradeHistoryInputView: View {
         return Color.hedgeUI.grey200
     }
     
-    var body: some View {
+    public init(image: Image, stockTitle: String, description: String) {
+        self.image = image
+        self.stockTitle = stockTitle
+        self.description = description
+    }
+    
+    public var body: some View {
         
         ZStack {
             Color.hedgeUI.neutralBgSecondary.ignoresSafeArea()
+                .onTapGesture {
+                    focusedID = nil
+                }
             
             VStack(spacing: 0) {
                 HedgeNavigationBar(buttonText: "", onLeftButtonTap: nil)
@@ -56,11 +66,26 @@ struct TradeHistoryInputView: View {
                     topView
                     
                     textFieldGroup
-                    
-                    Spacer()
-                    
-                    YieldInputToggleRow
                 }
+                
+                HedgeTradeTextField(inputText: $yield, focusedID: $focusedID)
+                    .type(.yield)
+                    .padding(.top, 12)
+                    .padding(.horizontal, 20)
+                    .opacity(isYieldInputVisible ? 1 : 0)
+                    .offset(y: isYieldInputVisible ? 0 : -12)
+                    .animation(.easeInOut(duration: 0.3), value: isYieldInputVisible)
+                
+                Spacer()
+                
+                YieldInputToggleRow
+                
+                HedgeBottomCTAButton()
+                    .style(.oneButton(
+                        title: "다음",
+                        onTapped: {
+                            print("다음")
+                        }))
             }
         }
     }
@@ -73,7 +98,7 @@ struct TradeHistoryInputView: View {
                     .resizable()
                     .frame(width: 22, height: 22)
                 
-                Text(StockTitle)
+                Text(stockTitle)
                     .font(FontModel.body3Medium)
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -91,23 +116,25 @@ struct TradeHistoryInputView: View {
     @ViewBuilder
     private var textFieldGroup: some View {
         VStack(spacing: 0) {
-            HedgeTradeTextField(inputText: $tradingPrice, focusedID: $focuedID)
+            HedgeTradeTextField(inputText: $tradingPrice, focusedID: $focusedID)
                 .type(.buyPrice)
             
             RoundedRectangle(cornerSize: .zero)
                 .fill(firstDividerColor)
                 .frame(height: 1)
                 .frame(maxWidth: .infinity)
+                .animation(.easeInOut(duration: 0.3), value: firstDividerColor)
             
-            HedgeTradeTextField(inputText: $tradingQuantity, focusedID: $focuedID)
+            HedgeTradeTextField(inputText: $tradingQuantity, focusedID: $focusedID)
                 .type(.quantity)
             
             RoundedRectangle(cornerSize: .zero)
                 .fill(secondDividerColor)
                 .frame(height: 1)
                 .frame(maxWidth: .infinity)
+                .animation(.easeInOut(duration: 0.3), value: secondDividerColor)
             
-            HedgeTradeTextField(inputText: $tradingDate, focusedID: $focuedID)
+            HedgeTradeTextField(inputText: $tradingDate, focusedID: $focusedID)
                 .type(.tradeDate)
         }
         .background(
@@ -134,7 +161,6 @@ struct TradeHistoryInputView: View {
                 .toggleStyle(CustomToggleStyle())
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 16)
     }
     
     struct CustomToggleStyle: ToggleStyle {
@@ -162,5 +188,5 @@ struct TradeHistoryInputView: View {
 }
 
 #Preview {
-    TradeHistoryInputView(image: HedgeUI.search, StockTitle: "종목명", description: "얼마에 매도하셨나요?")
+    TradeHistoryInputView(image: HedgeUI.search, stockTitle: "종목명", description: "얼마에 매도하셨나요?")
 }
