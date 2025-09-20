@@ -55,6 +55,9 @@ public struct RetrospectSearchFeature {
     public enum ScopeAction { }
     public enum DelegateAction { }
     
+    // MARK: - Debounce ID
+    private enum CancelID { case searchDebounce }
+    
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
@@ -69,7 +72,19 @@ extension RetrospectSearchFeature {
         _ action: Action
     ) -> Effect<Action> {
         switch action {
-        case .binding(_):
+        case .binding(\.searchText):
+            let text = state.searchText
+            return .run { send in
+                guard !text.isEmpty else { return }
+                await send(.async(.fetchStockSearch(text)))
+            }
+            .debounce(
+                id: CancelID.searchDebounce,
+                for: 0.5,
+                scheduler: RunLoop.main
+            )
+            
+        case .binding:
             return .none
             
         case .view(let action):
@@ -96,7 +111,7 @@ extension RetrospectSearchFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .send(.async(.fetchStockSearch("팔란티어")))
+            return .none
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
@@ -114,7 +129,7 @@ extension RetrospectSearchFeature {
             return .none
             
         case .failure(let error):
-            Log.debug("error")
+            Log.debug("error: \(error)")
             return .none
         }
     }
@@ -142,9 +157,7 @@ extension RetrospectSearchFeature {
         _ state: inout State,
         _ action: ScopeAction
     ) -> Effect<Action> {
-        switch action {
-            
-        }
+        
     }
     
     // MARK: - Delegate Core
@@ -152,8 +165,6 @@ extension RetrospectSearchFeature {
         _ state: inout State,
         _ action: DelegateAction
     ) -> Effect<Action> {
-        switch action {
-            
-        }
+        
     }
 }
