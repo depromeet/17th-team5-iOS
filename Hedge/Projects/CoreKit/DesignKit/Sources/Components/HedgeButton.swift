@@ -180,7 +180,7 @@ extension HedgeButton {
         HedgeButton("Text with Icon") {
             print("클릭")
         }
-        .icon(Image.hedgeUI.chevronRightSmall)
+        .icon(Image.hedgeUI.arrowRightThin)
         
         HedgeButton("Custom Icon") {
             print("클릭")

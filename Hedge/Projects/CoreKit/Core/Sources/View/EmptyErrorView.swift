@@ -16,7 +16,7 @@ public struct EmptyErrorView: View {
     public var body: some View {
         ZStack(alignment: .center) {
             VStack(alignment: .center, spacing: 12) {
-                Image.hedgeUI.iconError
+                Image.hedgeUI.error
                     .resizable()
                     .frame(width: 30, height: 30)
                 

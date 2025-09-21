@@ -10,19 +10,23 @@ import Foundation
 import SwiftUI
 
 extension HedgeUI where Base == Image {
-    public static var chevronLeftSmall: Image { asset(#function) }
-    public static var chevronLeftThickSmall: Image { asset(#function) }
-    public static var chevronLeftTightSmall: Image { asset(#function) }
-    public static var chevronLeftTightThickSmall: Image { asset(#function) }
-    public static var chevronRightSmall: Image { asset(#function) }
-    public static var chevronRightThickSmall: Image { asset(#function) }
-    public static var chevronRightTightSmall: Image { asset(#function) }
-    public static var chevronRightTightThickSmall: Image { asset(#function) }
-    public static var close: Image { asset(#function) }
+    // MARK: Size 24
+    public static var closeThin: Image { asset(#function) }
     public static var closeThick: Image { asset(#function) }
     public static var search: Image { asset(#function) }
     public static var closeFill: Image { asset(#function) }
-    public static var iconError: Image { asset(#function) }
+    public static var trash: Image { asset(#function) }
+    public static var edit: Image { asset(#function) }
+    public static var arrowDown: Image { asset(#function) }
+    public static var pencil: Image { asset(#function) }
+    public static var copy: Image { asset(#function) }
+    public static var arrowLeftThin: Image { asset(#function) }
+    public static var arrowLeftThick: Image { asset(#function) }
+    public static var arrowRightThin: Image { asset(#function) }
+    public static var arrowRightThick: Image { asset(#function) }
+    
+    // MARK: Size 30
+    public static var error: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {

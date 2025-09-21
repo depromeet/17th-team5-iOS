@@ -25,4 +25,10 @@ public extension TargetDependency.Feature {
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }
+    
+    struct TradeHistoryInput {
+        private static let name = "TradeHistoryFeature"
+        public static let feature = featureDependency(target: name)
+        public static let interface = featureInterfaceDependency(target: name)
+    }
 }

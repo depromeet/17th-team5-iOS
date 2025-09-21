@@ -25,9 +25,6 @@ extension HedgeUI where Base == Color {
     public static var greyOpacity300: Color { asset(#function) }
     public static var greyOpacity600: Color { asset(#function) }
     
-    public static var red500: Color { asset(#function) }
-    public static var red700: Color { asset(#function) }
-    
     public static var blue500: Color { asset(#function) }
     
     public static var backgroundGrey: Color { asset(#function) }
@@ -50,16 +47,17 @@ extension HedgeUI where Base == Color {
     public static var textWhite: Color { backgroundWhite }
     
     // MARK: Trade
-    public static var tradeBuy: Color { red500 }
-    public static var tradeSell: Color { blue500 }
+    public static var tradeBuy: Color { asset(#function) }
+    public static var tradeSell: Color { asset(#function) }
     
     // MARK: Feedback
-    public static var feedbackError: Color { red700 }
-    public static var feedbackAI: Color { purple700 }
+    public static var feedbackError: Color { asset(#function) }
+    public static var feedbackAI: Color { asset(#function) }
     
     // MARK: Brand
-    public static var brandPrimary: Color { grey900 }
-    public static var brandSecondary: Color { grey100 }
+    public static var brandPrimary: Color { asset(#function) }
+    public static var brandDarken: Color { asset(#function) }
+    public static var brandSecondary: Color { asset(#function) }
     public static var brandDisabled: Color { grey300 }
     
     // MARK: Neutral

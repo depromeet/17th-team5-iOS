@@ -38,7 +38,7 @@ public struct HedgeTradeTextField: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 
-                Text(type.text)
+                Text(displayText)
                     .font(state.textFont)
                     .foregroundStyle(state.textColor)
                     .scaleEffect()
@@ -96,6 +96,21 @@ public struct HedgeTradeTextField: View {
         hedgeTextField.id = type.rawValue
         return hedgeTextField
     }
+    
+    // MARK: - Computed Properties
+    
+    /// 현재 상태에 따라 표시할 텍스트를 반환합니다.
+    private var displayText: String {
+        switch state {
+        case .idleWithInput(let error), .focusingWithInput(let error):
+            if type == .tradeDate && error == .futureDate {
+                return "미래 날짜는 입력할 수 없어요"
+            }
+            return type.text
+        default:
+            return type.text
+        }
+    }
 }
 
 extension HedgeTradeTextField {
@@ -121,7 +136,6 @@ extension HedgeTradeTextField {
             case .yield: return "수익률"
             }
         }
-        
         var placeHolder: String {
             switch self {
             case .buyPrice, .sellPrice: return "1주당 가격"
@@ -130,7 +144,6 @@ extension HedgeTradeTextField {
             case .yield: return "수익률"
             }
         }
-        
         var segmentItems: [String]? {
             switch self {
             case .buyPrice, .sellPrice: return ["원", "$"]
@@ -145,35 +158,119 @@ extension HedgeTradeTextField {
     /// - `focusing`: 포커스된 상태 (입력 없음)
     /// - `idleWithInput`: 기본 상태 (포커스되지 않음, 입력 있음)
     /// - `focusingWithInput`: 포커스된 상태 (입력 있음)
-    public enum HedgeTextFieldState {
+    public enum HedgeTextFieldState: Equatable {
         case idle
         case focusing
-        case idleWithInput
-        case focusingWithInput
+        case idleWithInput(error: HedgeTextFieldError)
+        case focusingWithInput(error: HedgeTextFieldError)
         
-        var isFocused: Bool {
+        var textFont: FontModel { self == .idle ? .body1Medium : .label2Semibold }
+        var textColor: Color {
             switch self {
-            case .focusing, .focusingWithInput: return true
-            case .idle, .idleWithInput: return false
+            case .idle:
+                return Color.hedgeUI.grey400
+            case .focusing:
+                return Color.hedgeUI.grey500
+            case .idleWithInput(let error), .focusingWithInput(let error):
+                switch error {
+                case .none:
+                    return Color.hedgeUI.grey500
+                case .futureDate:
+                    return Color.hedgeUI.feedbackError
+                }
             }
         }
         
-        var textFont: FontModel { self == .idle ? .body1Medium : .label2Semibold }
-        var textColor: Color { self == .idle ? Color.hedgeUI.grey400 : Color.hedgeUI.grey500 }
-        var strokeColor: Color { self.isFocused ? Color.hedgeUI.brand500 : .clear }
+        var strokeColor: Color {
+            switch self {
+            case .idle, .idleWithInput:
+                return .clear
+            case .focusing:
+                return Color.hedgeUI.brand500
+            case .focusingWithInput(let error):
+                switch error {
+                case .none:
+                    return Color.hedgeUI.brand500
+                case .futureDate:
+                    return Color.hedgeUI.feedbackError
+                }
+            }
+        }
+    }
+    
+    /// 거래 날짜 검증 에러를 정의하는 enum
+    /// - `none`: 에러 없음
+    /// - `futureDate`: 미래 날짜 입력 (오늘보다 미래)
+    public enum HedgeTextFieldError {
+        case none
+        case futureDate
     }
 }
 
 private extension HedgeTradeTextField {
+    /// 텍스트 필드 탭 이벤트를 처리합니다.
+    /// 포커스 상태를 변경하고 타입에 따른 에러 검증을 수행합니다.
     func handleTap() {
         if let focusedID, focusedID == id { return }
         focusedID = id
         
         withAnimation(.easeInOut(duration: 0.3)) {
-            state = inputText.isEmpty ? .focusing : .focusingWithInput
+            switch type {
+            case .buyPrice:
+                state = inputText.isEmpty ? .focusing : .focusingWithInput(error: .none)
+            case .sellPrice:
+                state = inputText.isEmpty ? .focusing : .focusingWithInput(error: .none)
+            case .quantity:
+                state = inputText.isEmpty ? .focusing : .focusingWithInput(error: .none)
+            case .tradeDate:
+                state = inputText.isEmpty ? .focusing : .focusingWithInput(error: validateTradeDate(inputText))
+            case .yield:
+                state = inputText.isEmpty ? .focusing : .focusingWithInput(error: .none)
+            }
         }
     }
     
+    /// 거래 날짜를 검증합니다.
+    /// 미래 날짜인지 확인하여 에러 상태를 반환합니다.
+    /// - Parameter input: 입력된 날짜 문자열 (YYYYMMDD 형식)
+    /// - Returns: 검증 결과에 따른 HedgeTextFieldError
+    func validateTradeDate(_ input: String?) -> HedgeTextFieldError {
+        guard let input else { return .none }
+        let numbers = numbersOnly(input)
+        guard numbers.count >= 8 else { return .none }
+        
+        let year = String(numbers.prefix(4))
+        let month = String(numbers.dropFirst(4).prefix(2))
+        let day = String(numbers.dropFirst(6).prefix(2))
+        
+        guard let yearInt = Int(year),
+              let monthInt = Int(month),
+              let dayInt = Int(day) else { return .none }
+        
+        // 유효한 날짜인지 확인
+        let calendar = Calendar.current
+        var dateComponents = DateComponents()
+        dateComponents.year = yearInt
+        dateComponents.month = monthInt
+        dateComponents.day = dayInt
+        
+        guard let inputDate = calendar.date(from: dateComponents) else { return .none }
+        
+        // 오늘 날짜와 비교
+        let today = Date()
+        if inputDate > today {
+            return .futureDate
+        }
+        
+        return .none
+    }
+    
+    /// 입력값을 포커스 상태에 따라 처리합니다.
+    /// 포커스 중일 때는 숫자만 추출하고, 포커스 해제 시에는 타입에 맞게 포맷팅합니다.
+    /// - Parameters:
+    ///   - isFocus: 현재 포커스 상태
+    ///   - input: 입력된 문자열
+    /// - Returns: 처리된 문자열
     func handleInput(isFocus: Bool, _ input: String) -> String {
         if isFocus {
             return numbersOnly(input)
@@ -191,10 +288,17 @@ private extension HedgeTradeTextField {
         }
     }
     
+    /// 입력 문자열에서 숫자만 추출합니다.
+    /// - Parameter input: 입력된 문자열
+    /// - Returns: 숫자만 포함된 문자열
     func numbersOnly(_ input: String) -> String {
         return String(input.filter { $0.isNumber })
     }
     
+    /// 가격을 포맷팅합니다.
+    /// 천 단위 구분자(,)를 추가하고 선택된 통화 단위(원/$)를 붙입니다.
+    /// - Parameter input: 입력된 가격 문자열
+    /// - Returns: 포맷팅된 가격 문자열
     func formatPrice(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard !numbers.isEmpty else { return "" }
@@ -216,6 +320,10 @@ private extension HedgeTradeTextField {
         return numbers
     }
     
+    /// 거래량을 포맷팅합니다.
+    /// 천 단위 구분자(,)를 추가하고 "주" 단위를 붙입니다.
+    /// - Parameter input: 입력된 거래량 문자열
+    /// - Returns: 포맷팅된 거래량 문자열
     func formatQuantity(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard !numbers.isEmpty else { return "" }
@@ -234,6 +342,10 @@ private extension HedgeTradeTextField {
         return numbers
     }
     
+    /// 거래 날짜를 포맷팅합니다.
+    /// YYYYMMDD 형식을 "YYYY년 MM월 DD일" 형식으로 변환합니다.
+    /// - Parameter input: 입력된 날짜 문자열 (YYYYMMDD)
+    /// - Returns: 포맷팅된 날짜 문자열
     func formatTradeDate(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard numbers.count >= 8 else { return numbers }
@@ -251,6 +363,10 @@ private extension HedgeTradeTextField {
         return numbers
     }
     
+    /// 수익률을 포맷팅합니다.
+    /// 천 단위 구분자(,)를 추가하고 선택된 부호(+/-)와 "%" 단위를 붙입니다.
+    /// - Parameter input: 입력된 수익률 문자열
+    /// - Returns: 포맷팅된 수익률 문자열
     func formatYield(_ input: String) -> String {
         let numbers = numbersOnly(input)
         guard !numbers.isEmpty else { return "" }
@@ -270,6 +386,13 @@ private extension HedgeTradeTextField {
         return numbers
     }
     
+    /// 날짜의 유효성을 검증합니다.
+    /// 년, 월, 일이 유효한 날짜인지 확인합니다.
+    /// - Parameters:
+    ///   - year: 년도 문자열
+    ///   - month: 월 문자열
+    ///   - day: 일 문자열
+    /// - Returns: 유효한 날짜인지 여부
     func isValidDate(year: String, month: String, day: String) -> Bool {
         guard let yearInt = Int(year),
               let monthInt = Int(month),
@@ -290,12 +413,15 @@ private extension HedgeTradeTextField {
         return calendar.date(from: dateComponents) != nil
     }
     
+    /// 포커스 상태 변경을 처리합니다.
+    /// 포커스가 변경될 때 상태를 업데이트하고 입력값을 포맷팅합니다.
+    /// - Parameter newValue: 새로 포커스된 필드의 ID
     func handleFocusChange(_ newValue: String?) {
         DispatchQueue.main.async {
             if id == newValue {
                 textFieldFocused = true
             } else {
-                state = inputText.isEmpty ? .idle : .idleWithInput
+                state = inputText.isEmpty ? .idle : .idleWithInput(error: validateTradeDate(inputText))
                 textFieldFocused = false
             }
             
@@ -303,6 +429,7 @@ private extension HedgeTradeTextField {
         }
     }
 }
+
 
 #Preview {
     HedgeTradeTextField(inputText: .constant(""), focusedID: .constant(nil))
