@@ -232,5 +232,5 @@ struct VariousCasesDemo: View {
 }
 
 #Preview {
-    TopViewDemo()
+    TopView()
 }
