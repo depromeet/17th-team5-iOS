@@ -42,10 +42,10 @@ public struct HedgeNavigationBar: View {
                 onRightButtonTap?()
             } label: {
                 Text(buttonText)
-                    .foregroundStyle(.black)
-                    .font(.body3Semibold)
+                    .foregroundStyle(HedgeUI.brandDarken)
+                    .font(FontModel.body1Semibold)
             }
-            .padding(.horizontal, 14)
+            .padding(.trailing, 12)
         }
         .padding(.horizontal, 4)
         .frame(height: 44)
