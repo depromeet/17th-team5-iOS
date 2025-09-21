@@ -35,7 +35,4 @@ jobs:
 workflows:
   ios-ci-workflow:
     jobs:
-      - build-ios:
-          filters:
-            branches:
-              only: main
+      - build-ios
