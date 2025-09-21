@@ -10,8 +10,8 @@ jobs:
       - run:
           name: "Ensure main branch"
           command: |
-            git fetch origin main
-            git checkout origin/main
+            git fetch --prune origin main
+            git checkout -B main origin/main
       - run:
           name: "Install mise and Tuist"
           command: |
