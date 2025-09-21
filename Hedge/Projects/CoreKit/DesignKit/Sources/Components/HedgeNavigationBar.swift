@@ -14,15 +14,21 @@ import SwiftUI
 public struct HedgeNavigationBar: View {
     
     let buttonText: String
+    let color: HedgeTextButton.HedgeTextButtonColor
+    let state: HedgeTextButton.HedgeTextButtonState
     let onLeftButtonTap: (() -> Void)?
     let onRightButtonTap: (() -> Void)?
     
     public init(
         buttonText: String,
+        color: HedgeTextButton.HedgeTextButtonColor = .primary,
+        state: HedgeTextButton.HedgeTextButtonState = .active,
         onLeftButtonTap: (() -> Void)? = nil,
         onRightButtonTap: (() -> Void)? = nil
     ) {
         self.buttonText = buttonText
+        self.color = color
+        self.state = state
         self.onLeftButtonTap = onLeftButtonTap
         self.onRightButtonTap = onRightButtonTap
     }
@@ -38,14 +44,12 @@ public struct HedgeNavigationBar: View {
             
             Spacer()
             
-            Button {
+            HedgeTextButton(buttonText) {
                 onRightButtonTap?()
-            } label: {
-                Text(buttonText)
-                    .foregroundStyle(HedgeUI.brandDarken)
-                    .font(FontModel.body1Semibold)
             }
-            .padding(.trailing, 12)
+            .color(color)
+            .state(state)
+            .padding(.trailing, 6)
         }
         .padding(.horizontal, 4)
         .frame(height: 44)
