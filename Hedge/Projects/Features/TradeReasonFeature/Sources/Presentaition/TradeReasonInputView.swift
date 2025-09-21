@@ -24,48 +24,58 @@ struct TradeReasonInputView: View {
         VStack(spacing: 0) {
             HedgeNavigationBar(buttonText: "완료")
             
-            ScrollView {
-                VStack(spacing: 0) {
-                    HedgeTopView(
-                        symbolImage: symbolImage,
-                        title: title,
-                        description: description,
-                        footnote: footnote,
-                        buttonImage: Image.hedgeUI.pencil,
-                        buttonImageOnTapped: nil
-                    )
-                    
-                    Image.hedgeUI.tmpChart
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(maxWidth: .infinity)
-                    
-                    Rectangle()
-                        .frame(height: 16)
-                        .foregroundStyle(.clear)
-                    
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: $text)
-                            .focused($isFocused)
-                            .tint(.black)
-                            .font(FontModel.body3Medium)
-                            .foregroundStyle(Color.hedgeUI.textTitle)
-                            .padding(.zero)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        HedgeTopView(
+                            symbolImage: symbolImage,
+                            title: title,
+                            description: description,
+                            footnote: footnote,
+                            buttonImage: Image.hedgeUI.pencil,
+                            buttonImageOnTapped: nil
+                        )
                         
-                        if text.isEmpty && !isFocused {
-                            Text("매매 근거를 작성해보세요")
+                        Image.hedgeUI.tmpChart
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(maxWidth: .infinity)
+                        
+                        Rectangle()
+                            .frame(height: 16)
+                            .foregroundStyle(.clear)
+                        
+                        ZStack(alignment: .topLeading) {
+                            TextEditor(text: $text)
+                                .focused($isFocused)
+                                .tint(.black)
                                 .font(FontModel.body3Medium)
-                                .foregroundStyle(Color.hedgeUI.textAssistive)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .allowsHitTesting(false)
-                                .offset(x: 8, y: 8) // UITextView 기본 textContainerInset 값
+                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                .scrollContentBackground(.hidden)
+                            
+                            if text.isEmpty && !isFocused {
+                                Text("매매 근거를 작성해보세요")
+                                    .font(FontModel.body3Medium)
+                                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                                    .frame(maxWidth: .infinity, minHeight: 100, alignment: .topLeading)
+                                    .allowsHitTesting(false)
+                                    .offset(x: 8, y: 8) // UITextView 기본 textContainerInset 값
+                            }
+                        }
+                        .onTapGesture {
+                            isFocused = true
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, -8)
+                        .id("textEditorArea") // TextEditor 영역에 ID 부여
+                    }
+                }
+                .onChange(of: text) { _, newValue in
+                    if isFocused && !newValue.isEmpty {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo("textEditorArea", anchor: .bottom)
                         }
                     }
-                    .onTapGesture {
-                        isFocused = true
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, -8)
                 }
             }
         }
