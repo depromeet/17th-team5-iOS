@@ -6,7 +6,11 @@ jobs:
       xcode: 16.2.0
     resource_class: macos.m1.medium.gen1
     steps:
-      - checkout
+      - run:
+        name: "checkout main"
+        command: |
+            git fetch origin main
+            git checkout origin/main
       - run:
           name: "Install mise and Tuist"
           command: |
@@ -36,3 +40,6 @@ workflows:
   ios-ci-workflow:
     jobs:
       - build-ios
+          filters:
+            branches:
+              only: main
