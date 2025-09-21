@@ -8,6 +8,7 @@
 
 import SwiftUI
 import DesignKit
+import Combine
 
 public struct TradeHistoryInputView: View {
     
@@ -21,35 +22,45 @@ public struct TradeHistoryInputView: View {
     @State var yield: String = ""
     @State var focusedID: String? = nil
     @State var isYieldInputVisible: Bool = false
+    @State var selectedDate: Date = Date()
+    @State var showDatePicker: Bool = false
     
-    // 첫 번째 구분선 색상 (buy/SellPrice와 quantity 사이)
+    @State private var cancellables = Set<AnyCancellable>()
+    
+    // MARK: - Computed Properties
+    
+    /// 첫 번째 구분선 색상 (매수가/매도가와 거래량 사이)
     private var firstDividerColor: Color {
-        guard let focuedID = focusedID else { return Color.hedgeUI.grey200 }
+        guard let focusedID = focusedID else { return Color.hedgeUI.grey200 }
         
-        if focuedID == HedgeTradeTextField.HedgeTextFieldType.buyPrice.rawValue ||
-            focuedID == HedgeTradeTextField.HedgeTextFieldType.sellPrice.rawValue ||
-            focuedID == HedgeTradeTextField.HedgeTextFieldType.quantity.rawValue {
+        if focusedID == HedgeTradeTextField.HedgeTextFieldType.buyPrice.rawValue ||
+            focusedID == HedgeTradeTextField.HedgeTextFieldType.sellPrice.rawValue ||
+            focusedID == HedgeTradeTextField.HedgeTextFieldType.quantity.rawValue {
             return .clear
         }
         return Color.hedgeUI.grey200
     }
     
-    // 두 번째 구분선 색상 (quantity와 tradeDate 사이)
+    /// 두 번째 구분선 색상 (거래량과 거래날짜 사이)
     private var secondDividerColor: Color {
-        guard let focuedID = focusedID else { return Color.hedgeUI.grey200 }
+        guard let focusedID = focusedID else { return Color.hedgeUI.grey200 }
         
-        if focuedID == HedgeTradeTextField.HedgeTextFieldType.quantity.rawValue ||
-           focuedID == HedgeTradeTextField.HedgeTextFieldType.tradeDate.rawValue {
+        if focusedID == HedgeTradeTextField.HedgeTextFieldType.quantity.rawValue ||
+           focusedID == HedgeTradeTextField.HedgeTextFieldType.tradeDate.rawValue {
             return .clear
         }
         return Color.hedgeUI.grey200
     }
+    
+    // MARK: - Initializer
     
     public init(image: Image, stockTitle: String, description: String) {
         self.image = image
         self.stockTitle = stockTitle
         self.description = description
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         
@@ -63,7 +74,11 @@ public struct TradeHistoryInputView: View {
                 HedgeNavigationBar(buttonText: "", onLeftButtonTap: nil)
                 
                 VStack(spacing: 16) {
-                    topView
+                    HedgeTopView(
+                        symbolImage: image,
+                        title: stockTitle,
+                        description: description
+                    )
                     
                     textFieldGroup
                 }
@@ -78,7 +93,7 @@ public struct TradeHistoryInputView: View {
                 
                 Spacer()
                 
-                YieldInputToggleRow
+                yieldInputToggleRow
                 
                 HedgeBottomCTAButton()
                     .style(.oneButton(
@@ -88,30 +103,15 @@ public struct TradeHistoryInputView: View {
                         }))
             }
         }
-    }
-    
-    @ViewBuilder
-    private var topView: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 7) {
-                image
-                    .resizable()
-                    .frame(width: 22, height: 22)
-                
-                Text(stockTitle)
-                    .font(FontModel.body3Medium)
-                    .foregroundStyle(Color.hedgeUI.grey900)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            
-            Text(description)
-                .font(FontModel.h1Semibold)
-                .foregroundStyle(Color.hedgeUI.grey900)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear {
+            registerKeyboardDismissal()
+            registerDatePickerDisplay()
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 10)
     }
+}
+
+// MARK: - SubViews
+extension TradeHistoryInputView {
     
     @ViewBuilder
     private var textFieldGroup: some View {
@@ -136,6 +136,27 @@ public struct TradeHistoryInputView: View {
             
             HedgeTradeTextField(inputText: $tradingDate, focusedID: $focusedID)
                 .type(.tradeDate)
+                .sheet(isPresented: $showDatePicker) {
+                    VStack {
+                        DatePicker("날짜 선택", selection: $selectedDate, displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                        
+                        Button("완료") {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "yyyy-MM-dd"
+                            tradingDate = formatter.string(from: selectedDate)
+                            focusedID = nil
+                            showDatePicker = false
+                        }
+                    }
+                    .onDisappear(perform: {
+                        focusedID = nil
+                        showDatePicker = false
+                    })
+                    .presentationDetents([.height(100)])
+                    .presentationBackground(.white)
+                    .presentationCornerRadius(20)
+                }
         }
         .background(
             RoundedRectangle(cornerRadius: 16)
@@ -145,7 +166,7 @@ public struct TradeHistoryInputView: View {
     }
     
     @ViewBuilder
-    private var YieldInputToggleRow: some View {
+    private var yieldInputToggleRow: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("수익률도 입력하기")
@@ -162,7 +183,10 @@ public struct TradeHistoryInputView: View {
         }
         .padding(.horizontal, 20)
     }
-    
+}
+
+// MARK: - Custom Styles
+extension TradeHistoryInputView {
     struct CustomToggleStyle: ToggleStyle {
         func makeBody(configuration: Configuration) -> some View {
             HStack {
@@ -184,6 +208,32 @@ public struct TradeHistoryInputView: View {
                     }
             }
         }
+    }
+}
+
+// MARK: - Keyboard Management
+extension TradeHistoryInputView {
+    /// 키보드가 표시될 때 자동으로 숨기는 기능을 등록합니다.
+    private func registerKeyboardDismissal() {
+        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
+            .compactMap { _ in focusedID }
+            .filter { $0 == HedgeTradeTextField.HedgeTextFieldType.tradeDate.rawValue }
+            .sink { _ in
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+            .store(in: &cancellables)
+    }
+    
+    /// 키보드가 표시될 때 DatePicker를 표시하는 기능을 등록합니다.
+    private func registerDatePickerDisplay() {
+        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
+            .compactMap { _ in focusedID }
+            .filter { $0 == HedgeTradeTextField.HedgeTextFieldType.tradeDate.rawValue }
+            .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
+            .sink { _ in
+                showDatePicker = true
+            }
+            .store(in: &cancellables)
     }
 }
 
