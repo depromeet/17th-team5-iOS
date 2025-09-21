@@ -8,6 +8,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "Ensure main branch"
+          command: |
+            git fetch origin main
+            git checkout main origin/main
+      - run:
           name: "Install mise and Tuist"
           command: |
             cd Hedge
@@ -38,4 +43,5 @@ workflows:
       - build-ios:
           filters:
             branches:
-              only: main
+              only:
+                - main
