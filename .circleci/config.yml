@@ -10,7 +10,7 @@ jobs:
       - run:
           name: "Install mise and Tuist"
           command: |
-            cd Sample
+            cd Hedge
             curl https://mise.run | sh
             echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
             echo 'eval "$(/Users/distiller/.local/bin/mise activate bash)"' >> $BASH_ENV
@@ -19,18 +19,18 @@ jobs:
       - run:
           name: "Install dependencies"
           command: |
-            cd Sample
+            cd Hedge
             tuist install
       - run:
           name: "Generate Xcode project"
           command: |
-            cd Sample
+            cd Hedge
             tuist generate
 #      - run:
 #          name: "Build project"
 #          command: |
-#            cd Sample
-#            xcodebuild -workspace Sample.xcworkspace -scheme Sample -destination 'platform=iOS Simulator,name=iPhone 15' build
+#            cd Hedge
+#            xcodebuild -workspace Hedge.xcworkspace -scheme Hedge -destination 'platform=iOS Simulator,name=iPhone 15' build
 
 workflows:
   ios-ci-workflow:

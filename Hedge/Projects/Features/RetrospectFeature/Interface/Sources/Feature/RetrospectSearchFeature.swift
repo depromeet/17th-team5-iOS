@@ -11,10 +11,15 @@ import Foundation
 import ComposableArchitecture
 
 import Core
+import Shared
+
+import StockDomainInterface
 
 @Reducer
 public struct RetrospectSearchFeature {
     private let coordinator: RetrospectCoordinator
+    
+    private let fetchStockSearchUseCase = DIContainer.resolve(FetchStockSearchUseCase.self)
     
     public init(coordinator: RetrospectCoordinator) {
         self.coordinator = coordinator
@@ -23,6 +28,7 @@ public struct RetrospectSearchFeature {
     @ObservableState
     public struct State: Equatable {
         public var searchText: String = ""
+        public var stocks: [StockSearch] = []
         public init() {}
     }
     
@@ -36,12 +42,21 @@ public struct RetrospectSearchFeature {
     }
     
     public enum View {
+        case onAppear
         case backButtonTapped
     }
-    public enum InnerAction { }
-    public enum AsyncAction { }
+    public enum InnerAction {
+        case fetchStockSuccess([StockSearch])
+        case failure(Error)
+    }
+    public enum AsyncAction {
+        case fetchStockSearch(String)
+    }
     public enum ScopeAction { }
     public enum DelegateAction { }
+    
+    // MARK: - Debounce ID
+    private enum CancelID { case searchDebounce }
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -57,7 +72,19 @@ extension RetrospectSearchFeature {
         _ action: Action
     ) -> Effect<Action> {
         switch action {
-        case .binding(_):
+        case .binding(\.searchText):
+            let text = state.searchText
+            return .run { send in
+                guard !text.isEmpty else { return }
+                await send(.async(.fetchStockSearch(text)))
+            }
+            .debounce(
+                id: CancelID.searchDebounce,
+                for: 0.5,
+                scheduler: RunLoop.main
+            )
+            
+        case .binding:
             return .none
             
         case .view(let action):
@@ -83,6 +110,8 @@ extension RetrospectSearchFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
+        case .onAppear:
+            return .none
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
@@ -95,7 +124,13 @@ extension RetrospectSearchFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
+        case .fetchStockSuccess(let response):
+            state.stocks = response
+            return .none
             
+        case .failure(let error):
+            Log.debug("error: \(error)")
+            return .none
         }
     }
     
@@ -105,7 +140,15 @@ extension RetrospectSearchFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-            
+        case .fetchStockSearch(let text):
+            return .run { send in
+                do {
+                    let response = try await fetchStockSearchUseCase.execute(text: text)
+                    await send(.inner(.fetchStockSuccess(response)))
+                } catch {
+                    await send(.inner(.failure(error)))
+                }
+            }
         }
     }
     
@@ -114,9 +157,7 @@ extension RetrospectSearchFeature {
         _ state: inout State,
         _ action: ScopeAction
     ) -> Effect<Action> {
-        switch action {
-            
-        }
+        
     }
     
     // MARK: - Delegate Core
@@ -124,8 +165,6 @@ extension RetrospectSearchFeature {
         _ state: inout State,
         _ action: DelegateAction
     ) -> Effect<Action> {
-        switch action {
-            
-        }
+        
     }
 }

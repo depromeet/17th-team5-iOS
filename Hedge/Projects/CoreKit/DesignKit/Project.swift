@@ -12,6 +12,7 @@ let project = Project.configure(
     moduleType: .module(name: "DesignKit"),
     product: .framework,
     dependencies: [
+        .Library.kingfisher
     ],
     hasResources: true,
     hasDemo: true

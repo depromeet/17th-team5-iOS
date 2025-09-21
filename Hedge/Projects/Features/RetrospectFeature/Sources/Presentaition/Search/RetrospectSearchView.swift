@@ -27,7 +27,11 @@ public struct RetrospectSearchView: View {
             guideText
             searchTextField
             retrospectTitle
+            stockListView
             Spacer()
+        }
+        .onAppear {
+            send(.onAppear)
         }
     }
     
@@ -70,5 +74,18 @@ public struct RetrospectSearchView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
+    }
+    
+    private var stockListView: some View {
+        ScrollView(showsIndicators: false) {
+            LazyVStack {
+                ForEach(store.stocks, id: \.self) { stock in
+                    StockRow(
+                        symbol: stock.symbol,
+                        title: stock.title
+                    )
+                }
+            }
+        }
     }
 }
