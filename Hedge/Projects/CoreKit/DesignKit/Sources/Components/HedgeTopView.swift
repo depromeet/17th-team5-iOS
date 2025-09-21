@@ -86,7 +86,7 @@ public struct HedgeTopView: View {
         title: "삼성전자",
         description: "얼마에 매도하셨나요?",
         footnote: "얼마에 매도하셨나요?",
-        buttonImage: HedgeUI.close) {
+        buttonImage: HedgeUI.closeFill) {
             print("button Image tapped")
         }
 }

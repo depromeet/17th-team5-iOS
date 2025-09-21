@@ -15,6 +15,9 @@ public struct InfoPlist {
         "UIUserInterfaceStyle": "Light",
         "LSSupportsOpeningDocumentsInPlace": true,
         "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": [
+            "NSAllowsArbitraryLoads": true
+        ],
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
             "UISceneConfigurations": [

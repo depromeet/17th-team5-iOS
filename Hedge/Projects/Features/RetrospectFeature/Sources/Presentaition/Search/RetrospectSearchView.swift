@@ -12,6 +12,7 @@ import ComposableArchitecture
 
 import RetrospectFeatureInterface
 import DesignKit
+import Core
 
 @ViewAction(for: RetrospectSearchFeature.self)
 public struct RetrospectSearchView: View {
@@ -26,8 +27,12 @@ public struct RetrospectSearchView: View {
             navigationBar
             guideText
             searchTextField
-            retrospectTitle
-            stockListView
+            if store.stocks.isEmpty {
+                emptyErrorView
+            } else {
+                retrospectTitle
+                stockListView
+            }
             Spacer()
         }
         .onAppear {
@@ -87,5 +92,9 @@ public struct RetrospectSearchView: View {
                 }
             }
         }
+    }
+    
+    private var emptyErrorView: some View {
+        EmptyErrorView()
     }
 }
