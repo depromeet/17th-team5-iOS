@@ -12,26 +12,39 @@ struct ImageView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 20) {
-                // Chevron Left Images
-                ImageSection(title: "Chevron Left") {
-                    ImageRow(name: "chevronLeftSmall", image: Image.hedgeUI.chevronLeftSmall)
-                    ImageRow(name: "chevronLeftThickSmall", image: Image.hedgeUI.chevronLeftThickSmall)
-                    ImageRow(name: "chevronLeftTightSmall", image: Image.hedgeUI.chevronLeftTightSmall)
-                    ImageRow(name: "chevronLeftTightThickSmall", image: Image.hedgeUI.chevronLeftTightThickSmall)
-                }
-                
-                // Chevron Right Images
-                ImageSection(title: "Chevron Right") {
-                    ImageRow(name: "chevronRightSmall", image: Image.hedgeUI.chevronRightSmall)
-                    ImageRow(name: "chevronRightThickSmall", image: Image.hedgeUI.chevronRightThickSmall)
-                    ImageRow(name: "chevronRightTightSmall", image: Image.hedgeUI.chevronRightTightSmall)
-                    ImageRow(name: "chevronRightTightThickSmall", image: Image.hedgeUI.chevronRightTightThickSmall)
-                }
-                
                 // Close Images
                 ImageSection(title: "Close") {
-                    ImageRow(name: "close", image: Image.hedgeUI.close)
+                    ImageRow(name: "closeThin", image: Image.hedgeUI.closeThin)
                     ImageRow(name: "closeThick", image: Image.hedgeUI.closeThick)
+                    ImageRow(name: "closeFill", image: Image.hedgeUI.closeFill)
+                }
+                
+                // Arrow Images
+                ImageSection(title: "Arrow") {
+                    ImageRow(name: "arrowLeftThin", image: Image.hedgeUI.arrowLeftThin)
+                    ImageRow(name: "arrowLeftThick", image: Image.hedgeUI.arrowLeftThick)
+                    ImageRow(name: "arrowRightThin", image: Image.hedgeUI.arrowRightThin)
+                    ImageRow(name: "arrowRightThick", image: Image.hedgeUI.arrowRightThick)
+                    ImageRow(name: "arrowDown", image: Image.hedgeUI.arrowDown)
+                }
+                
+                // Action Images
+                ImageSection(title: "Actions") {
+                    ImageRow(name: "search", image: Image.hedgeUI.search)
+                    ImageRow(name: "edit", image: Image.hedgeUI.edit)
+                    ImageRow(name: "pencil", image: Image.hedgeUI.pencil)
+                    ImageRow(name: "copy", image: Image.hedgeUI.copy)
+                    ImageRow(name: "trash", image: Image.hedgeUI.trash)
+                }
+                
+                // Status Images
+                ImageSection(title: "Status") {
+                    ImageRow(name: "error", image: Image.hedgeUI.error)
+                }
+                
+                // Temporary Images
+                ImageSection(title: "Temporary") {
+                    ImageRow(name: "tmpChart", image: Image.hedgeUI.tmpChart)
                 }
             }
             .padding()

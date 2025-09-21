@@ -33,9 +33,6 @@ struct TradeReasonInputView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(maxWidth: .infinity)
-                        .overlay {
-                            Color.secondary
-                        }
                     
                     Rectangle()
                         .frame(height: 16)

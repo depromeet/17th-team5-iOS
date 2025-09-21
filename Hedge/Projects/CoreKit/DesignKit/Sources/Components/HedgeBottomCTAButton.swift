@@ -58,7 +58,7 @@ public struct HedgeBottomCTAButton: View {
             }
             
             if let text {
-                HedgeButton(text) { }
+                HedgeTextButton(text) { }
                 .size(.large)
                 .state(.active)
             }

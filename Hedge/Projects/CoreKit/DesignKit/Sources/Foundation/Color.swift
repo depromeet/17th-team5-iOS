@@ -25,15 +25,9 @@ extension HedgeUI where Base == Color {
     public static var greyOpacity300: Color { asset(#function) }
     public static var greyOpacity600: Color { asset(#function) }
     
-    public static var blue500: Color { asset(#function) }
-    
     public static var backgroundGrey: Color { asset(#function) }
     public static var backgroundWhite: Color { asset(#function) }
     public static var backgroundSecondary: Color { asset(#function) }
-    
-    public static var brand500: Color { asset(#function) }
-    
-    public static var purple700: Color { asset(#function) }
     
     // MARK: - Semantic
     

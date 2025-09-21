@@ -35,10 +35,10 @@ struct ColorView: View {
                 
                 // Brand & Accent Colors
                 ColorSection(title: "Brand & Accent Colors") {
-                    ColorRow(name: "brand500", color: Color.hedgeUI.brand500)
-                    ColorRow(name: "blue500", color: Color.hedgeUI.blue500)
-                    ColorRow(name: "red500", color: Color.hedgeUI.red500)
-                    ColorRow(name: "red700", color: Color.hedgeUI.red700)
+                    ColorRow(name: "brandPrimary", color: Color.hedgeUI.brandPrimary)
+                    ColorRow(name: "brandDarken", color: Color.hedgeUI.brandDarken)
+                    ColorRow(name: "brandSecondary", color: Color.hedgeUI.brandSecondary)
+                    ColorRow(name: "brandDisabled", color: Color.hedgeUI.brandDisabled)
                 }
                 
                 // Background Colors

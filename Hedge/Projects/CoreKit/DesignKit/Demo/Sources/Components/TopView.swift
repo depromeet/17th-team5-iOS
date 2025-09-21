@@ -72,7 +72,7 @@ struct ButtonTopViewDemo: View {
                 symbolImage: HedgeUI.search,
                 title: "삼성전자",
                 description: "얼마에 매도하셨나요?",
-                buttonImage: HedgeUI.close
+                buttonImage: HedgeUI.closeThin
             ) {
                 print("닫기 버튼 탭")
             }
@@ -124,7 +124,7 @@ struct CompleteTopViewDemo: View {
                 title: "삼성전자",
                 description: "얼마에 매도하셨나요?",
                 footnote: "최근 거래 내역을 확인해보세요",
-                buttonImage: HedgeUI.close
+                buttonImage: HedgeUI.closeThin
             ) {
                 print("완전한 TopView 닫기")
             }
@@ -172,7 +172,7 @@ struct VariousCasesDemo: View {
                         symbolImage: HedgeUI.search,
                         title: "버튼 TopView",
                         description: "버튼이 있는 TopView입니다",
-                        buttonImage: HedgeUI.close
+                        buttonImage: HedgeUI.closeThin
                     ) {
                         print("버튼 탭됨")
                     }
@@ -203,7 +203,7 @@ struct VariousCasesDemo: View {
                         title: "완전한 TopView",
                         description: "모든 요소가 포함된 TopView입니다",
                         footnote: "추가 정보를 제공하는 footnote입니다",
-                        buttonImage: HedgeUI.close
+                        buttonImage: HedgeUI.closeThin
                     ) {
                         print("완전한 TopView 버튼 탭됨")
                     }

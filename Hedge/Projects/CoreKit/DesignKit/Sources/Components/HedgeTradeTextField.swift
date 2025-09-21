@@ -47,10 +47,10 @@ public struct HedgeTradeTextField: View {
                     TextField(type.placeHolder, text: $inputText) { isEditing in
                         if isEditing { handleTap() }
                     }
-                    .tint(Color.hedgeUI.grey900)
+                    .tint(Color.hedgeUI.brandPrimary)
                     .focused($textFieldFocused)
                     .font(.body1Semibold)
-                    .foregroundStyle(Color.hedgeUI.brand500)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
                     .frame(height: 25)
                     .keyboardType(.numberPad)
                     .transition(.asymmetric(
@@ -170,11 +170,11 @@ extension HedgeTradeTextField {
             case .idle:
                 return Color.hedgeUI.grey400
             case .focusing:
-                return Color.hedgeUI.grey500
+                return Color.hedgeUI.brandDarken
             case .idleWithInput(let error), .focusingWithInput(let error):
                 switch error {
                 case .none:
-                    return Color.hedgeUI.grey500
+                    return Color.hedgeUI.brandDarken
                 case .futureDate:
                     return Color.hedgeUI.feedbackError
                 }
@@ -186,11 +186,11 @@ extension HedgeTradeTextField {
             case .idle, .idleWithInput:
                 return .clear
             case .focusing:
-                return Color.hedgeUI.brand500
+                return Color.hedgeUI.brandDarken
             case .focusingWithInput(let error):
                 switch error {
                 case .none:
-                    return Color.hedgeUI.brand500
+                    return Color.hedgeUI.brandDarken
                 case .futureDate:
                     return Color.hedgeUI.feedbackError
                 }
