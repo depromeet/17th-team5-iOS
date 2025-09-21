@@ -125,11 +125,12 @@ extension RetrospectSearchFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchStockSuccess(let response):
+            Log.debug("주식 조회 결과: \(response)")
             state.stocks = response
             return .none
             
         case .failure(let error):
-            Log.debug("error: \(error)")
+            Log.error("error: \(error)")
             return .none
         }
     }
