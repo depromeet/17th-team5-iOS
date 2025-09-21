@@ -6,9 +6,10 @@ jobs:
       xcode: 16.2.0
     resource_class: macos.m1.medium.gen1
     steps:
+      - checkout
       - run:
-        name: "checkout main"
-        command: |
+          name: "Ensure main branch"
+          command: |
             git fetch origin main
             git checkout origin/main
       - run:
@@ -39,7 +40,8 @@ jobs:
 workflows:
   ios-ci-workflow:
     jobs:
-    - build-ios
-        filters:
+      - build-ios:
+          filters:
             branches:
-                only: main
+              only:
+                - main
