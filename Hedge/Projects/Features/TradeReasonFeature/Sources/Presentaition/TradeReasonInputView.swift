@@ -11,6 +11,11 @@ import DesignKit
 
 struct TradeReasonInputView: View {
     
+    var symbolImage: Image
+    var title: String
+    var description: String
+    var footnote: String
+    
     @State var text: String = ""
     @FocusState private var isFocused: Bool
     
@@ -21,13 +26,14 @@ struct TradeReasonInputView: View {
             
             ScrollView {
                 VStack(spacing: 0) {
-                    // TODO: 탑뷰 들어갈 자리
-                    Rectangle()
-                        .frame(height: 98)
-                        .foregroundStyle(Color.hedgeUI.backgroundGrey)
-                        .overlay {
-                            Text("대충 탑뷰 들어갈 자리")
-                        }
+                    HedgeTopView(
+                        symbolImage: symbolImage,
+                        title: title,
+                        description: description,
+                        footnote: footnote,
+                        buttonImage: Image.hedgeUI.pencil,
+                        buttonImageOnTapped: nil
+                    )
                     
                     Image.hedgeUI.tmpChart
                         .resizable()
@@ -71,5 +77,5 @@ struct TradeReasonInputView: View {
 }
 
 #Preview {
-    TradeReasonInputView()
+    TradeReasonInputView(symbolImage: HedgeUI.trash, title: "종목명", description: "65,000원・3주 매도", footnote: "2025년 8월 25일")
 }
