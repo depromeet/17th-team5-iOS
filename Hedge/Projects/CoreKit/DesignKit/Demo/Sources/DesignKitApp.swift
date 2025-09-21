@@ -96,6 +96,12 @@ struct ContentView: View {
                                 Text("TextButtons")
                             }
                         }
+                        
+                        NavigationLink(destination: TopView()) {
+                            HStack {
+                                Text("TopView")
+                            }
+                        }
                     }
                 }
             }
