@@ -13,6 +13,7 @@ let project = Project.configure(
     product: .staticFramework,
     dependencies: [
         .Feature.Home.feature,
-        .Feature.Retrospect.feature
+        .Feature.Retrospect.feature,
+        .Feature.TradeHistoryInput.feature,
     ]
 )
