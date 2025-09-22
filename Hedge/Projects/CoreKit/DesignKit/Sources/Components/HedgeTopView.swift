@@ -60,9 +60,8 @@ public struct HedgeTopView: View {
                         buttonImageOnTapped?()
                     } label: {
                         buttonImage
-                            .resizable()
-                            .frame(width: 30, height: 30)
                     }
+                    .frame(width: 30, height: 30)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

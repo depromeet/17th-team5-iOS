@@ -160,7 +160,7 @@ extension HedgeActionButton {
             case .primary:
                 return Color.hedgeUI.brandPrimary
             case .secondary:
-                return Color.hedgeUI.brandSecondary
+                return Color.hedgeUI.neutralBgSecondary
             }
         }
         
@@ -169,7 +169,7 @@ extension HedgeActionButton {
             case .primary:
                 return Color.hedgeUI.brandDisabled
             case .secondary:
-                return Color.hedgeUI.brandSecondary
+                return Color.hedgeUI.neutralBgSecondary
             }
         }
     }

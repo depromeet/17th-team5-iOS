@@ -1,5 +1,5 @@
 //
-//  ButtonView.swift
+//  TextButtonView.swift
 //  DesignKit
 //
 //  Created by 이중엽 on 9/17/25.
@@ -10,7 +10,7 @@ import SwiftUI
 
 import DesignKit
 
-struct ButtonView: View {
+struct TextButtonView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -20,19 +20,19 @@ struct ButtonView: View {
                         .font(.headline)
                     
                     VStack(spacing: 8) {
-                        HedgeButton("Large 버튼") { }
+                        HedgeTextButton("Large 버튼") { }
                             .size(.large)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.active)
                         
-                        HedgeButton("Medium 버튼") { }
+                        HedgeTextButton("Medium 버튼") { }
                             .size(.medium)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.active)
                         
-                        HedgeButton("Small 버튼") { }
+                        HedgeTextButton("Small 버튼") { }
                             .size(.small)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.active)
                     }
                 }
@@ -43,12 +43,12 @@ struct ButtonView: View {
                         .font(.headline)
                     
                     VStack(spacing: 8) {
-                        HedgeButton("아이콘 있음") { }
+                        HedgeTextButton("아이콘 있음") { }
                             .size(.medium)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.active)
                         
-                        HedgeButton("아이콘 없음") { }
+                        HedgeTextButton("아이콘 없음") { }
                             .size(.medium)
                             .icon(.off)
                             .state(.active)
@@ -61,14 +61,14 @@ struct ButtonView: View {
                         .font(.headline)
                     
                     VStack(spacing: 8) {
-                        HedgeButton("Active 상태") { }
+                        HedgeTextButton("Active 상태") { }
                             .size(.medium)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.active)
                         
-                        HedgeButton("Disabled 상태") { }
+                        HedgeTextButton("Disabled 상태") { }
                             .size(.medium)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.disabled)
                     }
                 }
@@ -79,22 +79,22 @@ struct ButtonView: View {
                         .font(.headline)
                     
                     VStack(spacing: 8) {
-                        HedgeButton("Large + Icon + Active") { }
+                        HedgeTextButton("Large + Icon + Active") { }
                             .size(.large)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.active)
                         
-                        HedgeButton("Medium + No Icon + Disabled") { }
+                        HedgeTextButton("Medium + No Icon + Disabled") { }
                             .size(.medium)
                             .icon(.off)
                             .state(.disabled)
                         
-                        HedgeButton("Small + Icon + Disabled") { }
+                        HedgeTextButton("Small + Icon + Disabled") { }
                             .size(.small)
-                            .icon(Image.hedgeUI.chevronRightSmall)
+                            .icon(Image.hedgeUI.arrowRightThin)
                             .state(.disabled)
                         
-                        HedgeButton("Large + No Icon + Active") { }
+                        HedgeTextButton("Large + No Icon + Active") { }
                             .size(.large)
                             .icon(.off)
                             .state(.active)
@@ -107,5 +107,5 @@ struct ButtonView: View {
 }
 
 #Preview {
-    ButtonView()
+    TextButtonView()
 }

@@ -2,7 +2,7 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.configure(
-    moduleType: .micro(name: "RetrospectFeature"),
+    moduleType: .micro(name: "TradeReasonFeature"),
     product: .staticFramework,
     dependencies: [
         .Core.core

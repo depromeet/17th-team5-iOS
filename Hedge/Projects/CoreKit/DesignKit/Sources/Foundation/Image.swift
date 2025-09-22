@@ -27,6 +27,9 @@ extension HedgeUI where Base == Image {
     
     // MARK: Size 30
     public static var error: Image { asset(#function) }
+    
+    // TODO: 임시 차트 이미지 추후 삭제
+    public static var tmpChart: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {

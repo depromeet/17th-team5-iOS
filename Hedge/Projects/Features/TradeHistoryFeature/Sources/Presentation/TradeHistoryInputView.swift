@@ -101,6 +101,7 @@ public struct TradeHistoryInputView: View {
                         onTapped: {
                             print("다음")
                         }))
+                    .bg(.transparent)
             }
         }
         .onAppear {

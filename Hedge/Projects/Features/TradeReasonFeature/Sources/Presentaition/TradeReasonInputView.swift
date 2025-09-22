@@ -1,0 +1,91 @@
+//
+//  TradeReasonInputView.swift
+//  TradeReasonFeature
+//
+//  Created by 이중엽 on 9/21/25.
+//  Copyright © 2025 HedgeCompany. All rights reserved.
+//
+
+import SwiftUI
+import DesignKit
+
+struct TradeReasonInputView: View {
+    
+    var symbolImage: Image
+    var title: String
+    var description: String
+    var footnote: String
+    
+    @State var text: String = ""
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        
+        VStack(spacing: 0) {
+            HedgeNavigationBar(buttonText: "완료")
+            
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        HedgeTopView(
+                            symbolImage: symbolImage,
+                            title: title,
+                            description: description,
+                            footnote: footnote,
+                            buttonImage: Image.hedgeUI.pencil,
+                            buttonImageOnTapped: nil
+                        )
+                        
+                        Image.hedgeUI.tmpChart
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(maxWidth: .infinity)
+                        
+                        Rectangle()
+                            .frame(height: 16)
+                            .foregroundStyle(.clear)
+                        
+                        ZStack(alignment: .topLeading) {
+                            TextEditor(text: $text)
+                                .focused($isFocused)
+                                .tint(.black)
+                                .font(FontModel.body3Medium)
+                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                .scrollContentBackground(.hidden)
+                            
+                            if text.isEmpty && !isFocused {
+                                Text("매매 근거를 작성해보세요")
+                                    .font(FontModel.body3Medium)
+                                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                                    .frame(maxWidth: .infinity, minHeight: 100, alignment: .topLeading)
+                                    .allowsHitTesting(false)
+                                    .offset(x: 8, y: 8) // UITextView 기본 textContainerInset 값
+                            }
+                        }
+                        .onTapGesture {
+                            isFocused = true
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, -8)
+                        .id("textEditorArea") // TextEditor 영역에 ID 부여
+                    }
+                }
+                .onChange(of: text) { _, newValue in
+                    if isFocused && !newValue.isEmpty {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo("textEditorArea", anchor: .bottom)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.zero)
+        .onTapGesture {
+            isFocused = false
+        }
+    }
+}
+
+#Preview {
+    TradeReasonInputView(symbolImage: HedgeUI.trash, title: "종목명", description: "65,000원・3주 매도", footnote: "2025년 8월 25일")
+}
