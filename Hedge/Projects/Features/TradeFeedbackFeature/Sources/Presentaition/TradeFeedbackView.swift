@@ -12,7 +12,7 @@ import DesignKit
 
 struct TradeFeedbackView: View {
     
-    @State private var selectedTab = 0
+    @State private var selectedTab: Int = 0
     
     var symbolImage: Image
     var title: String
@@ -44,70 +44,87 @@ struct TradeFeedbackView: View {
                     .foregroundStyle(.clear)
                 
                 VStack(spacing: 0) {
+                    // 탭 헤더
                     HStack(spacing: 0) {
                         Text("나의 회고")
                             .font(FontModel.body2Medium)
+                            .foregroundColor(selectedTab == 0 ? Color.hedgeUI.textPrimary : Color.hedgeUI.textAlternative)
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    selectedTab = 0
+                                }
+                            }
                         
                         Text("AI 피드백")
                             .font(FontModel.body2Medium)
+                            .foregroundColor(selectedTab == 1 ? Color.hedgeUI.textPrimary : Color.hedgeUI.textAlternative)
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    selectedTab = 1
+                                }
+                            }
                     }
                     .padding(.vertical, 12)
                     
+                    // 선택된 탭의 밑줄
                     Rectangle()
-                        .frame(width: geometry.size.width / 2, height: 2)
+                        .foregroundColor(.primary)
+                        .offset(x: selectedTab == 0 ? -(geometry.size.width / 4) : (geometry.size.width / 4))
+                        .frame(width: geometry.size.width / 2, height: 2, alignment: .leading)
+                        .animation(.easeInOut(duration: 0.3), value: selectedTab)
                     
+                    // 전체 밑줄
                     Rectangle()
-                        .frame(width: .infinity, height: 1)
+                        .frame(height: 1)
                         .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
                 }
                 
-                // 커스텀 탭 UI with 애니메이션
-                ScrollView(.horizontal, showsIndicators: false) {
+                // TabView로 페이지네이션
+                TabView(selection: $selectedTab) {
+                    retrospectTab
+                        .tag(0)
                     
-                    HStack(spacing: 0) {
-                        retrospectTab
-                            .frame(width: geometry.size.width, alignment: .leading)
-                        
-                        feedbackTab
-                            .frame(width: geometry.size.width, alignment: .leading)
-                    }
-                    
+                    feedbackTab
+                        .tag(1)
                 }
-                .scrollTargetBehavior(.paging)
-                
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
-        
     }
 }
+
 
 // MARK: Subviews
 extension TradeFeedbackView {
     @ViewBuilder
     private var retrospectTab: some View {
         ScrollView(.vertical) {
-            Text("2025년 8월 25일")
-                .font(.body)
-                .foregroundColor(.primary)
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
-            
-            Spacer()
+            VStack(alignment: .leading, spacing: 0) {
+                Text("2025년 8월 25일")
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .padding(.top, 16)
+                    .padding(.horizontal, 16)
+                
+                Spacer()
+            }
         }
     }
     
     @ViewBuilder
     private var feedbackTab: some View {
         ScrollView(.vertical) {
-            HStack {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .purple))
-                Text("AI 피드백 작성중...")
-                    .foregroundColor(.secondary)
+            VStack {
+                HStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .purple))
+                    Text("AI 피드백 작성중...")
+                        .foregroundColor(.secondary)
+                }
+                .padding()
             }
-            .padding()
         }
     }
 }
