@@ -13,11 +13,24 @@ import DesignKit
 struct TradeFeedbackView: View {
     
     @State private var selectedTab: Int = 0
+    @State private var isImageHidden: Bool = false
+    
+    private let threshold: CGFloat = 150
     
     var symbolImage: Image
     var title: String
     var description: String
     var footnote: String
+    
+    // 이미지 높이 계산
+    private var imageHeight: CGFloat {
+        let baseWidth: CGFloat = 375
+        let adjust = UIScreen.main.bounds.width / baseWidth
+        let adjustHeight = 192 * adjust
+        
+        // 이미지가 숨겨진 상태면 높이 0, 아니면 원래 높이
+        return isImageHidden ? 0 : adjustHeight
+    }
     
     var body: some View {
         
@@ -36,8 +49,11 @@ struct TradeFeedbackView: View {
                 
                 Image.hedgeUI.tmpChart
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFill()
                     .frame(maxWidth: .infinity)
+                    .frame(height: imageHeight, alignment: .top)
+                    .clipped()
+                    .animation(.easeInOut(duration: 0.3), value: imageHeight)
                 
                 Rectangle()
                     .frame(height: 10)
@@ -111,6 +127,8 @@ extension TradeFeedbackView {
                 Spacer()
             }
         }
+        .scrollBounceBehavior(.basedOnSize)
+        .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
     }
     
     @ViewBuilder
@@ -126,6 +144,47 @@ extension TradeFeedbackView {
                 .padding()
             }
         }
+        .scrollBounceBehavior(.basedOnSize)
+        .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
+    }
+}
+
+// MARK: - ViewModifier
+struct ImageDragGestureModifier: ViewModifier {
+    @Binding var isImageHidden: Bool
+    let threshold: CGFloat
+    
+    func body(content: Content) -> some View {
+        content
+            .simultaneousGesture(
+                DragGesture()
+                    .onChanged { value in
+                        // 드래그 중에는 아무것도 하지 않음
+                    }
+                    .onEnded { value in
+                        let finalOffset = abs(value.translation.height)
+                        let isUpwardDrag = value.translation.height < 0 // 위로 드래그 (음수)
+                        
+                        // 위로 드래그하고 임계값 이상이면 이미지 숨김
+                        if isUpwardDrag && finalOffset >= threshold {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                isImageHidden = true
+                            }
+                        } else {
+                            // 아래로 드래그하거나 임계값 미만이면 이미지 표시
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                isImageHidden = false
+                            }
+                        }
+                    }
+            )
+    }
+}
+
+// MARK: - View Extension
+extension View {
+    func imageDragGesture(isImageHidden: Binding<Bool>, threshold: CGFloat) -> some View {
+        self.modifier(ImageDragGestureModifier(isImageHidden: isImageHidden, threshold: threshold))
     }
 }
 
