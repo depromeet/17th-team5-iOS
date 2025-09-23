@@ -24,6 +24,9 @@ extension HedgeUI where Base == Image {
     public static var arrowLeftThick: Image { asset(#function) }
     public static var arrowRightThin: Image { asset(#function) }
     public static var arrowRightThick: Image { asset(#function) }
+    public static var aiGenerateBackground: Image { asset(#function) }
+    public static var generateIcon: Image { asset(#function) }
+    public static var generateCloseIcon: Image { asset(#function) }
     
     public static var toastWarn: Image { asset(#function) }
     public static var toastCheck: Image { asset(#function) }

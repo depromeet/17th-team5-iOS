@@ -162,7 +162,7 @@ public extension View {
     StatefulPreviewWrapper(false) { show in
         ZStack {
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeButton("Show") { show.wrappedValue = true }
+            HedgeActionButton("Show") { show.wrappedValue = true }
         }
         .hedgeModal(
             isPresented: show,
@@ -180,7 +180,7 @@ public extension View {
     StatefulPreviewWrapper(false) { show in
         ZStack {
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeButton("Show") { show.wrappedValue = true }
+            HedgeActionButton("Show") { show.wrappedValue = true }
         }
         .hedgeModal(
             isPresented: show,
