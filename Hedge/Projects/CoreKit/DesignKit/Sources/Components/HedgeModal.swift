@@ -39,7 +39,7 @@ public struct HedgeModal: View {
         title: String,
         subtitle: String? = nil,
         showIcon: Bool = true,
-        icon: Image = Image.hedgeUI.modalIcon,
+        icon: Image = Image.hedgeUI.error,
         actions: Actions
     ) {
         self.title = title
@@ -143,7 +143,7 @@ public extension View {
         title: String,
         subtitle: String? = nil,
         showIcon: Bool = true,
-        icon: Image = Image.hedgeUI.modalIcon,
+        icon: Image = Image.hedgeUI.error,
         actions: HedgeModal.Actions
     ) -> some View {
         modifier(HedgeModalModifier(
@@ -162,7 +162,7 @@ public extension View {
     StatefulPreviewWrapper(false) { show in
         ZStack {
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeButton("Show") { show.wrappedValue = true }
+            HedgeTextButton("Show") { show.wrappedValue = true }
         }
         .hedgeModal(
             isPresented: show,
@@ -180,7 +180,7 @@ public extension View {
     StatefulPreviewWrapper(false) { show in
         ZStack {
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeButton("Show") { show.wrappedValue = true }
+            HedgeTextButton("Show") { show.wrappedValue = true }
         }
         .hedgeModal(
             isPresented: show,
