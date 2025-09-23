@@ -46,11 +46,10 @@ public enum TradeType: String, CaseIterable, Equatable {
 // MARK: - Emotion
 public enum Emotion: String, CaseIterable, Equatable {
     case confident = "자신감"
+    case conviction = "확신"
+    case mindfulness = "무념무상"
+    case impulse = "충동"
     case anxious = "불안"
-    case excited = "흥분"
-    case calm = "차분"
-    case regretful = "후회"
-    case satisfied = "만족"
 }
 
 // MARK: - TradeDataBuilder
@@ -142,19 +141,4 @@ public enum TradeDataError: Error, LocalizedError {
     case missingStockName
     case missingDate
     case missingReason
-    
-    public var errorDescription: String? {
-        switch self {
-        case .missingType:
-            return "거래 유형(매수/매도)을 선택해주세요"
-        case .missingQuantity:
-            return "거래 수량을 입력해주세요"
-        case .missingStockName:
-            return "종목명을 입력해주세요"
-        case .missingDate:
-            return "거래 날짜를 선택해주세요"
-        case .missingReason:
-            return "거래 근거를 입력해주세요"
-        }
-    }
 }
