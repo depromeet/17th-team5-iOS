@@ -103,7 +103,7 @@ struct ContentView: View {
                             }
                         }
                         
-                        NavigationLink(destination: FloatingToolbar()) {
+                        NavigationLink(destination: FloatingToolbar{_ in}) {
                             HStack {
                                 Text("FloatingToolbar")
                             }

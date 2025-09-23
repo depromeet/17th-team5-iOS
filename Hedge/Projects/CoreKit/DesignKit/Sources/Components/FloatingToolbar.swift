@@ -56,7 +56,10 @@ public struct FloatingToolbar: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 5)
-        .background(Color.hedgeUI.textWhite.opacity(0.7))
+        .background(
+            Color.hedgeUI.textWhite.opacity(0.7)
+                .blur(radius: 13)
+        )
         .clipShape(Capsule())
         .overlay(
             Capsule()
