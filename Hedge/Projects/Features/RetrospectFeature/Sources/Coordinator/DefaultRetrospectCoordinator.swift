@@ -20,8 +20,11 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
     
     public var childCoordinators: [Coordinator] = []
     
-    public init(navigationController: UINavigationController) {
+    public var tradeDataBuilder: TradeDataBuilder
+    
+    public init(navigationController: UINavigationController, tradeDataBuilder: TradeDataBuilder) {
         self.navigationController = navigationController
+        self.tradeDataBuilder = tradeDataBuilder
     }
     
     public func start() {

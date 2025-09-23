@@ -6,6 +6,7 @@
 //  Copyright © 2025 SampleCompany. All rights reserved.
 //
 
+import Foundation
 import ComposableArchitecture
 
 import Core
@@ -17,7 +18,11 @@ public struct HomeFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public init() {}
+        public var tradeDataBuilder: TradeDataBuilder
+        
+        public init(tradeDataBuilder: TradeDataBuilder = TradeDataBuilder()) {
+            self.tradeDataBuilder = tradeDataBuilder
+        }
     }
     
     public enum Action: FeatureAction, ViewAction {
@@ -29,13 +34,14 @@ public struct HomeFeature {
     }
     
     public enum View {
-        case retrospectTapped
+        case retrospectTapped(TradeType)
+        case setTradeType(TradeType)
     }
     public enum InnerAction { }
     public enum AsyncAction { }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToRetrospect
+        case pushToRetrospect(TradeDataBuilder)
     }
     
     public var body: some Reducer<State, Action> {
@@ -73,8 +79,16 @@ extension HomeFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
-        case .retrospectTapped:
-            return .send(.delegate(.pushToRetrospect))
+        case .retrospectTapped(let type):
+            return .send(.view(.setTradeType(type)))
+        case .setTradeType(let type):
+            do {
+                state.tradeDataBuilder = state.tradeDataBuilder.setType(type)
+                return .send(.delegate(.pushToRetrospect(state.tradeDataBuilder)))
+            } catch {
+                // 에러 처리 - 사용자에게 알림 표시 등
+                return .none
+            }
         }
     }
     
@@ -114,7 +128,9 @@ extension HomeFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToRetrospect:
+        case .pushToRetrospect(let tradeDataBuilder):
+            // 여기서는 단순히 .none을 반환
+            // 실제 처리는 TabBarFeature에서 담당
             return .none
         }
     }

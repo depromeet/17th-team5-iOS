@@ -65,6 +65,9 @@ public struct RetrospectSearchView: View {
             placeholder: "종목 검색",
             text: $store.searchText
         )
+        .onSubmit {
+            send(.fetchStockSearch)
+        }
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 16)

@@ -44,6 +44,7 @@ public struct RetrospectSearchFeature {
     public enum View {
         case onAppear
         case backButtonTapped
+        case fetchStockSearch
     }
     public enum InnerAction {
         case fetchStockSuccess([StockSearch])
@@ -115,6 +116,10 @@ extension RetrospectSearchFeature {
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
+        case .fetchStockSearch:
+            let text = state.searchText
+            guard !text.isEmpty else { return .none }
+            return .send(.async(.fetchStockSearch(text)))
         }
     }
     
