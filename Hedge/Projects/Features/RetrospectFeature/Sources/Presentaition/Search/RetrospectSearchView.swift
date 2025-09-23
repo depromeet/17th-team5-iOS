@@ -89,8 +89,8 @@ public struct RetrospectSearchView: View {
             LazyVStack {
                 ForEach(store.stocks, id: \.self) { stock in
                     StockRow(
-                        symbol: stock.symbol,
-                        title: stock.title
+                        symbol: stock.code,
+                        title: stock.companyName
                     )
                 }
             }
