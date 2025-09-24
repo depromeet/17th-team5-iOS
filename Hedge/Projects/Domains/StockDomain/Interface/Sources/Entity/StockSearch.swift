@@ -9,17 +9,17 @@
 import Foundation
 
 public struct StockSearch: Equatable, Hashable {
-    public let companyName: String
-    public let code: String
+    public let symbol: String
+    public let title: String
     public let market: String
     
     public init(
-        companyName: String,
-        code: String,
+        symbol: String,
+        title: String,
         market: String
     ) {
-        self.companyName = companyName
-        self.code = code
+        self.symbol = symbol
+        self.title = title
         self.market = market
     }
 }
