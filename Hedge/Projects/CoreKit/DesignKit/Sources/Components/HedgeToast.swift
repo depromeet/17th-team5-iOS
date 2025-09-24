@@ -143,7 +143,7 @@ private struct DemoView: View {
     @State private var show = false
     var body: some View {
         VStack {
-            HedgeButton("Show Toast") { show = true }
+            HedgeActionButton("Show Toast") { show = true }
         }
         .hedgeToast(isPresented: $show, message: "매도 기록을 입력해주세요", type: .normal)
     }

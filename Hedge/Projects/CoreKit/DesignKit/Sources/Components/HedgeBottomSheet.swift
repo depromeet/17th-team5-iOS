@@ -53,7 +53,7 @@ public struct HedgeBottomSheet<Content: View>: View {
                                 .foregroundStyle(Color.hedgeUI.textTitle)
                             Spacer()
                             Button { isPresented = false } label: {
-                                Image.hedgeUI.close
+                                Image.hedgeUI.closeFill
                                     .resizable()
                                     .frame(width: 20, height: 20)
                             }
@@ -214,7 +214,7 @@ private struct ChecklistContent: View {
         StatefulPreviewWrapper(2) { selection in
             ZStack {
                 Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-                HedgeButton("Show Emotions") { show.wrappedValue = true }
+                HedgeActionButton("Show Emotions") { show.wrappedValue = true }
             }
             .overlay(
                 HedgeBottomSheet(
@@ -255,7 +255,7 @@ private struct TwoStatePreview<A, B, Content: View>: View {
         ]
         ZStack {
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeButton("Show Checklist") { show.wrappedValue = true }
+            HedgeActionButton("Show Checklist") { show.wrappedValue = true }
         }
         .overlay(
             HedgeBottomSheet(
