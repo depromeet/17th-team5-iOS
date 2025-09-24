@@ -113,6 +113,8 @@ extension TradeHistoryFeature {
                                             tradingDate: state.tradingDate,
                                             yield: state.yield)
             
+            print(state.tradingPrice)
+            
             return .none
         }
     }

@@ -10,6 +10,6 @@ import Foundation
 
 import Core
 
-public protocol TradeReasonCoordinator: Coordinator {
-    
+public protocol TradeFeedbackCoordinator: Coordinator {
+    func popToPrev()
 }

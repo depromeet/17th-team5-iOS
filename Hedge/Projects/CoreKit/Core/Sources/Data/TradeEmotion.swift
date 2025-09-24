@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - Emotion
-public enum Emotion: String, CaseIterable, Equatable {
+public enum TradeEmotion: String, CaseIterable, Equatable {
     case confident = "자신감"
     case conviction = "확신"
     case mindfulness = "무념무상"
