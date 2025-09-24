@@ -15,6 +15,7 @@ let project = Project.configure(
         .Feature.Home.feature,
         .Feature.Retrospect.feature,
         .Feature.TradeReason.feature,
-        .Feature.TradeHistory.feature
+        .Feature.TradeHistory.feature,
+        .Feature.TradeFeedback.feature
     ]
 )
