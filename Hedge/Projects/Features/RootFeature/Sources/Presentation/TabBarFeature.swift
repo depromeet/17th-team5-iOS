@@ -124,8 +124,8 @@ extension TabBarFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .homeAction(.delegate(.pushToRetrospect)):
-            coordinator.pushToRetrospect()
+        case .homeAction(.delegate(.pushToRetrospect(let tradeDataBuilder))):
+            coordinator.pushToRetrospect(with: tradeDataBuilder)
             return .none
         default:
             return .none

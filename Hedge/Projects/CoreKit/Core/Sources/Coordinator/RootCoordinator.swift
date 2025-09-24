@@ -9,5 +9,5 @@
 import Foundation
 
 public protocol RootCoordinator: Coordinator {
-    func pushToRetrospect()
+    func pushToRetrospect(with tradeDataBuilder: TradeDataBuilder)
 }

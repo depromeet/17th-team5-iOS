@@ -39,7 +39,10 @@ extension HedgeUI where Base == Image {
     
     // TODO: 임시 차트 이미지 추후 삭제
     public static var tmpChart: Image { asset(#function) }
-    public static var modalIcon: Image { asset(#function) }
+    public static var buyDemo: Image { asset(#function) }
+    public static var sellDemo: Image { asset(#function) }
+    public static var plusDemo: Image { asset(#function) }
+    public static var cancelDemo: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {

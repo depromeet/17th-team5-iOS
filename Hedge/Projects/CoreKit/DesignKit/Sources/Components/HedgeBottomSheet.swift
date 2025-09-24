@@ -214,7 +214,7 @@ private struct ChecklistContent: View {
         StatefulPreviewWrapper(2) { selection in
             ZStack {
                 Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-                HedgeActionButton("Show Emotions") { show.wrappedValue = true }
+                HedgeTextButton("Show Emotions") { show.wrappedValue = true }
             }
             .overlay(
                 HedgeBottomSheet(
@@ -255,7 +255,7 @@ private struct TwoStatePreview<A, B, Content: View>: View {
         ]
         ZStack {
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeActionButton("Show Checklist") { show.wrappedValue = true }
+            HedgeTextButton("Show Checklist") { show.wrappedValue = true }
         }
         .overlay(
             HedgeBottomSheet(

@@ -40,8 +40,11 @@ public final class DefaultRootCoordinator: RootCoordinator {
         navigationController.viewControllers = [viewController]
     }
     
-    public func pushToRetrospect() {
-        let retrospectCoordinator = DefaultRetrospectCoordinator(navigationController: self.navigationController)
+    public func pushToRetrospect(with tradeDataBuilder: TradeDataBuilder) {
+        let retrospectCoordinator = DefaultRetrospectCoordinator(
+            navigationController: self.navigationController,
+            tradeDataBuilder: tradeDataBuilder
+        )
         
         retrospectCoordinator.start()
     }
