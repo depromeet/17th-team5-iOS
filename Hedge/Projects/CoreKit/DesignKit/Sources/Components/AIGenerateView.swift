@@ -10,16 +10,19 @@ import SwiftUI
 
 struct AIGenerateView: View {
     private let date: String
-    @Binding private var content: String
+    @Binding private var contents: String
+    private let closeTapped: () -> Void
     
     private let shadowColor = Color.init(red: 19/255, green: 26/255, blue: 43/255).opacity(0.32)
     
     public init(
         date: String,
-        content: Binding<String>
+        contents: Binding<String>,
+        _ closeTapped: @escaping () -> Void
     ) {
         self.date = date
-        self._content = content
+        self._contents = contents
+        self.closeTapped = closeTapped
     }
     
     var body: some View {
@@ -43,7 +46,7 @@ struct AIGenerateView: View {
                     Spacer()
                     
                     Button {
-                        
+                        closeTapped()
                     } label: {
                         Image.hedgeUI.generateCloseIcon
                             .frame(width: 28, height: 28)
@@ -51,7 +54,7 @@ struct AIGenerateView: View {
                 }
                 
                 ScrollView(showsIndicators: false) {
-                    Text(content)
+                    Text(contents)
                         .font(.label1Medium)
                         .foregroundStyle(Color.hedgeUI.textDisabled)
                 }
@@ -84,7 +87,9 @@ struct AIGenerateView: View {
     ZStack {
         AIGenerateView(
             date: "8월 25일",
-            content: .constant("거래량이 평소보다 2.5배 늘었어서 단기 급등락 가능성에 영향을 주어서 확인했어야 해요.")
+            contents: .constant("거래량이 평소보다 2.5배 늘었어서 단기 급등락 가능성에 영향을 주어서 확인했어야 해요."), {
+                print("close")
+            }
         )
         .padding(.horizontal, 10)
     }
