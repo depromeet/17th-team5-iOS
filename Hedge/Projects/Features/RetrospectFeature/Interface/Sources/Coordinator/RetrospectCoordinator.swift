@@ -9,7 +9,9 @@
 import Foundation
 
 import Core
+import StockDomainInterface
 
 public protocol RetrospectCoordinator: Coordinator {
     func popToPrev()
+    func pushToTradeHistory(stock: StockSearch)
 }

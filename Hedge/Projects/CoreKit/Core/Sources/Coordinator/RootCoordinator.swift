@@ -8,6 +8,9 @@
 
 import Foundation
 
+import StockDomainInterface
+
 public protocol RootCoordinator: Coordinator {
     func pushToRetrospect(with tradeDataBuilder: TradeDataBuilder)
+    func pushToTradeHistory(stock: StockSearch)
 }

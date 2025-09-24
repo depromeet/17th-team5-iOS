@@ -14,6 +14,9 @@ import ComposableArchitecture
 import Core
 import RetrospectFeature
 import RetrospectFeatureInterface
+import TradeHistoryFeature
+import TradeHistoryFeatureInterface
+import StockDomainInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     public var navigationController: UINavigationController
@@ -45,7 +48,18 @@ public final class DefaultRootCoordinator: RootCoordinator {
             navigationController: self.navigationController,
             tradeDataBuilder: tradeDataBuilder
         )
-        
+        retrospectCoordinator.parentCoordinator = self
         retrospectCoordinator.start()
+    }
+}
+
+extension DefaultRootCoordinator {
+    public func pushToTradeHistory(stock: StockSearch) {
+        let tradeHistoryCoordinator = DefaultTradeHistoryCoordinator(
+            navigationController: navigationController,
+            stockSearch: stock
+        )
+        tradeHistoryCoordinator.parentCoordinator = self
+        tradeHistoryCoordinator.start()
     }
 }

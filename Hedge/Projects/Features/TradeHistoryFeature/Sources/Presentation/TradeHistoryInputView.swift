@@ -7,19 +7,16 @@
 //
 
 import SwiftUI
-import DesignKit
 import Combine
 
+import ComposableArchitecture
+
+import TradeHistoryFeatureInterface
+import DesignKit
+
+@ViewAction(for: TradeHistoryFeature.self)
 public struct TradeHistoryInputView: View {
-    
-    let image: Image
-    let stockTitle: String
-    let description: String
-    
-    @State var tradingPrice: String = ""
-    @State var tradingQuantity: String = ""
-    @State var tradingDate: String = ""
-    @State var yield: String = ""
+    @Bindable public var store: StoreOf<TradeHistoryFeature>
     @State var focusedID: String? = nil
     @State var isYieldInputVisible: Bool = false
     @State var selectedDate: Date = Date()
@@ -54,10 +51,10 @@ public struct TradeHistoryInputView: View {
     
     // MARK: - Initializer
     
-    public init(image: Image, stockTitle: String, description: String) {
-        self.image = image
-        self.stockTitle = stockTitle
-        self.description = description
+    public init(
+        store: StoreOf<TradeHistoryFeature>
+    ) {
+        self.store = store
     }
     
     // MARK: - Body
@@ -75,15 +72,15 @@ public struct TradeHistoryInputView: View {
                 
                 VStack(spacing: 16) {
                     HedgeTopView(
-                        symbolImage: image,
-                        title: stockTitle,
-                        description: description
+                        symbolImage: Image.hedgeUI.buyDemo,
+                        title: store.stock.title,
+                        description: store.stock.market
                     )
                     
                     textFieldGroup
                 }
                 
-                HedgeTradeTextField(inputText: $yield, focusedID: $focusedID)
+                HedgeTradeTextField(inputText: $store.yield, focusedID: $focusedID)
                     .type(.yield)
                     .padding(.top, 12)
                     .padding(.horizontal, 20)
@@ -96,11 +93,14 @@ public struct TradeHistoryInputView: View {
                 yieldInputToggleRow
                 
                 HedgeBottomCTAButton()
-                    .style(.oneButton(
-                        title: "다음",
-                        onTapped: {
-                            print("다음")
-                        }))
+                    .style(
+                        .oneButton(
+                            title: "다음",
+                            onTapped: {
+                                send(.nextTapped)
+                            }
+                        )
+                    )
                     .bg(.transparent)
             }
         }
@@ -117,7 +117,7 @@ extension TradeHistoryInputView {
     @ViewBuilder
     private var textFieldGroup: some View {
         VStack(spacing: 0) {
-            HedgeTradeTextField(inputText: $tradingPrice, focusedID: $focusedID)
+            HedgeTradeTextField(inputText: $store.tradingPrice, focusedID: $focusedID)
                 .type(.buyPrice)
             
             RoundedRectangle(cornerSize: .zero)
@@ -126,7 +126,7 @@ extension TradeHistoryInputView {
                 .frame(maxWidth: .infinity)
                 .animation(.easeInOut(duration: 0.3), value: firstDividerColor)
             
-            HedgeTradeTextField(inputText: $tradingQuantity, focusedID: $focusedID)
+            HedgeTradeTextField(inputText: $store.tradingQuantity, focusedID: $focusedID)
                 .type(.quantity)
             
             RoundedRectangle(cornerSize: .zero)
@@ -135,7 +135,7 @@ extension TradeHistoryInputView {
                 .frame(maxWidth: .infinity)
                 .animation(.easeInOut(duration: 0.3), value: secondDividerColor)
             
-            HedgeTradeTextField(inputText: $tradingDate, focusedID: $focusedID)
+            HedgeTradeTextField(inputText: $store.tradingDate, focusedID: $focusedID)
                 .type(.tradeDate)
                 .sheet(isPresented: $showDatePicker) {
                     VStack {
@@ -145,7 +145,7 @@ extension TradeHistoryInputView {
                         Button("완료") {
                             let formatter = DateFormatter()
                             formatter.dateFormat = "yyyy-MM-dd"
-                            tradingDate = formatter.string(from: selectedDate)
+                            store.tradingDate = formatter.string(from: selectedDate)
                             focusedID = nil
                             showDatePicker = false
                         }
@@ -236,8 +236,4 @@ extension TradeHistoryInputView {
             }
             .store(in: &cancellables)
     }
-}
-
-#Preview {
-    TradeHistoryInputView(image: HedgeUI.search, stockTitle: "종목명", description: "얼마에 매도하셨나요?")
 }

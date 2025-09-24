@@ -65,9 +65,6 @@ public struct RetrospectSearchView: View {
             placeholder: "종목 검색",
             text: $store.searchText
         )
-        .onSubmit {
-            send(.fetchStockSearch)
-        }
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 16)
@@ -89,9 +86,12 @@ public struct RetrospectSearchView: View {
             LazyVStack {
                 ForEach(store.stocks, id: \.self) { stock in
                     StockRow(
-                        symbol: stock.code,
-                        title: stock.companyName
+                        symbol: stock.symbol,
+                        title: stock.title
                     )
+                    .onTapGesture {
+                        send(.stockTapped(stock))
+                    }
                 }
             }
         }
