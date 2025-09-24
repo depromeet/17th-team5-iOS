@@ -90,7 +90,9 @@ public struct TradeHistoryInputView: View {
                 
                 Spacer()
                 
-                yieldInputToggleRow
+                if store.state.tradeType == .sell {
+                    yieldInputToggleRow
+                }
                 
                 HedgeBottomCTAButton()
                     .style(

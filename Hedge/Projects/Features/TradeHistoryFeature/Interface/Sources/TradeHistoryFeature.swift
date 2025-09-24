@@ -30,8 +30,10 @@ public struct TradeHistoryFeature {
         public var tradingDate: String = ""
         public var yield: String = ""
         public var stock: StockSearch
+        public var tradeType: TradeType
         
-        public init(stock: StockSearch) {
+        public init(tradeType: TradeType, stock: StockSearch) {
+            self.tradeType = tradeType
             self.stock = stock
         }
     }
@@ -106,10 +108,11 @@ extension TradeHistoryFeature {
             return .none
             
         case .nextTapped:
-            print(state.tradingPrice)
-            print(state.tradingQuantity)
-            print(state.tradingDate)
-            print(state.yield)
+            let tradeHistory = TradeHistory(tradingPrice: state.tradingPrice,
+                                            tradingQuantity: state.tradingQuantity,
+                                            tradingDate: state.tradingDate,
+                                            yield: state.yield)
+            
             return .none
         }
     }

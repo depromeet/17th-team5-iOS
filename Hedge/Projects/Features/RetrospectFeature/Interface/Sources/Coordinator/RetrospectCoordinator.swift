@@ -13,5 +13,5 @@ import StockDomainInterface
 
 public protocol RetrospectCoordinator: Coordinator {
     func popToPrev()
-    func pushToTradeHistory(stock: StockSearch)
+    func pushToTradeHistory(tradeType: TradeType, stock: StockSearch)
 }

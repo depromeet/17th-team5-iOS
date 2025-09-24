@@ -22,11 +22,11 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var parentCoordinator: RootCoordinator?
     
-    public var tradeDataBuilder: TradeDataBuilder
+    public var tradeType: TradeType
     
-    public init(navigationController: UINavigationController, tradeDataBuilder: TradeDataBuilder) {
+    public init(navigationController: UINavigationController, tradeType: TradeType) {
         self.navigationController = navigationController
-        self.tradeDataBuilder = tradeDataBuilder
+        self.tradeType = tradeType
     }
     
     public func start() {
@@ -35,7 +35,8 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
                 initialState: RetrospectSearchFeature.State(),
                 reducer: {
                     RetrospectSearchFeature(
-                        coordinator: self
+                        coordinator: self,
+                        tradeType: tradeType
                     )
                 }
             )
@@ -53,7 +54,7 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
         navigationController.popViewController(animated: true)
     }
     
-    public func pushToTradeHistory(stock: StockSearch) {
-        parentCoordinator?.pushToTradeHistory(stock: stock)
+    public func pushToTradeHistory(tradeType: TradeType, stock: StockSearch) {
+        parentCoordinator?.pushToTradeHistory(tradeType: tradeType, stock: stock)
     }
 }

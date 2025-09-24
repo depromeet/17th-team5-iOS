@@ -43,10 +43,10 @@ public final class DefaultRootCoordinator: RootCoordinator {
         navigationController.viewControllers = [viewController]
     }
     
-    public func pushToRetrospect(with tradeDataBuilder: TradeDataBuilder) {
+    public func pushToRetrospect(with tradeType: TradeType) {
         let retrospectCoordinator = DefaultRetrospectCoordinator(
             navigationController: self.navigationController,
-            tradeDataBuilder: tradeDataBuilder
+            tradeType: tradeType
         )
         retrospectCoordinator.parentCoordinator = self
         retrospectCoordinator.start()
@@ -54,9 +54,10 @@ public final class DefaultRootCoordinator: RootCoordinator {
 }
 
 extension DefaultRootCoordinator {
-    public func pushToTradeHistory(stock: StockSearch) {
+    public func pushToTradeHistory(tradeType: TradeType, stock: StockSearch) {
         let tradeHistoryCoordinator = DefaultTradeHistoryCoordinator(
             navigationController: navigationController,
+            tradeType: tradeType,
             stockSearch: stock
         )
         tradeHistoryCoordinator.parentCoordinator = self

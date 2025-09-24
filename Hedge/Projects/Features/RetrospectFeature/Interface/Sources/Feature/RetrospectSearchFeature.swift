@@ -21,8 +21,11 @@ public struct RetrospectSearchFeature {
     
     private let fetchStockSearchUseCase = DIContainer.resolve(FetchStockSearchUseCase.self)
     
-    public init(coordinator: RetrospectCoordinator) {
+    private let tradeType: TradeType
+    
+    public init(coordinator: RetrospectCoordinator, tradeType: TradeType) {
         self.coordinator = coordinator
+        self.tradeType = tradeType
     }
     
     @ObservableState
@@ -119,7 +122,7 @@ extension RetrospectSearchFeature {
             return .none
             
         case .stockTapped(let stock):
-            coordinator.pushToTradeHistory(stock: stock)
+            coordinator.pushToTradeHistory(tradeType: tradeType, stock: stock)
             return .none
         }
     }
