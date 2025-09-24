@@ -1,6 +1,6 @@
 //
-//  RetrospectSearchView.swift
-//  RetrospectFeature
+//  StockSearchView.swift
+//  StockSearchFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
@@ -10,15 +10,15 @@ import SwiftUI
 
 import ComposableArchitecture
 
-import RetrospectFeatureInterface
+import StockSearchFeatureInterface
 import DesignKit
 import Core
 
-@ViewAction(for: RetrospectSearchFeature.self)
-public struct RetrospectSearchView: View {
-    @Bindable public var store: StoreOf<RetrospectSearchFeature>
+@ViewAction(for: StockSearchFeature.self)
+public struct StockSearchView: View {
+    @Bindable public var store: StoreOf<StockSearchFeature>
     
-    public init(store: StoreOf<RetrospectSearchFeature>) {
+    public init(store: StoreOf<StockSearchFeature>) {
         self.store = store
     }
     

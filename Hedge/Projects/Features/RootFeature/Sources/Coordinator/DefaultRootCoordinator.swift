@@ -12,8 +12,8 @@ import SwiftUI
 import ComposableArchitecture
 
 import Core
-import RetrospectFeature
-import RetrospectFeatureInterface
+import StockSearchFeature
+import StockSearchFeatureInterface
 import TradeHistoryFeature
 import TradeHistoryFeatureInterface
 import StockDomainInterface
@@ -43,13 +43,13 @@ public final class DefaultRootCoordinator: RootCoordinator {
         navigationController.viewControllers = [viewController]
     }
     
-    public func pushToRetrospect(with tradeType: TradeType) {
-        let retrospectCoordinator = DefaultRetrospectCoordinator(
+    public func pushToStockSearch(with tradeType: TradeType) {
+        let stockSearchCoordinator = DefaultStockSearchCoordinator(
             navigationController: self.navigationController,
             tradeType: tradeType
         )
-        retrospectCoordinator.parentCoordinator = self
-        retrospectCoordinator.start()
+        stockSearchCoordinator.parentCoordinator = self
+        stockSearchCoordinator.start()
     }
 }
 

@@ -1,6 +1,6 @@
 //
-//  DefaultRetrospectCoordinator.swift
-//  RetrospectFeature
+//  DefaultStockSearchCoordinator.swift
+//  StockSearchFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
@@ -13,10 +13,10 @@ import SwiftUI
 import ComposableArchitecture
 
 import Core
-import RetrospectFeatureInterface
+import StockSearchFeatureInterface
 import StockDomainInterface
 
-public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
+public final class DefaultStockSearchCoordinator: StockSearchCoordinator {
     public var navigationController: UINavigationController
     
     public var childCoordinators: [Coordinator] = []
@@ -30,11 +30,11 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
     }
     
     public func start() {
-        let retrospectView = RetrospectSearchView(
+        let stockSearchView = StockSearchView(
             store: .init(
-                initialState: RetrospectSearchFeature.State(),
+                initialState: StockSearchFeature.State(),
                 reducer: {
-                    RetrospectSearchFeature(
+                    StockSearchFeature(
                         coordinator: self,
                         tradeType: tradeType
                     )
@@ -42,10 +42,10 @@ public final class DefaultRetrospectCoordinator: RetrospectCoordinator {
             )
         )
         
-        let retrospectViewController = UIHostingController(rootView: retrospectView)
+        let stockSearchViewController = UIHostingController(rootView: stockSearchView)
         
         navigationController.pushViewController(
-            retrospectViewController,
+            stockSearchViewController,
             animated: true
         )
     }

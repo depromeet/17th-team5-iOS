@@ -1,6 +1,6 @@
 //
-//  RetrospectFeature.swift
-//  RetrospectFeature
+//  StockSearchFeature.swift
+//  StockSearchFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
@@ -16,14 +16,14 @@ import Shared
 import StockDomainInterface
 
 @Reducer
-public struct RetrospectSearchFeature {
-    private let coordinator: RetrospectCoordinator
+public struct StockSearchFeature {
+    private let coordinator: StockSearchCoordinator
     
     private let fetchStockSearchUseCase = DIContainer.resolve(FetchStockSearchUseCase.self)
     
     private let tradeType: TradeType
     
-    public init(coordinator: RetrospectCoordinator, tradeType: TradeType) {
+    public init(coordinator: StockSearchCoordinator, tradeType: TradeType) {
         self.coordinator = coordinator
         self.tradeType = tradeType
     }
@@ -69,7 +69,7 @@ public struct RetrospectSearchFeature {
     }
 }
 
-extension RetrospectSearchFeature {
+extension StockSearchFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,

@@ -36,7 +36,7 @@ public struct HomeFeature {
     public enum AsyncAction { }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToRetrospect(TradeType)
+        case pushToStockSearch(TradeType)
     }
     
     public var body: some Reducer<State, Action> {
@@ -75,7 +75,7 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .retrospectTapped(let type):
-            return .send(.delegate(.pushToRetrospect(type)))
+            return .send(.delegate(.pushToStockSearch(type)))
         }
     }
     
@@ -115,7 +115,7 @@ extension HomeFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToRetrospect(let tradeDataBuilder):
+        case .pushToStockSearch(let tradeType):
             // 여기서는 단순히 .none을 반환
             // 실제 처리는 TabBarFeature에서 담당
             return .none

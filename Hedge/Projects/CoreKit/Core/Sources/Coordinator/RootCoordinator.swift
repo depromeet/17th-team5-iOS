@@ -11,6 +11,6 @@ import Foundation
 import StockDomainInterface
 
 public protocol RootCoordinator: Coordinator {
-    func pushToRetrospect(with tradeType: TradeType)
+    func pushToStockSearch(with tradeType: TradeType)
     func pushToTradeHistory(tradeType: TradeType, stock: StockSearch)
 }

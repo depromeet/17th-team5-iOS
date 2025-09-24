@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct RetrospectApp: App {
+struct StockSearchApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     var body: some Scene {
