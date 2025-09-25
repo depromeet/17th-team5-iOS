@@ -106,6 +106,12 @@ struct TradeFeedbackView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
+            .onAppear {
+                UIScrollView.appearance().bounces = false
+            }
+            .onDisappear {
+                UIScrollView.appearance().bounces = true
+            }
         }
     }
 }
@@ -120,8 +126,9 @@ extension TradeFeedbackView {
     
     @ViewBuilder
     private var retrospectTab: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 0) {
+        ScrollViewReader { proxy in
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
                 Text(tradeData.tradingDate)
                     .font(FontModel.label2Regular)
                     .foregroundColor(Color.hedgeUI.textAlternative)
@@ -175,6 +182,15 @@ extension TradeFeedbackView {
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 isPrincipleExpanded.toggle()
+                                
+                                // 원칙 리스트가 펼쳐질 때 해당 위치로 스크롤
+                                if isPrincipleExpanded {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        withAnimation(.easeInOut(duration: 0.5)) {
+                                            proxy.scrollTo("principleList", anchor: .bottom)
+                                        }
+                                    }
+                                }
                             }
                         }
                         
@@ -194,9 +210,9 @@ extension TradeFeedbackView {
                             VStack(alignment: .leading, spacing: 8) {
                                 ForEach(tradeData.tradePrinciple, id: \.self) { principle in
                                     HStack(spacing: 8) {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                            .font(.system(size: 16))
+                                        Image.hedgeUI.checkDemo
+                                            .resizable()
+                                            .frame(width: 16, height: 16)
                                         
                                         Text(principle)
                                             .font(FontModel.body3Regular)
@@ -208,18 +224,20 @@ extension TradeFeedbackView {
                         }
                         .clipped()
                         .opacity(isPrincipleExpanded ? 1 : 0)
+                        .id("principleList")
                     }
                 }
                 
                 Spacer()
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .scrollBounceBehavior(.basedOnSize)
         .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
         .simultaneousGesture(
             DragGesture()
                 .onEnded { value in
-                    if value.translation.width < 0 {
+                    if value.translation.width < 0, threshold < abs(value.translation.width) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             selectedTab += 1
                         }
@@ -247,7 +265,7 @@ extension TradeFeedbackView {
         .simultaneousGesture(
             DragGesture()
                 .onEnded { value in
-                    if value.translation.width > 0 {
+                    if value.translation.width > 0, threshold < abs(value.translation.width) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             selectedTab -= 1
                         }

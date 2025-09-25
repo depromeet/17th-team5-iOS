@@ -70,6 +70,7 @@ extension HedgeUI where Base == Image {
     public static var plusDemo: Image { asset(#function) }
     public static var cancelDemo: Image { asset(#function) }
     public static var stockThumbnailDemo: Image { asset(#function) }
+    public static var checkDemo: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {
