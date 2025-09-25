@@ -19,6 +19,7 @@ struct TradeFeedbackView: View {
     
     @State private var selectedTab: Int = 0
     @State private var isImageHidden: Bool = false
+    @State private var isPrincipleExpanded: Bool = false
     
     private let threshold: CGFloat = 150
     
@@ -119,55 +120,103 @@ extension TradeFeedbackView {
     
     @ViewBuilder
     private var retrospectTab: some View {
-        ScrollView(.vertical) {
+        ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
-                Text(tradeData.tradingDate)
-                    .font(FontModel.label2Regular)
-                    .foregroundColor(Color.hedgeUI.textAlternative)
-                
-                Rectangle()
-                    .frame(height: 12)
-                    .foregroundStyle(.clear)
-                
-                Text(tradeData.retrospection)
-                    .font(FontModel.body3Regular)
-                
-                Rectangle()
-                    .frame(height: 24)
-                    .foregroundStyle(.clear)
-                
-                if let emotion = tradeData.emotion {
-                    HStack(spacing: 9) {
-                        emotion.normalImage
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                        
-                        Text("\(emotion.rawValue) \(tradeData.tradeType == .buy ? "매도" : "매수")")
-                            .font(FontModel.label1Semibold)
+                    Text(tradeData.tradingDate)
+                        .font(FontModel.label2Regular)
+                        .foregroundColor(Color.hedgeUI.textAlternative)
+                    
+                    Rectangle()
+                        .frame(height: 12)
+                        .foregroundStyle(.clear)
+                    
+                    Text(tradeData.retrospection)
+                        .font(FontModel.body3Regular)
+                    
+                    Rectangle()
+                        .frame(height: 24)
+                        .foregroundStyle(.clear)
+                    
+                    if let emotion = tradeData.emotion {
+                        HStack(spacing: 9) {
+                            emotion.normalImage
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                            
+                            Text("\(emotion.rawValue) \(tradeData.tradeType == .buy ? "매도" : "매수")")
+                                .font(FontModel.label1Semibold)
+                        }
                     }
-                }
-                
-                Rectangle()
-                    .frame(height: 12)
-                    .foregroundStyle(.clear)
-                
-                if !tradeData.tradePrinciple.isEmpty {
-                    HStack(spacing: 9) {
-                        Image.hedgeUI.principle
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                        
-                        Text("적용한 원칙")
-                            .font(FontModel.label1Semibold)
+                    
+                    Rectangle()
+                        .frame(height: 12)
+                        .foregroundStyle(.clear)
+                    
+                    if !tradeData.tradePrinciple.isEmpty {
+                        VStack(alignment: .leading, spacing: 0) {
+                            // 헤더 (클릭 가능)
+                            HStack(spacing: 9) {
+                                Image.hedgeUI.principle
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
+                                
+                                Text("적용한 원칙")
+                                    .font(FontModel.label1Semibold)
+                                
+                                Spacer()
+                                
+                                Image.hedgeUI.arrowDown
+                                    .foregroundColor(Color.hedgeUI.textAlternative)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .rotationEffect(.degrees(isPrincipleExpanded ? 180 : 0))
+                                    .animation(.easeInOut(duration: 0.3), value: isPrincipleExpanded)
+                                
+                            }
+                             .onTapGesture {
+                                 withAnimation(.easeInOut(duration: 0.3)) {
+                                     isPrincipleExpanded.toggle()
+                                 }
+                             }
+                            
+                            Rectangle()
+                                .frame(height: 12)
+                                .foregroundStyle(.clear)
+                            
+                            // 원칙 목록 (항상 렌더링하되 높이로 애니메이션)
+                            HStack(spacing: 4) {
+                                
+                                Rectangle()
+                                    .frame(width: 3)
+                                    .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                                    .padding(.horizontal, 8)
+                                    .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
+                                
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ForEach(tradeData.tradePrinciple, id: \.self) { principle in
+                                        HStack(spacing: 8) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(.green)
+                                                .font(.system(size: 16))
+                                            
+                                            Text(principle)
+                                                .font(FontModel.body3Regular)
+                                                .foregroundColor(Color.hedgeUI.textPrimary)
+                                        }
+                                    }
+                                }
+                                .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
+                            }
+                             .clipped()
+                             .opacity(isPrincipleExpanded ? 1 : 0)
+                         }
                     }
+                    
+                    Spacer()
                 }
-                
-                Spacer()
             }
-        }
-        .scrollBounceBehavior(.basedOnSize)
-        .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
-        .padding(20)
+            .scrollBounceBehavior(.basedOnSize)
+            .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
+            .padding(20)
     }
     
     @ViewBuilder
