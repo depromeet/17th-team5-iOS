@@ -10,6 +10,14 @@ import Foundation
 import SwiftUI
 
 extension HedgeUI where Base == Image {
+    
+    // MARK: Size 19
+    public static var generate: Image { asset(#function) }
+    
+    // MARK: Size 22
+    public static var emotion: Image { asset(#function) }
+    public static var checklist: Image { asset(#function) }
+    
     // MARK: Size 24
     public static var closeThin: Image { asset(#function) }
     public static var closeThick: Image { asset(#function) }
@@ -27,15 +35,32 @@ extension HedgeUI where Base == Image {
     public static var aiGenerateBackground: Image { asset(#function) }
     public static var generateIcon: Image { asset(#function) }
     public static var generateCloseIcon: Image { asset(#function) }
-    public static var generate: Image { asset(#function) }
-    public static var emotion: Image { asset(#function) }
-    public static var checklist: Image { asset(#function) }
-    
-    public static var toastWarn: Image { asset(#function) }
-    public static var toastCheck: Image { asset(#function) }
 
     // MARK: Size 30
     public static var error: Image { asset(#function) }
+    
+    // MARK: Size 32
+    public static var toastWarn: Image { asset(#function) }
+    public static var toastCheck: Image { asset(#function) }
+    
+    // MARK: Size 35
+    public static var anxious: Image { asset(#function) }
+    public static var anxiousOff: Image { asset(#function) }
+    public static var confidence: Image { asset(#function) }
+    public static var confidenceOff: Image { asset(#function) }
+    public static var conviction: Image { asset(#function) }
+    public static var convictionOff: Image { asset(#function) }
+    public static var impulse: Image { asset(#function) }
+    public static var impulseOff: Image { asset(#function) }
+    public static var neutral: Image { asset(#function) }
+    public static var neutralOff: Image { asset(#function) }
+    
+    // MARK: Size 48
+    public static var anxiousOn: Image { asset(#function) }
+    public static var confidenceOn: Image { asset(#function) }
+    public static var convictionOn: Image { asset(#function) }
+    public static var impulseOn: Image { asset(#function) }
+    public static var neutralOn: Image { asset(#function) }
     
     // TODO: 임시 차트 이미지 추후 삭제
     public static var tmpChart: Image { asset(#function) }
@@ -43,6 +68,7 @@ extension HedgeUI where Base == Image {
     public static var sellDemo: Image { asset(#function) }
     public static var plusDemo: Image { asset(#function) }
     public static var cancelDemo: Image { asset(#function) }
+    public static var stockThumbnailDemo: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {
