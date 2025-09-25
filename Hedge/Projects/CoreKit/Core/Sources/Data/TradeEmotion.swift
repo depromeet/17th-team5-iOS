@@ -18,7 +18,7 @@ public enum TradeEmotion: String, CaseIterable, Equatable {
     case impulse = "충동"
     case anxious = "불안"
     
-    var onImage: Image {
+    public var onImage: Image {
         switch self {
         case .confidence:
             return .hedgeUI.confidenceOn
@@ -33,7 +33,7 @@ public enum TradeEmotion: String, CaseIterable, Equatable {
         }
     }
     
-    var offImage: Image {
+    public var offImage: Image {
         switch self {
         case .confidence:
             return .hedgeUI.anxiousOff
@@ -48,7 +48,7 @@ public enum TradeEmotion: String, CaseIterable, Equatable {
         }
     }
     
-    var normalImage: Image {
+    public var normalImage: Image {
         switch self {
         case .confidence:
             return .hedgeUI.confidence

@@ -112,21 +112,62 @@ struct TradeFeedbackView: View {
 
 // MARK: Subviews
 extension TradeFeedbackView {
+    
+    private var tradeData: TradeData {
+        return store.state.tradeData
+    }
+    
     @ViewBuilder
     private var retrospectTab: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0) {
-                Text(store.state.tradeData.tradingDate)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                    .padding(.top, 16)
-                    .padding(.horizontal, 16)
+                Text(tradeData.tradingDate)
+                    .font(FontModel.label2Regular)
+                    .foregroundColor(Color.hedgeUI.textAlternative)
+                
+                Rectangle()
+                    .frame(height: 12)
+                    .foregroundStyle(.clear)
+                
+                Text(tradeData.retrospection)
+                    .font(FontModel.body3Regular)
+                
+                Rectangle()
+                    .frame(height: 24)
+                    .foregroundStyle(.clear)
+                
+                if let emotion = tradeData.emotion {
+                    HStack(spacing: 9) {
+                        emotion.normalImage
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                        
+                        Text("\(emotion.rawValue) \(tradeData.tradeType == .buy ? "매도" : "매수")")
+                            .font(FontModel.label1Semibold)
+                    }
+                }
+                
+                Rectangle()
+                    .frame(height: 12)
+                    .foregroundStyle(.clear)
+                
+                if !tradeData.tradePrinciple.isEmpty {
+                    HStack(spacing: 9) {
+                        Image.hedgeUI.principle
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                        
+                        Text("적용한 원칙")
+                            .font(FontModel.label1Semibold)
+                    }
+                }
                 
                 Spacer()
             }
         }
         .scrollBounceBehavior(.basedOnSize)
         .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
+        .padding(20)
     }
     
     @ViewBuilder
@@ -187,7 +228,10 @@ extension View {
 }
 
 #Preview {
-    TradeFeedbackView(store: .init(initialState: TradeFeedbackFeature.State(tradeData: TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.")),
-                                   reducer: { TradeFeedbackFeature(coordinator: DefaultTradeHFeedbackCoordinator(navigationController: UINavigationController(), tradeData: TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.")))
+    
+    let tradeData = TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성123했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.")
+    
+    TradeFeedbackView(store: .init(initialState: TradeFeedbackFeature.State(tradeData: tradeData),
+                                   reducer: { TradeFeedbackFeature(coordinator: DefaultTradeHFeedbackCoordinator(navigationController: UINavigationController(), tradeData: tradeData))
     }))
 }
