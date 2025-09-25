@@ -1,9 +1,9 @@
 //
-//  TradeHistoryFeature.swift
-//  TradeHistoryFeature
+//  TradeFeedbackFeature.swift
+//  TradeFeedbackFeatureInterface
 //
-//  Created by Junyoung on 9/14/25.
-//  Copyright © 2025 SampleCompany. All rights reserved.
+//  Created by 이중엽 on 9/24/25.
+//  Copyright © 2025 HedgeCompany. All rights reserved.
 //
 
 import Foundation
@@ -16,25 +16,19 @@ import Shared
 import StockDomainInterface
 
 @Reducer
-public struct TradeHistoryFeature {
-    private let coordinator: TradeHistoryCoordinator
+public struct TradeFeedbackFeature {
+    private let coordinator: TradeFeedbackCoordinator
     
-    public init(coordinator: TradeHistoryCoordinator) {
+    public init(coordinator: TradeFeedbackCoordinator) {
         self.coordinator = coordinator
     }
     
     @ObservableState
     public struct State: Equatable {
-        public var tradingPrice: String = ""
-        public var tradingQuantity: String = ""
-        public var tradingDate: String = ""
-        public var yield: String = ""
-        public var stock: StockSearch
-        public var tradeType: TradeType
+        public var tradeData: TradeData
         
-        public init(tradeType: TradeType, stock: StockSearch) {
-            self.tradeType = tradeType
-            self.stock = stock
+        public init(tradeData: TradeData) {
+            self.tradeData = tradeData
         }
     }
     
@@ -67,7 +61,7 @@ public struct TradeHistoryFeature {
     }
 }
 
-extension TradeHistoryFeature {
+extension TradeFeedbackFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,
@@ -99,24 +93,7 @@ extension TradeHistoryFeature {
         _ state: inout State,
         _ action: View
     ) -> Effect<Action> {
-        switch action {
-        case .onAppear:
-            return .none
-            
-        case .backButtonTapped:
-            coordinator.popToPrev()
-            return .none
-            
-        case .nextTapped:
-            let tradeHistory = TradeHistory(tradingPrice: state.tradingPrice,
-                                            tradingQuantity: state.tradingQuantity,
-                                            tradingDate: state.tradingDate,
-                                            yield: state.yield)
-            
-            print(state.tradingPrice)
-            
-            return .none
-        }
+        return .none
     }
     
     // MARK: - Inner Core
@@ -124,8 +101,7 @@ extension TradeHistoryFeature {
         _ state: inout State,
         _ action: InnerAction
     ) -> Effect<Action> {
-        switch action {
-        }
+        
     }
     
     // MARK: - Async Core

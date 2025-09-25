@@ -18,14 +18,17 @@ public final class DefaultTradeHistoryCoordinator: TradeHistoryCoordinator {
     
     public var childCoordinators: [Coordinator] = []
     public var parentCoordinator: RootCoordinator?
+    public let tradeType: TradeType
     public let stockSearch: StockSearch
     
     public init(
         navigationController: UINavigationController,
+        tradeType: TradeType,
         stockSearch: StockSearch
     ) {
         self.navigationController = navigationController
         self.stockSearch = stockSearch
+        self.tradeType = tradeType
     }
     
     public func start() {
@@ -33,6 +36,7 @@ public final class DefaultTradeHistoryCoordinator: TradeHistoryCoordinator {
             rootView: TradeHistoryInputView(
                 store: .init(
                     initialState: TradeHistoryFeature.State(
+                        tradeType: tradeType,
                         stock: stockSearch
                     ),
                     reducer: {

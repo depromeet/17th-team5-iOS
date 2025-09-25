@@ -1,6 +1,6 @@
 //
-//  TradeHistoryFeature.swift
-//  TradeHistoryFeature
+//  StockSearchFeature.swift
+//  StockSearchFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
@@ -16,26 +16,23 @@ import Shared
 import StockDomainInterface
 
 @Reducer
-public struct TradeHistoryFeature {
-    private let coordinator: TradeHistoryCoordinator
+public struct StockSearchFeature {
+    private let coordinator: StockSearchCoordinator
     
-    public init(coordinator: TradeHistoryCoordinator) {
+    private let fetchStockSearchUseCase = DIContainer.resolve(FetchStockSearchUseCase.self)
+    
+    private let tradeType: TradeType
+    
+    public init(coordinator: StockSearchCoordinator, tradeType: TradeType) {
         self.coordinator = coordinator
+        self.tradeType = tradeType
     }
     
     @ObservableState
     public struct State: Equatable {
-        public var tradingPrice: String = ""
-        public var tradingQuantity: String = ""
-        public var tradingDate: String = ""
-        public var yield: String = ""
-        public var stock: StockSearch
-        public var tradeType: TradeType
-        
-        public init(tradeType: TradeType, stock: StockSearch) {
-            self.tradeType = tradeType
-            self.stock = stock
-        }
+        public var searchText: String = ""
+        public var stocks: [StockSearch] = []
+        public init() {}
     }
     
     public enum Action: FeatureAction, ViewAction, BindableAction {
@@ -50,15 +47,20 @@ public struct TradeHistoryFeature {
     public enum View {
         case onAppear
         case backButtonTapped
-        case nextTapped
+        case stockTapped(StockSearch)
     }
     public enum InnerAction {
+        case fetchStockSuccess([StockSearch])
+        case failure(Error)
     }
     public enum AsyncAction {
-        
+        case fetchStockSearch(String)
     }
     public enum ScopeAction { }
     public enum DelegateAction { }
+    
+    // MARK: - Debounce ID
+    private enum CancelID { case searchDebounce }
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -67,13 +69,25 @@ public struct TradeHistoryFeature {
     }
 }
 
-extension TradeHistoryFeature {
+extension StockSearchFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,
         _ action: Action
     ) -> Effect<Action> {
         switch action {
+        case .binding(\.searchText):
+            let text = state.searchText
+            return .run { send in
+                guard !text.isEmpty else { return }
+                await send(.async(.fetchStockSearch(text)))
+            }
+            .debounce(
+                id: CancelID.searchDebounce,
+                for: 0.5,
+                scheduler: RunLoop.main
+            )
+            
         case .binding:
             return .none
             
@@ -107,14 +121,8 @@ extension TradeHistoryFeature {
             coordinator.popToPrev()
             return .none
             
-        case .nextTapped:
-            let tradeHistory = TradeHistory(tradingPrice: state.tradingPrice,
-                                            tradingQuantity: state.tradingQuantity,
-                                            tradingDate: state.tradingDate,
-                                            yield: state.yield)
-            
-            print(state.tradingPrice)
-            
+        case .stockTapped(let stock):
+            coordinator.pushToTradeHistory(tradeType: tradeType, stock: stock)
             return .none
         }
     }
@@ -125,6 +133,14 @@ extension TradeHistoryFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
+        case .fetchStockSuccess(let response):
+            Log.debug("주식 조회 결과: \(response)")
+            state.stocks = response
+            return .none
+            
+        case .failure(let error):
+            Log.error("error: \(error)")
+            return .none
         }
     }
     
@@ -133,7 +149,17 @@ extension TradeHistoryFeature {
         _ state: inout State,
         _ action: AsyncAction
     ) -> Effect<Action> {
-        
+        switch action {
+        case .fetchStockSearch(let text):
+            return .run { send in
+                do {
+                    let response = try await fetchStockSearchUseCase.execute(text: text)
+                    await send(.inner(.fetchStockSuccess(response)))
+                } catch {
+                    await send(.inner(.failure(error)))
+                }
+            }
+        }
     }
     
     // MARK: - Scope Core

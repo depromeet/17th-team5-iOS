@@ -1,6 +1,6 @@
 //
-//  RootCoordinator.swift
-//  Core
+//  StockSearchCoordinator.swift
+//  StockSearchFeature
 //
 //  Created by Junyoung on 9/14/25.
 //  Copyright © 2025 SampleCompany. All rights reserved.
@@ -8,9 +8,10 @@
 
 import Foundation
 
+import Core
 import StockDomainInterface
 
-public protocol RootCoordinator: Coordinator {
-    func pushToStockSearch(with tradeType: TradeType)
+public protocol StockSearchCoordinator: Coordinator {
+    func popToPrev()
     func pushToTradeHistory(tradeType: TradeType, stock: StockSearch)
 }

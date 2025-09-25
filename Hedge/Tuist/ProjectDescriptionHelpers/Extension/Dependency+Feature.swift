@@ -20,8 +20,8 @@ public extension TargetDependency.Feature {
         public static let interface = featureInterfaceDependency(target: name)
     }
     
-    struct Retrospect {
-        private static let name = "RetrospectFeature"
+    struct StockSearch {
+        private static let name = "StockSearchFeature"
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }

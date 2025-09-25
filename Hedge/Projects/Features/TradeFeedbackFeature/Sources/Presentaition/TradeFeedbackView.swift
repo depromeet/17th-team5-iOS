@@ -9,18 +9,18 @@
 import SwiftUI
 
 import DesignKit
+import TradeFeedbackFeatureInterface
+import ComposableArchitecture
+import Core
 
 struct TradeFeedbackView: View {
+    
+    @Bindable public var store: StoreOf<TradeFeedbackFeature>
     
     @State private var selectedTab: Int = 0
     @State private var isImageHidden: Bool = false
     
     private let threshold: CGFloat = 150
-    
-    var symbolImage: Image
-    var title: String
-    var description: String
-    var footnote: String
     
     // 이미지 높이 계산
     private var imageHeight: CGFloat {
@@ -39,12 +39,10 @@ struct TradeFeedbackView: View {
                 HedgeNavigationBar(buttonText: "삭제", color: .secondary)
                 
                 HedgeTopView(
-                    symbolImage: symbolImage,
-                    title: title,
-                    description: description,
-                    footnote: footnote,
-                    buttonImage: Image.hedgeUI.pencil,
-                    buttonImageOnTapped: nil
+                    symbolImage: Image.hedgeUI.generate,
+                    title: store.state.tradeData.stockTitle,
+                    description: "\(store.state.tradeData.tradingPrice)・\(store.state.tradeData.tradingQuantity)주 \(store.state.tradeData.tradeType.rawValue)",
+                    footnote: store.state.tradeData.tradingDate
                 )
                 
                 Image.hedgeUI.tmpChart
@@ -118,7 +116,7 @@ extension TradeFeedbackView {
     private var retrospectTab: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0) {
-                Text("2025년 8월 25일")
+                Text(store.state.tradeData.tradingDate)
                     .font(.body)
                     .foregroundColor(.primary)
                     .padding(.top, 16)
@@ -189,5 +187,7 @@ extension View {
 }
 
 #Preview {
-    TradeFeedbackView(symbolImage: HedgeUI.trash, title: "종목명", description: "65,000원・3주 매도", footnote: "2025년 8월 25일")
+    TradeFeedbackView(store: .init(initialState: TradeFeedbackFeature.State(tradeData: TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.")),
+                                   reducer: { TradeFeedbackFeature(coordinator: DefaultTradeHFeedbackCoordinator(navigationController: UINavigationController(), tradeData: TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.")))
+    }))
 }

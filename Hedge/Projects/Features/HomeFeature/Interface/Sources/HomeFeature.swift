@@ -18,11 +18,7 @@ public struct HomeFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public var tradeDataBuilder: TradeDataBuilder
-        
-        public init(tradeDataBuilder: TradeDataBuilder = TradeDataBuilder()) {
-            self.tradeDataBuilder = tradeDataBuilder
-        }
+        public init() { }
     }
     
     public enum Action: FeatureAction, ViewAction {
@@ -35,13 +31,12 @@ public struct HomeFeature {
     
     public enum View {
         case retrospectTapped(TradeType)
-        case setTradeType(TradeType)
     }
     public enum InnerAction { }
     public enum AsyncAction { }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToRetrospect(TradeDataBuilder)
+        case pushToStockSearch(TradeType)
     }
     
     public var body: some Reducer<State, Action> {
@@ -80,15 +75,7 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .retrospectTapped(let type):
-            return .send(.view(.setTradeType(type)))
-        case .setTradeType(let type):
-            do {
-                state.tradeDataBuilder = state.tradeDataBuilder.setType(type)
-                return .send(.delegate(.pushToRetrospect(state.tradeDataBuilder)))
-            } catch {
-                // 에러 처리 - 사용자에게 알림 표시 등
-                return .none
-            }
+            return .send(.delegate(.pushToStockSearch(type)))
         }
     }
     
@@ -128,7 +115,7 @@ extension HomeFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToRetrospect(let tradeDataBuilder):
+        case .pushToStockSearch(let tradeType):
             // 여기서는 단순히 .none을 반환
             // 실제 처리는 TabBarFeature에서 담당
             return .none
