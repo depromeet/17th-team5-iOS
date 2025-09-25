@@ -35,6 +35,7 @@ extension HedgeUI where Base == Image {
     public static var aiGenerateBackground: Image { asset(#function) }
     public static var generateIcon: Image { asset(#function) }
     public static var generateCloseIcon: Image { asset(#function) }
+    public static var principle: Image { asset(#function) }
 
     // MARK: Size 30
     public static var error: Image { asset(#function) }
