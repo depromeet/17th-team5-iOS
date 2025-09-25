@@ -122,101 +122,115 @@ extension TradeFeedbackView {
     private var retrospectTab: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
-                    Text(tradeData.tradingDate)
-                        .font(FontModel.label2Regular)
-                        .foregroundColor(Color.hedgeUI.textAlternative)
-                    
-                    Rectangle()
-                        .frame(height: 12)
-                        .foregroundStyle(.clear)
-                    
-                    Text(tradeData.retrospection)
-                        .font(FontModel.body3Regular)
-                    
-                    Rectangle()
-                        .frame(height: 24)
-                        .foregroundStyle(.clear)
-                    
-                    if let emotion = tradeData.emotion {
+                Text(tradeData.tradingDate)
+                    .font(FontModel.label2Regular)
+                    .foregroundColor(Color.hedgeUI.textAlternative)
+                
+                Rectangle()
+                    .frame(height: 12)
+                    .foregroundStyle(.clear)
+                
+                Text(tradeData.retrospection)
+                    .font(FontModel.body3Regular)
+                
+                Rectangle()
+                    .frame(height: 24)
+                    .foregroundStyle(.clear)
+                
+                if let emotion = tradeData.emotion {
+                    HStack(spacing: 9) {
+                        emotion.normalImage
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                        
+                        Text("\(emotion.rawValue) \(tradeData.tradeType == .buy ? "매도" : "매수")")
+                            .font(FontModel.label1Semibold)
+                    }
+                }
+                
+                Rectangle()
+                    .frame(height: 12)
+                    .foregroundStyle(.clear)
+                
+                if !tradeData.tradePrinciple.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // 헤더 (클릭 가능)
                         HStack(spacing: 9) {
-                            emotion.normalImage
+                            Image.hedgeUI.principle
                                 .resizable()
                                 .frame(width: 24, height: 24)
                             
-                            Text("\(emotion.rawValue) \(tradeData.tradeType == .buy ? "매도" : "매수")")
+                            Text("적용한 원칙")
                                 .font(FontModel.label1Semibold)
+                            
+                            Spacer()
+                            
+                            Image.hedgeUI.arrowDown
+                                .foregroundColor(Color.hedgeUI.textAlternative)
+                                .font(.system(size: 14, weight: .medium))
+                                .rotationEffect(.degrees(isPrincipleExpanded ? 180 : 0))
+                                .animation(.easeInOut(duration: 0.3), value: isPrincipleExpanded)
+                            
                         }
-                    }
-                    
-                    Rectangle()
-                        .frame(height: 12)
-                        .foregroundStyle(.clear)
-                    
-                    if !tradeData.tradePrinciple.isEmpty {
-                        VStack(alignment: .leading, spacing: 0) {
-                            // 헤더 (클릭 가능)
-                            HStack(spacing: 9) {
-                                Image.hedgeUI.principle
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
-                                
-                                Text("적용한 원칙")
-                                    .font(FontModel.label1Semibold)
-                                
-                                Spacer()
-                                
-                                Image.hedgeUI.arrowDown
-                                    .foregroundColor(Color.hedgeUI.textAlternative)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .rotationEffect(.degrees(isPrincipleExpanded ? 180 : 0))
-                                    .animation(.easeInOut(duration: 0.3), value: isPrincipleExpanded)
-                                
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                isPrincipleExpanded.toggle()
                             }
-                             .onTapGesture {
-                                 withAnimation(.easeInOut(duration: 0.3)) {
-                                     isPrincipleExpanded.toggle()
-                                 }
-                             }
+                        }
+                        
+                        Rectangle()
+                            .frame(height: 12)
+                            .foregroundStyle(.clear)
+                        
+                        // 원칙 목록 (항상 렌더링하되 높이로 애니메이션)
+                        HStack(spacing: 4) {
                             
                             Rectangle()
-                                .frame(height: 12)
-                                .foregroundStyle(.clear)
+                                .frame(width: 3)
+                                .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                                .padding(.horizontal, 8)
+                                .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
                             
-                            // 원칙 목록 (항상 렌더링하되 높이로 애니메이션)
-                            HStack(spacing: 4) {
-                                
-                                Rectangle()
-                                    .frame(width: 3)
-                                    .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                                    .padding(.horizontal, 8)
-                                    .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
-                                
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ForEach(tradeData.tradePrinciple, id: \.self) { principle in
-                                        HStack(spacing: 8) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.green)
-                                                .font(.system(size: 16))
-                                            
-                                            Text(principle)
-                                                .font(FontModel.body3Regular)
-                                                .foregroundColor(Color.hedgeUI.textPrimary)
-                                        }
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(tradeData.tradePrinciple, id: \.self) { principle in
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.green)
+                                            .font(.system(size: 16))
+                                        
+                                        Text(principle)
+                                            .font(FontModel.body3Regular)
+                                            .foregroundColor(Color.hedgeUI.textPrimary)
                                     }
                                 }
-                                .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
                             }
-                             .clipped()
-                             .opacity(isPrincipleExpanded ? 1 : 0)
-                         }
+                            .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
+                        }
+                        .clipped()
+                        .opacity(isPrincipleExpanded ? 1 : 0)
                     }
-                    
-                    Spacer()
                 }
+                
+                Spacer()
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
-            .padding(20)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
+        .simultaneousGesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 0 {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedTab -= 1
+                        }
+                    } else {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedTab += 1
+                        }
+                    }
+                }
+        )
+        .padding(20)
     }
     
     @ViewBuilder
@@ -234,6 +248,20 @@ extension TradeFeedbackView {
         }
         .scrollBounceBehavior(.basedOnSize)
         .imageDragGesture(isImageHidden: $isImageHidden, threshold: threshold)
+        .simultaneousGesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 0 {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedTab -= 1
+                        }
+                    } else {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedTab += 1
+                        }
+                    }
+                }
+        )
     }
 }
 
@@ -277,7 +305,6 @@ extension View {
 }
 
 #Preview {
-    
     let tradeData = TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성123했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.")
     
     TradeFeedbackView(store: .init(initialState: TradeFeedbackFeature.State(tradeData: tradeData),
