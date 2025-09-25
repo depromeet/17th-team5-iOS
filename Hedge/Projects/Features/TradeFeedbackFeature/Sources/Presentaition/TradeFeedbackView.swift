@@ -219,11 +219,7 @@ extension TradeFeedbackView {
         .simultaneousGesture(
             DragGesture()
                 .onEnded { value in
-                    if value.translation.width > 0 {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedTab -= 1
-                        }
-                    } else {
+                    if value.translation.width < 0 {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             selectedTab += 1
                         }
@@ -254,10 +250,6 @@ extension TradeFeedbackView {
                     if value.translation.width > 0 {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             selectedTab -= 1
-                        }
-                    } else {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedTab += 1
                         }
                     }
                 }
