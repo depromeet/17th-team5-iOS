@@ -21,6 +21,8 @@ import TradeReasonFeatureInterface
 import PrinciplesFeature
 import PrinciplesFeatureInterface
 import StockDomainInterface
+import TradeFeedbackFeature
+import TradeFeedbackFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     public var navigationController: UINavigationController
@@ -119,5 +121,14 @@ extension DefaultRootCoordinator {
         )
         principlesCoordinator.parentCoordinator = self
         principlesCoordinator.start()
+    }
+    
+    public func pushToFeedback(tradeData: TradeData) {
+        let tradeFeedbackCoordinator = DefaultTradeHFeedbackCoordinator(
+            navigationController: self.navigationController,
+            tradeData: tradeData
+        )
+        tradeFeedbackCoordinator.parentCoordinator = self
+        tradeFeedbackCoordinator.start()
     }
 }

@@ -12,4 +12,13 @@ import Foundation
 public enum TradeType: String, CaseIterable, Equatable {
     case buy = "매수"
     case sell = "매도"
+    
+    public var toRequest: String {
+        switch self {
+        case .buy:
+            "BUY"
+        case .sell:
+            "SELL"
+        }
+    }
 }

@@ -2,8 +2,10 @@ import UIKit
 import SwiftUI
 
 import Core
+import Shared
 import StockDomainInterface
 import TradeFeedbackFeatureInterface
+import FeedbackDomainInterface
 
 public final class DefaultTradeHFeedbackCoordinator: TradeFeedbackCoordinator {
     public var navigationController: UINavigationController
@@ -11,6 +13,7 @@ public final class DefaultTradeHFeedbackCoordinator: TradeFeedbackCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var parentCoordinator: RootCoordinator?
     public let tradeData: TradeData
+    private let fetchFeedbackUseCase = DIContainer.resolve(FetchFeedbackUseCase.self)
     
     public init(
         navigationController: UINavigationController,
@@ -22,11 +25,17 @@ public final class DefaultTradeHFeedbackCoordinator: TradeFeedbackCoordinator {
     
     public func start() {
         let viewController = UIHostingController(
-            rootView: TradeFeedbackView(store:
-                    .init(initialState: TradeFeedbackFeature.State(tradeData: tradeData),
-                          reducer: {
-                              TradeFeedbackFeature(coordinator: self)
-                          }))
+            rootView: TradeFeedbackView(
+                store: .init(
+                    initialState: TradeFeedbackFeature.State(tradeData: tradeData),
+                    reducer: {
+                        TradeFeedbackFeature(
+                            coordinator: self,
+                            fetchFeedbackUseCase: fetchFeedbackUseCase
+                        )
+                    }
+                )
+            )
         )
         
         navigationController.pushViewController(viewController, animated: true)

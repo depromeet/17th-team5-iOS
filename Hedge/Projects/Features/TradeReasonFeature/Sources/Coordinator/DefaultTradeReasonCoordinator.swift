@@ -11,7 +11,9 @@ import SwiftUI
 import ComposableArchitecture
 import Core
 import TradeReasonFeatureInterface
+import RetrospectDomainInterface
 import StockDomainInterface
+import Shared
 
 public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var navigationController: UINavigationController
@@ -19,6 +21,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var parentCoordinator: RootCoordinator?
     
+    private let generateRetrospectUseCase = DIContainer.resolve(GenerateRetrospectUseCase.self)
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradingPrice: String
@@ -26,7 +29,15 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     private let tradingDate: String
     private let yield: String
     
-    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String) {
+    public init(
+        navigationController: UINavigationController,
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradingPrice: String,
+        tradingQuantity: String,
+        tradingDate: String,
+        yield: String
+    ) {
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
@@ -41,7 +52,10 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
             store: .init(
                 initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield),
                 reducer: {
-                    TradeReasonFeature(coordinator: self)
+                    TradeReasonFeature(
+                        coordinator: self,
+                        generateRetrospectUseCase: generateRetrospectUseCase
+                    )
                 }
             )
         )
@@ -54,11 +68,31 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         navigationController.popViewController(animated: true)
     }
     
-    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+    public func pushToPrinciples(
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradingPrice: String,
+        tradingQuantity: String,
+        tradingDate: String,
+        yield: String,
+        reasonText: String
+    ) {
         parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)
     }
     
-    public func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+    public func showEmotionSelection(
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradingPrice: String,
+        tradingQuantity: String,
+        tradingDate: String,
+        yield: String,
+        reasonText: String
+    ) {
         parentCoordinator?.showEmotionSelection(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)
+    }
+    
+    public func pushToFeedback(tradeData: TradeData) {
+        parentCoordinator?.pushToFeedback(tradeData: tradeData)
     }
 }

@@ -10,6 +10,7 @@ import Foundation
 
 public struct TradeData: Equatable {
     private let uuid: UUID = UUID()
+    public var id: Int
     public var tradeType: TradeType
     public var stockSymbol: String
     public var stockTitle: String
@@ -22,7 +23,21 @@ public struct TradeData: Equatable {
     public var tradePrinciple: [String]
     public var retrospection: String
     
-    public init(tradeType: TradeType, stockSymbol: String, stockTitle: String, stockMarket: String, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String? = nil, emotion: TradeEmotion? = nil, tradePrinciple: [String], retrospection: String) {
+    public init(
+        id: Int,
+        tradeType: TradeType,
+        stockSymbol: String,
+        stockTitle: String,
+        stockMarket: String,
+        tradingPrice: String,
+        tradingQuantity: String,
+        tradingDate: String,
+        yield: String? = nil,
+        emotion: TradeEmotion? = nil,
+        tradePrinciple: [String],
+        retrospection: String
+    ) {
+        self.id = id
         self.tradeType = tradeType
         self.stockSymbol = stockSymbol
         self.stockTitle = stockTitle
