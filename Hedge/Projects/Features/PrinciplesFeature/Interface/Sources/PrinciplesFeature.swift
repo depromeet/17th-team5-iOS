@@ -112,7 +112,7 @@ extension PrinciplesFeature {
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
-           
+            
         case .principleToggled(let index):
             if state.selectedPrinciples.contains(index) {
                 state.selectedPrinciples.remove(index)
@@ -139,7 +139,7 @@ extension PrinciplesFeature {
                 tradingQuantity: state.tradingQuantity,
                 tradingDate: state.tradingDate,
                 yield: state.yield,
-                emotion: .mindfulness, // Default emotion since we're not handling emotions here
+                emotion: .neutral, // Default emotion since we're not handling emotions here
                 tradePrinciple: selectedPrinciples
             )))
             
@@ -156,7 +156,7 @@ extension PrinciplesFeature {
                 tradingQuantity: state.tradingQuantity,
                 tradingDate: state.tradingDate,
                 yield: state.yield,
-                emotion: .mindfulness, // Default emotion
+                emotion: .neutral, // Default emotion
                 tradePrinciple: [] // Empty array for skip
             )))
         }
