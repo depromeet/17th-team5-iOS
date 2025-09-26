@@ -24,10 +24,10 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     private let tradingPrice: String
     private let tradingQuantity: String
     private let tradingDate: String
-    private let yield: String
+    private let yield: String?
     private let reasonText: String
     
-    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
@@ -56,7 +56,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
         navigationController.popViewController(animated: true)
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, emotion: TradeEmotion, tradePrinciple: [String]) {
         
         // Navigate to TradeReason using parent coordinator
         if let parent = parentCoordinator {

@@ -12,5 +12,5 @@ import StockDomainInterface
 
 public protocol PrinciplesCoordinator: Coordinator {
     func popToPrev()
-    func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String])
+    func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, emotion: TradeEmotion, tradePrinciple: [String])
 }

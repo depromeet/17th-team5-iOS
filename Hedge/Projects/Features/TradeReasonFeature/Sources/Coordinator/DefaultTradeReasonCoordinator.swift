@@ -27,7 +27,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     private let tradingPrice: String
     private let tradingQuantity: String
     private let tradingDate: String
-    private let yield: String
+    private let yield: String?
     
     public init(
         navigationController: UINavigationController,
@@ -36,7 +36,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         tradingPrice: String,
         tradingQuantity: String,
         tradingDate: String,
-        yield: String
+        yield: String?
     ) {
         self.navigationController = navigationController
         self.tradeType = tradeType
@@ -74,7 +74,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         tradingPrice: String,
         tradingQuantity: String,
         tradingDate: String,
-        yield: String,
+        yield: String?,
         reasonText: String
     ) {
         parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)

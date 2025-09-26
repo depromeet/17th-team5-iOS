@@ -70,7 +70,7 @@ extension DefaultRootCoordinator {
         tradeHistoryCoordinator.start()
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, emotion: TradeEmotion, tradePrinciple: [String]) {
         
         let tradeReasonCoordinator = DefaultTradeReasonCoordinator(
             navigationController: navigationController,
@@ -85,7 +85,7 @@ extension DefaultRootCoordinator {
         tradeReasonCoordinator.start()
     }
     
-    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
         let principlesCoordinator = DefaultPrinciplesCoordinator(
             navigationController: navigationController,
             tradeType: tradeType,
@@ -100,7 +100,7 @@ extension DefaultRootCoordinator {
         principlesCoordinator.start()
     }
     
-    public func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+    public func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
         let principlesCoordinator = DefaultPrinciplesCoordinator(
             navigationController: navigationController,
             tradeType: tradeType,

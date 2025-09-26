@@ -60,7 +60,7 @@ public struct TradeHistoryFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String)
+        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?)
     }
     
     public var body: some Reducer<State, Action> {

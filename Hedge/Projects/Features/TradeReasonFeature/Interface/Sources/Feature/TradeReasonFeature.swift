@@ -34,7 +34,7 @@ public struct TradeReasonFeature {
         public var tradingPrice: String
         public var tradingQuantity: String
         public var tradingDate: String
-        public var yield: String
+        public var yield: String?
         public var reasonText: String = ""
         public var selectedButton: FloatingButtonSelectType? = .generate
         public var emotionSelection: Int = 0
@@ -42,7 +42,7 @@ public struct TradeReasonFeature {
         public var isChecklistShow: Bool = false
         public var checkedItems: Set<Int> = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String) {
+        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?) {
             self.tradeType = tradeType
             self.stock = stock
             self.tradingPrice = tradingPrice
@@ -83,7 +83,7 @@ public struct TradeReasonFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
+        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String)
     }
     
     public var body: some Reducer<State, Action> {

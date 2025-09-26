@@ -32,11 +32,11 @@ public struct PrinciplesFeature {
         public var tradingPrice: String
         public var tradingQuantity: String
         public var tradingDate: String
-        public var yield: String
+        public var yield: String?
         public var reasonText: String
         public var principles: [Principle] = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
             self.tradeType = tradeType
             self.stock = stock
             self.tradingPrice = tradingPrice
@@ -74,7 +74,7 @@ public struct PrinciplesFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String])
+        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, emotion: TradeEmotion, tradePrinciple: [String])
     }
     
     public var body: some Reducer<State, Action> {
