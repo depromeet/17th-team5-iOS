@@ -13,6 +13,7 @@ import ComposableArchitecture
 
 import TradeHistoryFeatureInterface
 import DesignKit
+import Shared
 
 @ViewAction(for: TradeHistoryFeature.self)
 public struct TradeHistoryInputView: View {
@@ -49,6 +50,31 @@ public struct TradeHistoryInputView: View {
         return Color.hedgeUI.grey200
     }
     
+    private var description: String {
+        if let focusedID, let type = HedgeTradeTextField.HedgeTextFieldType(rawValue: focusedID) {
+            switch type {
+            case .buyPrice:
+                return "얼마에 매수하셨나요?"
+            case .sellPrice:
+                return "얼마에 매도하셨나요?"
+            case .quantity:
+                return "몇 주 \(store.tradeType.rawValue)하셨나요?"
+            case .tradeDate:
+                return "언제 \(store.tradeType.rawValue)하셨나요?"
+            case .yield:
+                let price = store.tradingPrice.extractDecimalNumber()
+                let quantity = Double(store.tradingQuantity.extractNumbers())
+                let total = String(price * quantity).toDecimalStringWithDecimal()
+                return "총 \(total) \(store.tradeType == .buy ? "매수" : "매도")"
+            }
+        } else {
+            let price = store.tradingPrice.extractDecimalNumber()
+            let quantity = Double(store.tradingQuantity.extractNumbers())
+            let total = String(price * quantity).toDecimalStringWithDecimal()
+            return "총 \(total) \(store.tradeType == .buy ? "매수" : "매도")"
+        }
+    }
+    
     // MARK: - Initializer
     
     public init(
@@ -68,13 +94,15 @@ public struct TradeHistoryInputView: View {
                 }
             
             VStack(spacing: 0) {
-                HedgeNavigationBar(buttonText: "", onLeftButtonTap: nil)
+                HedgeNavigationBar(buttonText: "", onLeftButtonTap:  {
+                    store.send(.view(.backButtonTapped))
+                })
                 
                 VStack(spacing: 16) {
                     HedgeTopView(
-                        symbolImage: Image.hedgeUI.buyDemo,
+                        symbolImage: Image.hedgeUI.stockThumbnailDemo,
                         title: store.stock.title,
-                        description: store.stock.market
+                        description: description
                     )
                     
                     textFieldGroup

@@ -71,11 +71,6 @@ extension DefaultRootCoordinator {
     }
     
     public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String]) {
-        print("🎯 RootCoordinator.pushToTradeReason called!")
-        print("   TradeType: \(tradeType.rawValue)")
-        print("   Stock: \(stock.title) (\(stock.symbol))")
-        print("   Emotion: \(emotion)")
-        print("   Principles: \(tradePrinciple)")
         
         let tradeReasonCoordinator = DefaultTradeReasonCoordinator(
             navigationController: navigationController,
@@ -88,7 +83,6 @@ extension DefaultRootCoordinator {
         )
         tradeReasonCoordinator.parentCoordinator = self
         tradeReasonCoordinator.start()
-        print("   ✅ TradeReasonCoordinator started")
     }
     
     public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
@@ -107,8 +101,6 @@ extension DefaultRootCoordinator {
     }
     
     public func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
-        // For now, just navigate to principles with emotion selection
-        // This will show the emotion selection bottom sheet first
         let principlesCoordinator = DefaultPrinciplesCoordinator(
             navigationController: navigationController,
             tradeType: tradeType,
