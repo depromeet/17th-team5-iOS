@@ -14,6 +14,7 @@ import TradeReasonFeatureInterface
 import RetrospectDomainInterface
 import StockDomainInterface
 import Shared
+import PrinciplesDomainInterface
 
 public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var navigationController: UINavigationController
@@ -28,6 +29,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     private let tradingQuantity: String
     private let tradingDate: String
     private let yield: String?
+    private let selectedPrinciples: [Principle]
     
     public init(
         navigationController: UINavigationController,
@@ -36,7 +38,8 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         tradingPrice: String,
         tradingQuantity: String,
         tradingDate: String,
-        yield: String?
+        yield: String?,
+        selectedPrinciples: [Principle]
     ) {
         self.navigationController = navigationController
         self.tradeType = tradeType
@@ -45,12 +48,13 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         self.tradingQuantity = tradingQuantity
         self.tradingDate = tradingDate
         self.yield = yield
+        self.selectedPrinciples = selectedPrinciples
     }
     
     public func start() {
         let tradeReasonInputView = TradeReasonInputView(
             store: .init(
-                initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield),
+                initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, selectedPrinciples: selectedPrinciples),
                 reducer: {
                     TradeReasonFeature(
                         coordinator: self,

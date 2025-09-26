@@ -108,6 +108,7 @@ extension TradeFeedbackFeature {
             return .send(.async(.fetchFeedback(state.tradeData.id)))
             
         case .backButtonTapped:
+            coordinator.popToPrev()
             return .none
             
         case .nextTapped:

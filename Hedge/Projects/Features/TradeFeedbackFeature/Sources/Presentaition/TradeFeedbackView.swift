@@ -40,7 +40,11 @@ struct TradeFeedbackView: View {
         
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                HedgeNavigationBar(buttonText: "삭제", color: .secondary)
+                HedgeNavigationBar(buttonText: "삭제", color: .secondary, onLeftButtonTap: {
+                    store.send(.view(.backButtonTapped))
+                }, onRightButtonTap: {
+                    
+                })
                 
                 HedgeTopView(
                     symbolImage: Image.hedgeUI.generate,

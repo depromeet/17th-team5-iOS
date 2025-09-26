@@ -12,6 +12,7 @@ import ComposableArchitecture
 import Core
 import PrinciplesFeatureInterface
 import StockDomainInterface
+import PrinciplesDomainInterface
 
 public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public var navigationController: UINavigationController
@@ -56,7 +57,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
         navigationController.popViewController(animated: true)
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, emotion: TradeEmotion, tradePrinciple: [String]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, tradePrinciple: [Principle]) {
         
         // Navigate to TradeReason using parent coordinator
         if let parent = parentCoordinator {
@@ -67,7 +68,6 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
                 tradingQuantity: tradingQuantity,
                 tradingDate: tradingDate,
                 yield: yield,
-                emotion: emotion,
                 tradePrinciple: tradePrinciple
             )
         } else {

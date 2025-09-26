@@ -11,6 +11,7 @@ import ComposableArchitecture
 import Core
 import StockDomainInterface
 import RetrospectDomainInterface
+import PrinciplesDomainInterface
 import DesignKit
 import Shared
 
@@ -35,6 +36,7 @@ public struct TradeReasonFeature {
         public var tradingQuantity: String
         public var tradingDate: String
         public var yield: String?
+        public var selectedPrinciples: [Principle]
         public var reasonText: String = ""
         public var selectedButton: FloatingButtonSelectType? = .generate
         public var emotionSelection: Int = 0
@@ -42,13 +44,14 @@ public struct TradeReasonFeature {
         public var isChecklistShow: Bool = false
         public var checkedItems: Set<Int> = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?) {
+        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, selectedPrinciples: [Principle]) {
             self.tradeType = tradeType
             self.stock = stock
             self.tradingPrice = tradingPrice
             self.tradingQuantity = tradingQuantity
             self.tradingDate = tradingDate
             self.yield = yield
+            self.selectedPrinciples = selectedPrinciples
         }
     }
     
@@ -130,16 +133,8 @@ extension TradeReasonFeature {
             return .none
             
         case .backButtonTapped:
-            // Go back to PrinciplesView
-            return .send(.delegate(.pushToPrinciples(
-                tradeType: state.tradeType,
-                stock: state.stock,
-                tradingPrice: state.tradingPrice,
-                tradingQuantity: state.tradingQuantity,
-                tradingDate: state.tradingDate,
-                yield: state.yield,
-                reasonText: state.reasonText
-            )))
+            coordinator.popToPrev()
+            return .none
             
         case .nextTapped:
             return .send(.async(.generateRetrospection))

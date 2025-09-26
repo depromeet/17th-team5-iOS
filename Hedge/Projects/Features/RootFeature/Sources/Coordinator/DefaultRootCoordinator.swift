@@ -23,6 +23,7 @@ import PrinciplesFeatureInterface
 import StockDomainInterface
 import TradeFeedbackFeature
 import TradeFeedbackFeatureInterface
+import PrinciplesDomainInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     public var navigationController: UINavigationController
@@ -70,7 +71,7 @@ extension DefaultRootCoordinator {
         tradeHistoryCoordinator.start()
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, emotion: TradeEmotion, tradePrinciple: [String]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, tradePrinciple: [Principle]) {
         
         let tradeReasonCoordinator = DefaultTradeReasonCoordinator(
             navigationController: navigationController,
@@ -79,7 +80,8 @@ extension DefaultRootCoordinator {
             tradingPrice: tradingPrice,
             tradingQuantity: tradingQuantity,
             tradingDate: tradingDate,
-            yield: yield
+            yield: yield,
+            selectedPrinciples: tradePrinciple
         )
         tradeReasonCoordinator.parentCoordinator = self
         tradeReasonCoordinator.start()

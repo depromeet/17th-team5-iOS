@@ -95,7 +95,7 @@ public struct TradeHistoryInputView: View {
             
             VStack(spacing: 0) {
                 HedgeNavigationBar(buttonText: "", onLeftButtonTap:  {
-                    store.send(.view(.backButtonTapped))
+                    send(.backButtonTapped)
                 })
                 
                 VStack(spacing: 16) {
