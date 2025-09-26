@@ -270,7 +270,7 @@ extension TradeFeedbackView {
     
     @ViewBuilder
     private var feedbackTab: some View {
-        ScrollView(.vertical) {
+        ScrollView(.vertical, showsIndicators: false) {
             if let _ = store.state.feedback {
                 feedbackView
             } else {
@@ -298,6 +298,7 @@ extension TradeFeedbackView {
             
             summaryView
             marketStatusView
+            principleView
         }
     }
     
@@ -396,6 +397,70 @@ extension TradeFeedbackView {
                 .padding(.horizontal, 20)
                 .background(Color.hedgeUI.neutralBgSecondary)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .padding(.vertical, 22)
+        .padding(.horizontal, 20)
+    }
+    
+    @ViewBuilder
+    private var principleView: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                Rectangle()
+                    .frame(width: 22, height: 22)
+                    .foregroundStyle(Color.hedgeUI.textDisabled)
+                
+                Text("AI 추천 원칙")
+                    .font(FontModel.h2Semibold)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                
+                Spacer()
+            }
+            
+            Rectangle()
+                .frame(height: 16)
+                .foregroundStyle(.clear)
+            
+            ForEach(Array((store.state.feedback?.principle ?? []).enumerated()), id: \.offset) { index, principle in
+                VStack(spacing: 0) {
+                    
+                    HStack(spacing: 0) {
+                        Text(store.state.feedback?.principle[index].0 ?? "")
+                            .font(FontModel.body2Semibold)
+                            .foregroundStyle(Color.hedgeUI.textTitle)
+                            .lineLimit(2)
+                        
+                        Spacer(minLength: 40)
+                        
+                        HedgeActionButton("추가", Image.hedgeUI.plus, Color.hedgeUI.neutralBgDefault) {
+                            
+                        }
+                        .size(.icon)
+                        .color(.primary)
+                        .font(.label2Semibold)
+                    }
+                    
+                    Rectangle()
+                        .frame(height: 8)
+                        .foregroundStyle(.clear)
+                    
+                    Text(store.state.feedback?.principle[index].1 ?? "")
+                        .font(FontModel.label1Regular)
+                        .foregroundStyle(Color.hedgeUI.textSecondary)
+                        .lineLimit(3)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Rectangle()
+                        .frame(height: 22)
+                        .foregroundStyle(.clear)
+                    
+                    if index < (store.state.feedback?.principle.count ?? 0) - 1 {
+                        Rectangle()
+                            .frame(height: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    }
+                }
+            }
         }
         .padding(.vertical, 22)
         .padding(.horizontal, 20)

@@ -18,16 +18,22 @@ public struct HedgeActionButton: View {
     
     private var size: HedgeActionButtonSize
     private var color: HedgeActionButtonColor
+    private var image: Image?
+    private var imageColor: Color?
     private var title: String
     private var onTapped: () -> Void
     
     public init(
         _ title: String,
+        _ image: Image? = nil,
+        _ imageColor: Color? = nil,
         _ onTapped: @escaping () -> Void
     ) {
         self.size = .large
         self.color = .primary
         self.title = title
+        self.image = image
+        self.imageColor = imageColor
         self.onTapped = onTapped
     }
     
@@ -35,10 +41,18 @@ public struct HedgeActionButton: View {
         Button {
             onTapped()
         } label: {
-            Text(title)
-                .font(size.font)
-                .foregroundStyle(isEnabled ? color.textColor : color.disableTextColor)
-                .frame(maxWidth: .infinity)
+            HStack(alignment: .center, spacing: 0) {
+                if let image, let imageColor {
+                    image
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                        .foregroundStyle(imageColor)
+                }
+                
+                Text(title)
+                    .font(size.font)
+                    .foregroundStyle(isEnabled ? color.textColor : color.disableTextColor)
+            }
         }
         .padding(.vertical, size.verticalPadding)
         .padding(.horizontal, size.horizontalPadding)
@@ -76,6 +90,7 @@ extension HedgeActionButton {
         case medium
         case small
         case tiny
+        case icon
         
         var font: FontModel {
             switch self {
@@ -85,7 +100,7 @@ extension HedgeActionButton {
                 return FontModel.body1Medium
             case .small:
                 return FontModel.body3Semibold
-            case .tiny:
+            case .tiny, .icon:
                 return FontModel.label2Semibold
             }
         }
@@ -98,7 +113,7 @@ extension HedgeActionButton {
                 return 12
             case .small:
                 return 10
-            case .tiny:
+            case .tiny, .icon:
                 return 8
             }
         }
@@ -113,6 +128,8 @@ extension HedgeActionButton {
                 return 20
             case .tiny:
                 return 12
+            case .icon:
+                return 10
             }
         }
         
@@ -124,7 +141,7 @@ extension HedgeActionButton {
                 return 14
             case .small:
                 return 12
-            case .tiny:
+            case .tiny, .icon:
                 return 8
             }
         }
