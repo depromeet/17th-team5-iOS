@@ -17,9 +17,12 @@ struct TradeFeedbackView: View {
     
     @Bindable public var store: StoreOf<TradeFeedbackFeature>
     
-    @State private var selectedTab: Int = 0
+    @State private var selectedTab: Int = 1
     @State private var isImageHidden: Bool = false
     @State private var isPrincipleExpanded: Bool = false
+    @State private var feedback: Feedback? = nil
+    @State private var rotationAngle: Double = 0
+    @State private var timer: Timer?
     
     private let threshold: CGFloat = 150
     
@@ -116,6 +119,24 @@ struct TradeFeedbackView: View {
     }
 }
 
+
+// MARK: Timer Functions
+extension TradeFeedbackView {
+    private func startRotationTimer() {
+        rotationAngle = 0
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            withAnimation(.linear(duration: 1)) {
+                rotationAngle += 360
+            }
+        }
+    }
+    
+    private func stopRotationTimer() {
+        timer?.invalidate()
+        timer = nil
+        rotationAngle = 0
+    }
+}
 
 // MARK: Subviews
 extension TradeFeedbackView {
@@ -250,14 +271,10 @@ extension TradeFeedbackView {
     @ViewBuilder
     private var feedbackTab: some View {
         ScrollView(.vertical) {
-            VStack {
-                HStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .purple))
-                    Text("AI 피드백 작성중...")
-                        .foregroundColor(.secondary)
-                }
-                .padding()
+            if let _ = store.state.feedback {
+                feedbackView
+            } else {
+                loadingView
             }
         }
         .scrollBounceBehavior(.basedOnSize)
@@ -272,6 +289,141 @@ extension TradeFeedbackView {
                     }
                 }
         )
+    }
+    
+    @ViewBuilder
+    private var feedbackView: some View {
+        VStack(spacing: 0) {
+            warningView
+            
+            summaryView
+            marketStatusView
+        }
+    }
+    
+    @ViewBuilder
+    private var warningView: some View {
+        HStack(spacing: 10) {
+            VStack(spacing: 0) {
+                ZStack {
+                    Circle()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(Color.hedgeUI.feedbackAI)
+                    
+                    
+                    Image.hedgeUI.error
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                }
+                
+                Spacer()
+            }
+            .padding(.top, 2)
+            
+            Text("본 서비스에서 제공하는 AI 피드백은 투자 참고용 정보이며, 실제 투자 판단에 대한 책임은 사용자 본인에게 있습니다.")
+                .font(FontModel.label2Medium)
+                .foregroundStyle(Color.hedgeUI.feedbackAI)
+            
+            Spacer()
+        }
+        .padding(.vertical, 22)
+        .padding(.horizontal, 20)
+        .background(Color.hedgeUI.feedbackAI.opacity(0.05))
+    }
+    
+    @ViewBuilder
+    private var summaryView: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                Image.hedgeUI.generateIcon
+                    .resizable()
+                    .frame(width: 22, height: 22)
+                
+                Text("요약")
+                    .font(FontModel.body2Semibold)
+                    .foregroundStyle(Color.hedgeUI.feedbackAI)
+                
+                Spacer()
+            }
+            
+            Rectangle()
+                .frame(height: 16)
+                .foregroundStyle(.clear)
+            
+            Text("요약 한마디")
+                .font(FontModel.h2Semibold)
+                .foregroundStyle(Color.hedgeUI.textTitle)
+            
+            Rectangle()
+                .frame(height: 8)
+                .foregroundStyle(.clear)
+            
+            Text(store.state.feedback?.summary ?? "")
+                .font(FontModel.body3Medium)
+                .foregroundStyle(Color.hedgeUI.textSecondary)
+        }
+        .padding(.vertical, 22)
+        .padding(.horizontal, 20)
+    }
+    
+    @ViewBuilder
+    private var marketStatusView: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                Rectangle()
+                    .frame(width: 22, height: 22)
+                    .foregroundStyle(Color.hedgeUI.textDisabled)
+                
+                Text("당시 시장 현황")
+                    .font(FontModel.h2Semibold)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                
+                Spacer()
+            }
+            
+            Rectangle()
+                .frame(height: 16)
+                .foregroundStyle(.clear)
+            
+            Rectangle()
+                .frame(height: 8)
+                .foregroundStyle(.clear)
+            
+            Text(store.state.feedback?.marketStatus ?? "")
+                .font(FontModel.body3Medium)
+                .foregroundStyle(Color.hedgeUI.textSecondary)
+                .padding(.vertical, 32)
+                .padding(.horizontal, 20)
+                .background(Color.hedgeUI.neutralBgSecondary)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .padding(.vertical, 22)
+        .padding(.horizontal, 20)
+    }
+    
+    @ViewBuilder
+    private var loadingView: some View {
+        HStack(spacing: 12) {
+            Image.hedgeUI.indicator
+                .resizable()
+                .frame(width: 20, height: 20)
+                .rotationEffect(.degrees(rotationAngle))
+                .onAppear {
+                    startRotationTimer()
+                }
+                .onDisappear {
+                    stopRotationTimer()
+                }
+            
+            Text("AI 피드백 작성중...")
+                .font(FontModel.body3Medium)
+                .foregroundStyle(Color.hedgeUI.feedbackAI)
+            
+            Spacer()
+        }
+        .padding(.vertical, 22)
+        .padding(.horizontal, 20)
+        .background(Color.hedgeUI.feedbackAI.opacity(0.05))
     }
 }
 

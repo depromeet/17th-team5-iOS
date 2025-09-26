@@ -8,7 +8,13 @@
 
 import Foundation
 
-public struct Feedback {
+public struct Feedback: Equatable {
+    
+    public static func == (lhs: Feedback, rhs: Feedback) -> Bool {
+        return lhs.uuid == rhs.uuid
+    }
+    
+    public let uuid: UUID = UUID()
     public let summary: String
     public let marketStatus: String
     public let principle: [(String, String)]
