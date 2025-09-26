@@ -33,6 +33,8 @@ public struct DataAssembly: Assembly {
         container.register(PrinciplesRepository.self) { _ in
             DefaultPrinciplesRepository(
                 dataSource: DefaultsPrinciplesDataSource()
+            )
+        }
               
         container.register(RetrospectRepository.self) { _ in
             DefaultRetrospectRepository(

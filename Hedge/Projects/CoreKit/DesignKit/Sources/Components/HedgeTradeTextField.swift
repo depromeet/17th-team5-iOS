@@ -65,6 +65,7 @@ public struct HedgeTradeTextField: View {
             if let segmentItems = type.segmentItems {
                 HedgeSegmentControl(selectedIndex: $selectedIndex, items: segmentItems)
                     .onChange(of: selectedIndex) {
+                        inputText = ""
                         handleTap()
                     }
             }
@@ -313,8 +314,11 @@ private extension HedgeTradeTextField {
             let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
             
             // SegmentControl의 선택에 따라 suffix 추가
-            let suffix = selectedIndex == 0 ? "원" : "$"
-            return "\(formattedNumber)\(suffix)"
+            if selectedIndex == 0 {
+                return "\(formattedNumber)원"
+            } else {
+                return "$\(formattedNumber)"
+            }
         }
         
         return numbers
