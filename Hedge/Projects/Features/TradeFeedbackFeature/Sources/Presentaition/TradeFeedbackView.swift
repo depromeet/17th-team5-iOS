@@ -49,7 +49,7 @@ struct TradeFeedbackView: View {
                 HedgeTopView(
                     symbolImage: Image.hedgeUI.generate,
                     title: store.state.tradeData.stockTitle,
-                    description: "\(store.state.tradeData.tradingPrice)・\(store.state.tradeData.tradingQuantity)주 \(store.state.tradeData.tradeType.rawValue)",
+                    description: "\(store.state.tradeData.tradingPrice)・\(store.state.tradeData.tradingQuantity) \(store.state.tradeData.tradeType.rawValue)",
                     footnote: store.state.tradeData.tradingDate
                 )
                 
@@ -146,16 +146,12 @@ extension TradeFeedbackView {
 // MARK: Subviews
 extension TradeFeedbackView {
     
-    private var tradeData: TradeData {
-        return store.state.tradeData
-    }
-    
     @ViewBuilder
     private var retrospectTab: some View {
         ScrollViewReader { proxy in
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
-                Text(tradeData.tradingDate)
+                Text(store.state.tradeData.tradingDate)
                     .font(FontModel.label2Regular)
                     .foregroundColor(Color.hedgeUI.textAlternative)
                 
@@ -163,20 +159,20 @@ extension TradeFeedbackView {
                     .frame(height: 12)
                     .foregroundStyle(.clear)
                 
-                Text(tradeData.retrospection)
+                Text(store.state.tradeData.retrospection)
                     .font(FontModel.body3Regular)
                 
                 Rectangle()
                     .frame(height: 24)
                     .foregroundStyle(.clear)
                 
-                if let emotion = tradeData.emotion {
+                if let emotion = store.state.tradeData.emotion {
                     HStack(spacing: 9) {
                         emotion.normalImage
                             .resizable()
                             .frame(width: 24, height: 24)
                         
-                        Text("\(emotion.rawValue) \(tradeData.tradeType == .buy ? "매도" : "매수")")
+                        Text("\(emotion.rawValue) \(store.state.tradeData.tradeType == .buy ? "매도" : "매수")")
                             .font(FontModel.label1Semibold)
                     }
                 }
@@ -185,7 +181,7 @@ extension TradeFeedbackView {
                     .frame(height: 12)
                     .foregroundStyle(.clear)
                 
-                if !tradeData.tradePrinciple.isEmpty {
+                if !store.state.tradeData.tradePrinciple.isEmpty {
                     VStack(alignment: .leading, spacing: 0) {
                         // 헤더 (클릭 가능)
                         HStack(spacing: 9) {
@@ -234,13 +230,13 @@ extension TradeFeedbackView {
                                 .frame(maxHeight: isPrincipleExpanded ? .infinity : 0)
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                ForEach(tradeData.tradePrinciple, id: \.self) { principle in
+                                ForEach(store.state.tradeData.tradePrinciple, id: \.self) { principle in
                                     HStack(spacing: 8) {
                                         Image.hedgeUI.checkDemo
                                             .resizable()
                                             .frame(width: 16, height: 16)
                                         
-                                        Text(principle)
+                                        Text(principle.principle)
                                             .font(FontModel.body3Regular)
                                             .foregroundColor(Color.hedgeUI.textPrimary)
                                     }

@@ -39,6 +39,7 @@ public struct TradeReasonFeature {
         public var isEmotionShow: Bool = false
         public var isChecklistShow: Bool = false
         public var checkedItems: Set<Int> = []
+        public var text: String = ""
         
         public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, selectedPrinciples: [Principle]) {
             self.tradeType = tradeType
@@ -170,14 +171,6 @@ extension TradeReasonFeature {
             return .none
             
         case .checklistSelected(let selectedItems):
-            let items = [
-                "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기",
-                "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
-                "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기",
-                "분산 투자 원칙을 지키고 감정적 결정을 피하기",
-                "리스크를 관리하며 손절 기준을 미리 정해두기"
-            ]
-            let picked = selectedItems.sorted().map { items[$0] }
             state.isChecklistShow = false
             state.selectedButton = nil
             return .none
@@ -186,15 +179,15 @@ extension TradeReasonFeature {
             Log.debug("\(id)")
             let tradeData = TradeData(
                 id: id,
-                tradeType: .sell,
-                stockSymbol: "",
-                stockTitle: "",
-                stockMarket: "",
-                tradingPrice: "",
-                tradingQuantity: "",
-                tradingDate: "",
-                tradePrinciple: [],
-                retrospection: ""
+                tradeType: state.tradeType,
+                stockSymbol: state.stock.symbol,
+                stockTitle: state.stock.title,
+                stockMarket: state.stock.market,
+                tradingPrice: state.tradeHistory.tradingPrice,
+                tradingQuantity: state.tradeHistory.tradingQuantity,
+                tradingDate: state.tradeHistory.tradingDate,
+                tradePrinciple: state.selectedPrinciples,
+                retrospection: state.text
             )
             coordinator.pushToFeedback(tradeData: tradeData)
             return .none
@@ -213,6 +206,7 @@ extension TradeReasonFeature {
         switch action {
         case .generateRetrospection:
             return .run { [state] send in
+                print(state.text)
                 let request = GenerateRetrospectRequest(
                     symbol: state.stock.symbol,
                     market: state.stock.market,
@@ -222,7 +216,7 @@ extension TradeReasonFeature {
                     volume: state.tradeHistory.tradingQuantity.extractNumbers(),
                     orderDate: state.tradeHistory.tradingDate.toDateString(),
                     returnRate: state.tradeHistory.yield?.extractDecimalNumber() ?? 0,
-                    content: state.tradeHistory.reasonText,
+                    content: state.text,
                     principleChecks: state.selectedPrinciples.map { PrincipleCheck(principleId: $0.id, isFollowed: true) },
                     emotion: .confidence
                 )

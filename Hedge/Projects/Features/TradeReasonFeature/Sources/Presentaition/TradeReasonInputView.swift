@@ -20,7 +20,6 @@ struct TradeReasonInputView: View {
         self.store = store
     }
     
-    @State var text: String = ""
     @FocusState private var isFocused: Bool
     
     var body: some View {
@@ -55,14 +54,14 @@ struct TradeReasonInputView: View {
                                 .foregroundStyle(.clear)
                             
                             ZStack(alignment: .topLeading) {
-                                TextEditor(text: $text)
+                                TextEditor(text: $store.state.text)
                                     .focused($isFocused)
                                     .tint(.black)
                                     .font(FontModel.body3Medium)
                                     .foregroundStyle(Color.hedgeUI.textTitle)
                                     .scrollContentBackground(.hidden)
                                 
-                                if text.isEmpty && !isFocused {
+                                if store.state.text.isEmpty && !isFocused {
                                     Text("매매 근거를 작성해보세요")
                                         .font(FontModel.body3Medium)
                                         .foregroundStyle(Color.hedgeUI.textAssistive)
@@ -79,7 +78,7 @@ struct TradeReasonInputView: View {
                             .id("textEditorArea") // TextEditor 영역에 ID 부여
                         }
                     }
-                    .onChange(of: text) { _, newValue in
+                    .onChange(of: store.state.text) { _, newValue in
                         if isFocused && !newValue.isEmpty {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 proxy.scrollTo("textEditorArea", anchor: .bottom)

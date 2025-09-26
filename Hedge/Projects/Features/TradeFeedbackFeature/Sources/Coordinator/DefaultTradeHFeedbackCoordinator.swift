@@ -21,6 +21,8 @@ public final class DefaultTradeHFeedbackCoordinator: TradeFeedbackCoordinator {
     ) {
         self.navigationController = navigationController
         self.tradeData = tradeData
+        
+        dump(tradeData)
     }
     
     public func start() {
