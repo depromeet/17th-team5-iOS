@@ -10,14 +10,16 @@ import SwiftUI
 
 public struct AIGenerateView: View {
     private let date: String
-    @Binding private var contents: String
+    @Binding private var contents: String?
     private let closeTapped: () -> Void
     
     private let shadowColor = Color.init(red: 19/255, green: 26/255, blue: 43/255).opacity(0.32)
+    @State private var rotationAngle: Double = 0
+    @State private var timer: Timer?
     
     public init(
         date: String,
-        contents: Binding<String>,
+        contents: Binding<String?>,
         _ closeTapped: @escaping () -> Void
     ) {
         self.date = date
@@ -53,10 +55,31 @@ public struct AIGenerateView: View {
                     }
                 }
                 
-                ScrollView(showsIndicators: false) {
-                    Text(contents)
-                        .font(.label1Medium)
-                        .foregroundStyle(Color.hedgeUI.textDisabled)
+                if let contents {
+                    ScrollView(showsIndicators: false) {
+                        Text(contents)
+                            .font(.label1Medium)
+                            .foregroundStyle(Color.hedgeUI.textDisabled)
+                    }
+                    .onAppear {
+                        stopRotationTimer()
+                    }
+                    
+                } else {
+                    VStack {
+                        Spacer()
+                        Image.hedgeUI.indicator
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .rotationEffect(.degrees(rotationAngle))
+                            .onAppear {
+                                startRotationTimer()
+                            }
+                            .onDisappear {
+                                stopRotationTimer()
+                            }
+                        Spacer()
+                    }
                 }
             }
             .padding(.vertical, 18)
@@ -80,6 +103,24 @@ public struct AIGenerateView: View {
             x: 0,
             y: 12
         )
+    }
+}
+
+extension AIGenerateView {
+    
+    private func startRotationTimer() {
+        rotationAngle = 0
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            withAnimation(.linear(duration: 1)) {
+                rotationAngle += 360
+            }
+        }
+    }
+    
+    private func stopRotationTimer() {
+        timer?.invalidate()
+        timer = nil
+        rotationAngle = 0
     }
 }
 
