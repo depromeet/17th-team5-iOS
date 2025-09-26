@@ -49,7 +49,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
         navigationController.popViewController(animated: true)
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>) {
         
         // Navigate to TradeReason using parent coordinator
         if let parent = parentCoordinator {
@@ -57,7 +57,8 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
                 tradeType: tradeType,
                 stock: stock,
                 tradeHistory: tradeHistory,
-                tradePrinciple: tradePrinciple
+                tradePrinciple: tradePrinciple,
+                selectedPrinciples: selectedPrinciples
             )
         } else {
             print("   ❌ ERROR: parentCoordinator is nil!")

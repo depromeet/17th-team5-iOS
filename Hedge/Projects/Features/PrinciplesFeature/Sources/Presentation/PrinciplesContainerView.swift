@@ -31,11 +31,13 @@ public struct PrinciplesContainerView: View {
                 principles: $store.principles,
                 onPrincipleTapped: { principleId in
                     send(.principleToggled(principleId))
-                },
-                onCompleteTapped: {
-                    send(.completeTapped)
                 }
             )
+            
+            HedgeBottomCTAButton()
+                .style(.oneButton(title: "기록하기", onTapped: {
+                    send(.completeTapped)
+                }))
         }
         .onAppear {
             send(.onAppear)

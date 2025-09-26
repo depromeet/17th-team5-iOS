@@ -33,19 +33,23 @@ public struct TradeReasonFeature {
         public var tradeType: TradeType
         public var stock: StockSearch
         public var tradeHistory: TradeHistory
-        public var selectedPrinciples: [Principle]
+        public var principles: [Principle]
         public var selectedButton: FloatingButtonSelectType? = .generate
         public var emotionSelection: Int = 0
         public var isEmotionShow: Bool = false
         public var isChecklistShow: Bool = false
         public var checkedItems: Set<Int> = []
         public var text: String = ""
+        public var emotion: TradeEmotion? = nil
+        internal var checkedItemsTmp: Set<Int> = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, selectedPrinciples: [Principle]) {
+        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, principles: [Principle], selectedPrinciples: Set<Int>) {
             self.tradeType = tradeType
             self.stock = stock
             self.tradeHistory = tradeHistory
-            self.selectedPrinciples = selectedPrinciples
+            self.principles = principles
+            self.checkedItems = selectedPrinciples
+            self.checkedItemsTmp = selectedPrinciples
         }
     }
     
@@ -71,7 +75,8 @@ public struct TradeReasonFeature {
         case emotionCloseTapped
         case checklistShowTapped
         case checklistCloseTapped
-        case checklistSelected(Set<Int>)
+        case checklistTapped(id: Int)
+        case checkListApproveTapped
         case generateSuccess(Int)
         case generateFailure(Error)
     }
@@ -146,8 +151,7 @@ extension TradeReasonFeature {
             return .none
             
         case .emotionSelected(let emotionIndex):
-            // 감정 선택 완료 처리
-            print("Selected emotion index: \(emotionIndex)")
+            state.emotion = TradeEmotion(rawValue: emotionIndex)
             state.isEmotionShow = false
             state.selectedButton = nil
             return .none
@@ -166,17 +170,31 @@ extension TradeReasonFeature {
             return .none
             
         case .checklistCloseTapped:
+            state.checkedItems = state.checkedItemsTmp
             state.isChecklistShow = false
             state.selectedButton = nil
             return .none
             
-        case .checklistSelected(let selectedItems):
+        case .checklistTapped(let id):
+            if state.checkedItems.contains(id) {
+                state.checkedItems.remove(id)
+            } else {
+                state.checkedItems.insert(id)
+            }
+            return .none
+            
+        case .checkListApproveTapped:
+            state.checkedItemsTmp = state.checkedItems
             state.isChecklistShow = false
             state.selectedButton = nil
+            
             return .none
             
         case .generateSuccess(let id):
             Log.debug("\(id)")
+            let checks = state.principles
+            let principleChecks = checks.filter { state.checkedItems.contains($0.id) }
+            
             let tradeData = TradeData(
                 id: id,
                 tradeType: state.tradeType,
@@ -186,7 +204,7 @@ extension TradeReasonFeature {
                 tradingPrice: state.tradeHistory.tradingPrice,
                 tradingQuantity: state.tradeHistory.tradingQuantity,
                 tradingDate: state.tradeHistory.tradingDate,
-                tradePrinciple: state.selectedPrinciples,
+                tradePrinciple: principleChecks,
                 retrospection: state.text
             )
             coordinator.pushToFeedback(tradeData: tradeData)
@@ -206,7 +224,9 @@ extension TradeReasonFeature {
         switch action {
         case .generateRetrospection:
             return .run { [state] send in
-                print(state.text)
+                let checks = state.principles.map { PrincipleCheck(principleId: $0.id, isFollowed: true) }
+                let principleChecks = checks.filter { state.checkedItems.contains($0.principleId) }
+                
                 let request = GenerateRetrospectRequest(
                     symbol: state.stock.symbol,
                     market: state.stock.market,
@@ -217,7 +237,7 @@ extension TradeReasonFeature {
                     orderDate: state.tradeHistory.tradingDate.toDateString(),
                     returnRate: state.tradeHistory.yield?.extractDecimalNumber() ?? 0,
                     content: state.text,
-                    principleChecks: state.selectedPrinciples.map { PrincipleCheck(principleId: $0.id, isFollowed: true) },
+                    principleChecks: principleChecks,
                     emotion: .confidence
                 )
                 

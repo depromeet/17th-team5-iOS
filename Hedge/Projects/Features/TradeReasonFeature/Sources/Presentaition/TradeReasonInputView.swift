@@ -124,12 +124,30 @@ struct TradeReasonInputView: View {
                             primaryTitle: "기록하기",
                             onPrimary: {
                                 store.send(.inner(.emotionSelected(store.state.emotionSelection)))
-                            }
-                        ) {
-                            EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
-                        }
+                            },
+                            onClose: {
+                                store.send(.inner(.emotionCloseTapped))
+                            }, content: {
+                                EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
+                            })
+                        
                     case .checklist:
-                        Text("123")
+                        HedgeBottomSheet(
+                            isPresented: $store.state.isChecklistShow,
+                            title: "투자 원칙",
+                            primaryTitle: "기록하기",
+                            onPrimary: {
+                                store.send(.inner(.checkListApproveTapped))
+                            },
+                            onClose: {
+                                store.send(.inner(.checklistCloseTapped))
+                            }, content: {
+                                PrinciplesView(selectedPrinciples: $store.state.checkedItems,
+                                               principles: $store.state.principles)
+                                { selected in
+                                    store.send(.inner(.checklistTapped(id: selected)))
+                                }
+                            })
                     }
                 }
             }

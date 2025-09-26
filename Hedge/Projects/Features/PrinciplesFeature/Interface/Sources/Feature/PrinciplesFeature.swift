@@ -66,7 +66,7 @@ public struct PrinciplesFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle])
+        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>)
     }
     
     public var body: some Reducer<State, Action> {
@@ -127,15 +127,12 @@ extension PrinciplesFeature {
             return .none
             
         case .completeTapped:
-            let selectedPrinciples = state.selectedPrinciples.compactMap { principleID in
-                state.principles.first { principleID == $0.id }
-            }
-            
             return .send(.delegate(.pushToTradeReason(
                 tradeType: state.tradeType,
                 stock: state.stock,
                 tradeHistory: state.tradeHistory,
-                tradePrinciple: selectedPrinciples
+                tradePrinciple: state.principles,
+                selectedPrinciples: state.selectedPrinciples
             )))
             
         case .skipTapped:
@@ -143,7 +140,8 @@ extension PrinciplesFeature {
                 tradeType: state.tradeType,
                 stock: state.stock,
                 tradeHistory: state.tradeHistory,
-                tradePrinciple: [] // Empty array for skip
+                tradePrinciple: [],
+                selectedPrinciples: [] // Empty array for skip
             )))
         }
     }
@@ -185,7 +183,6 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrinciplesSuccess(let response):
-            dump(response)
             state.principles = response
             return .none
             
@@ -201,12 +198,13 @@ extension PrinciplesFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToTradeReason(let tradeType, let stock, let tradeHistory, let tradePrinciple):
+        case .pushToTradeReason(let tradeType, let stock, let tradeHistory, let tradePrinciple, let selectedPrinciples):
             coordinator.pushToTradeReason(
                 tradeType: tradeType,
                 stock: stock,
                 tradeHistory: tradeHistory,
-                tradePrinciple: tradePrinciple
+                tradePrinciple: tradePrinciple,
+                selectedPrinciples: selectedPrinciples
             )
             return .none
         }

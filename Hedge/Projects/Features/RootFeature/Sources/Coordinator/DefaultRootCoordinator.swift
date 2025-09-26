@@ -71,14 +71,15 @@ extension DefaultRootCoordinator {
         tradeHistoryCoordinator.start()
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>) {
         
         let tradeReasonCoordinator = DefaultTradeReasonCoordinator(
             navigationController: navigationController,
             tradeType: tradeType,
             stock: stock,
             tradeHistory: tradeHistory,
-            selectedPrinciples: tradePrinciple
+            principles: tradePrinciple,
+            selectedPrinciples: selectedPrinciples
         )
         tradeReasonCoordinator.parentCoordinator = self
         tradeReasonCoordinator.start()

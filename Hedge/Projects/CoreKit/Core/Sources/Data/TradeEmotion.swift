@@ -11,12 +11,27 @@ import SwiftUI
 import DesignKit
 
 // MARK: - Emotion
-public enum TradeEmotion: String, CaseIterable, Equatable {
-    case confidence = "자신감"
-    case conviction = "확신"
-    case neutral = "무념무상"
-    case impulse = "충동"
-    case anxious = "불안"
+public enum TradeEmotion: Int, CaseIterable, Equatable {
+    case confidence
+    case conviction
+    case neutral
+    case impulse
+    case anxious
+    
+    public var value: String {
+        switch self {
+        case .confidence:
+            return "자신감"
+        case .conviction:
+            return "확신"
+        case .neutral:
+            return "무념무상"
+        case .impulse:
+            return "충동"
+        case .anxious:
+            return "불안"
+        }
+    }
     
     public var onImage: Image {
         switch self {
