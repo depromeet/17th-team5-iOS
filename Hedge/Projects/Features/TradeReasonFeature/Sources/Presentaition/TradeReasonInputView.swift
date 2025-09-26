@@ -118,7 +118,16 @@ struct TradeReasonInputView: View {
                         }
                         .padding(.horizontal, 10)
                     case .emotion:
-                        Text("!23")
+                        HedgeBottomSheet(
+                            isPresented: $store.state.isEmotionShow,
+                            title: "당시 어떤 감정이었나요?",
+                            primaryTitle: "기록하기",
+                            onPrimary: {
+                                store.send(.inner(.emotionSelected(store.state.emotionSelection)))
+                            }
+                        ) {
+                            EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
+                        }
                     case .checklist:
                         Text("123")
                     }
