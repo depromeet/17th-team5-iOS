@@ -126,7 +126,17 @@ extension TradeFeedbackFeature {
             return .none
             
         case .fetchFeedbackFailure(let error):
-            Log.debug(error.localizedDescription)
+            Log.error("FetchFeedback failed: \(error)")
+            if let hedgeError = error as? HedgeError {
+                switch hedgeError {
+                case .client(let clientError):
+                    Log.error("Client error: \(clientError)")
+                case .server(let serverError):
+                    Log.error("Server error: \(serverError.code) - \(serverError.message)")
+                case .unknown:
+                    Log.error("Unknown error occurred")
+                }
+            }
             return .none
         }
     }

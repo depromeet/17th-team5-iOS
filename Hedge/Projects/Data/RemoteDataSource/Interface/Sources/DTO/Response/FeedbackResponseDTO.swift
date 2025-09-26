@@ -27,7 +27,7 @@ public struct FeedbackResponseDTO: Decodable {
 public struct FeedbackDataResponseDTO: Decodable {
     public let summary: String
     public let marketCondition: String
-    public let aiRecommendedPrinciples: [String: String]
+    public let aiRecommendedPrinciples: [[String: String]]
     
     private enum CodingKeys: String, CodingKey {
         case summary = "요약 한 마디"

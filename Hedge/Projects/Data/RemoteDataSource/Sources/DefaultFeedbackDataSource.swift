@@ -52,7 +52,7 @@ extension FeedbackTarget: TargetType {
     
     var parameters: Networker.RequestParams? {
         switch self {
-        case .fetch(let request):
+        case .fetch:
             return .none
         }
     }

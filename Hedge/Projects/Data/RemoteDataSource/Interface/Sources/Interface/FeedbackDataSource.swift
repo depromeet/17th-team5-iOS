@@ -9,5 +9,6 @@
 import Foundation
 
 public protocol FeedbackDataSource {
+    /// 피드백 조회
     func fetch(id: Int) async throws -> FeedbackResponseDTO
 }

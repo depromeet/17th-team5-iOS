@@ -42,6 +42,8 @@ public struct Provider: ProviderProtocol {
                 .serializingDecodable(T.self)
                 .response
             
+            print(response.request?.url)
+            
             if let error = response.error {
                 throw makeHedgeError(error, data: response.data)
             }

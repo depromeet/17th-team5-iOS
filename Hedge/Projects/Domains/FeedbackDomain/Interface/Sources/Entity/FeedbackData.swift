@@ -11,12 +11,12 @@ import Foundation
 public struct FeedbackData {
     public let summary: String
     public let marketCondition: String
-    public let aiRecommendedPrinciples: [String: String]
+    public let aiRecommendedPrinciples: [[String: String]]
     
     public init(
         summary: String,
         marketCondition: String,
-        aiRecommendedPrinciples: [String : String]
+        aiRecommendedPrinciples: [[String: String]]
     ) {
         self.summary = summary
         self.marketCondition = marketCondition
