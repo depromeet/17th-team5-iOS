@@ -14,6 +14,9 @@ extension HedgeUI where Base == Image {
     // MARK: Size 19
     public static var generate: Image { asset(#function) }
     
+    // MARK: Size 20
+    public static var indicator: Image { asset(#function) }
+    
     // MARK: Size 22
     public static var emotion: Image { asset(#function) }
     public static var checklist: Image { asset(#function) }
