@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct AIGenerateView: View {
+public struct AIGenerateView: View {
     private let date: String
     @Binding private var contents: String
     private let closeTapped: () -> Void
@@ -25,7 +25,7 @@ struct AIGenerateView: View {
         self.closeTapped = closeTapped
     }
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             Image.hedgeUI.aiGenerateBackground
                 .resizable()

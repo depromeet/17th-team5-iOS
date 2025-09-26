@@ -10,6 +10,7 @@ import Foundation
 import ComposableArchitecture
 import Core
 import StockDomainInterface
+import DesignKit
 
 @Reducer
 public struct TradeReasonFeature {
@@ -28,6 +29,11 @@ public struct TradeReasonFeature {
         public var tradingDate: String
         public var yield: String
         public var reasonText: String = ""
+        public var selectedButton: FloatingButtonSelectType? = .generate
+        public var emotionSelection: Int = 0
+        public var isEmotionShow: Bool = false
+        public var isChecklistShow: Bool = false
+        public var checkedItems: Set<Int> = []
         
         public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String) {
             self.tradeType = tradeType
@@ -54,7 +60,15 @@ public struct TradeReasonFeature {
         case nextTapped
     }
     
-    public enum InnerAction { }
+    public enum InnerAction {
+        case aiGenerateCloseTapped
+        case emotionSelected(Int)
+        case emotionShowTapped
+        case emotionCloseTapped
+        case checklistShowTapped
+        case checklistCloseTapped
+        case checklistSelected(Set<Int>)
+    }
     public enum AsyncAction { }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -130,7 +144,47 @@ extension TradeReasonFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
+        case .aiGenerateCloseTapped:
+            state.selectedButton = nil
+            return .none
             
+        case .emotionSelected(let emotionIndex):
+            // 감정 선택 완료 처리
+            print("Selected emotion index: \(emotionIndex)")
+            state.isEmotionShow = false
+            state.selectedButton = nil
+            return .none
+            
+        case .emotionShowTapped:
+            state.isEmotionShow = true
+            return .none
+            
+        case .emotionCloseTapped:
+            state.isEmotionShow = false
+            state.selectedButton = nil
+            return .none
+            
+        case .checklistShowTapped:
+            state.isChecklistShow = true
+            return .none
+            
+        case .checklistCloseTapped:
+            state.isChecklistShow = false
+            state.selectedButton = nil
+            return .none
+            
+        case .checklistSelected(let selectedItems):
+            let items = [
+                "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기",
+                "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
+                "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기",
+                "분산 투자 원칙을 지키고 감정적 결정을 피하기",
+                "리스크를 관리하며 손절 기준을 미리 정해두기"
+            ]
+            let picked = selectedItems.sorted().map { items[$0] }
+            state.isChecklistShow = false
+            state.selectedButton = nil
+            return .none
         }
     }
     

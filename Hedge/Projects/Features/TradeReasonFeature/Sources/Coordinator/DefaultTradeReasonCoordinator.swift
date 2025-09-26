@@ -37,7 +37,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     }
     
     public func start() {
-        let tradeReasonView = TradeReasonView(
+        let tradeReasonInputView = TradeReasonInputView(
             store: .init(
                 initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield),
                 reducer: {
@@ -46,7 +46,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
             )
         )
         
-        let viewController = UIHostingController(rootView: tradeReasonView)
+        let viewController = UIHostingController(rootView: tradeReasonInputView)
         navigationController.pushViewController(viewController, animated: true)
     }
     
