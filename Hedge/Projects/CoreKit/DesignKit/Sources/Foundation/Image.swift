@@ -12,10 +12,13 @@ import SwiftUI
 extension HedgeUI where Base == Image {
     
     // MARK: Size 16
-    public static var plus: Image { 
-        asset(#function)
-            .renderingMode(.template)
-    }
+    public static var plus: Image { asset(#function).renderingMode(.template) }
+    public static var anxiousSimple: Image { asset(#function) }
+    public static var confidenceSimple: Image { asset(#function) }
+    public static var convictionSimple: Image { asset(#function) }
+    public static var impulseSimple: Image { asset(#function) }
+    public static var neutralSimple: Image { asset(#function) }
+    public static var principleSimple: Image { asset(#function) }
     
     // MARK: Size 19
     public static var generate: Image { asset(#function) }

@@ -49,9 +49,60 @@ struct TradeReasonInputView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(maxWidth: .infinity)
                             
-                            Rectangle()
-                                .frame(height: 16)
-                                .foregroundStyle(.clear)
+                            
+                            if !store.state.checkedItems.isEmpty || store.state.emotion != nil {
+                                Rectangle()
+                                    .frame(height: 16)
+                                    .foregroundStyle(.clear)
+                                
+                                HStack(spacing: 8) {
+                                    if let emotion = store.state.emotion {
+                                        HStack(spacing: 4) {
+                                            emotion.simpleImage
+                                                .resizable()
+                                                .frame(width: 16, height: 16)
+                                            
+                                            Text(emotion.value)
+                                                .font(FontModel.caption1Semibold)
+                                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                        }
+                                        .padding(.vertical, 8)
+                                        .padding(.leading, 6)
+                                        .padding(.trailing, 8)
+                                        .background(Color.hedgeUI.neutralBgSecondary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
+                                    
+                                    if !store.state.checkedItems.isEmpty {
+                                        HStack(spacing: 4) {
+                                            Image.hedgeUI.principleSimple
+                                                .resizable()
+                                                .frame(width: 16, height: 16)
+                                            
+                                            Text("지킨 원칙 \(store.state.checkedItems.count)개")
+                                                .font(FontModel.caption1Semibold)
+                                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                        }
+                                        .padding(.vertical, 8)
+                                        .padding(.leading, 6)
+                                        .padding(.trailing, 8)
+                                        .background(Color.hedgeUI.neutralBgSecondary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 20)
+                                
+                                Rectangle()
+                                    .frame(height: 12)
+                                    .foregroundStyle(.clear)
+                                
+                            } else {
+                                Rectangle()
+                                    .frame(height: 16)
+                                    .foregroundStyle(.clear)
+                            }
                             
                             ZStack(alignment: .topLeading) {
                                 TextEditor(text: $store.state.text)

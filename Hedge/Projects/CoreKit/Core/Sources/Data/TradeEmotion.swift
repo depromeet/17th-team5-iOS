@@ -77,4 +77,19 @@ public enum TradeEmotion: Int, CaseIterable, Equatable {
             return .hedgeUI.anxious
         }
     }
+    
+    public var simpleImage: Image {
+        switch self {
+        case .confidence:
+            return .hedgeUI.confidenceSimple
+        case .conviction:
+            return .hedgeUI.convictionSimple
+        case .neutral:
+            return .hedgeUI.neutralSimple
+        case .impulse:
+            return .hedgeUI.impulseSimple
+        case .anxious:
+            return .hedgeUI.anxiousSimple
+        }
+    }
 }
