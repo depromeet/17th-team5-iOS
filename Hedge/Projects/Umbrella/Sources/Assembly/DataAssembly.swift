@@ -14,6 +14,7 @@ import RemoteDataSourceInterface
 import RemoteDataSource
 import Repository
 import StockDomainInterface
+import PrinciplesDomainInterface
 import RetrospectDomainInterface
 import FeedbackDomainInterface
 
@@ -28,6 +29,11 @@ public struct DataAssembly: Assembly {
             )
         }
         
+        // PrinciplesRepository
+        container.register(PrinciplesRepository.self) { _ in
+            DefaultPrinciplesRepository(
+                dataSource: DefaultsPrinciplesDataSource()
+              
         container.register(RetrospectRepository.self) { _ in
             DefaultRetrospectRepository(
                 dataSource: DefaultRetrospectDataSource()

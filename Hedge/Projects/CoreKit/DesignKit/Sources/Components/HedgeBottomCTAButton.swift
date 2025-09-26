@@ -142,11 +142,8 @@ extension HedgeBottomCTAButton {
         Color.hedgeUI.grey500
         HedgeBottomCTAButton("Text")
         .bg(.whiteGradient)
-        .style(.twoButton(
-                leftTitle: "버튼명1",
-                rightTitle: "버튼명2",
-                leftOnTapped: { print("button tapped 1") },
-                rightOnTapped: { print("button tapped 2") })
-        )
+        .style(.oneButton(title: "123", onTapped: {
+            
+        }))
     }
 }

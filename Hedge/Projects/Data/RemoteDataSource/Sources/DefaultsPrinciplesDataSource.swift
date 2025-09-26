@@ -1,8 +1,8 @@
 //
-//  DefaultStockDataSource.swift
+//  DefaultsPrinciplesDataSource.swift
 //  RemoteDataSourceInterface
 //
-//  Created by Junyoung on 9/18/25.
+//  Created by 이중엽 on 9/26/25.
 //  Copyright © 2025 HedgeCompany. All rights reserved.
 //
 
@@ -11,27 +11,28 @@ import Foundation
 import Alamofire
 
 import Networker
-@preconcurrency import RemoteDataSourceInterface
+import RemoteDataSourceInterface
 
-public struct DefaultStockSearchDataSource: StockDataSource {
+public struct DefaultsPrinciplesDataSource: PrinciplesDataSource {
+    
     private let provider: Provider
     
     public init() {
         self.provider = Provider.plain
     }
     
-    public func search(_ request: StockSearchRequestDTO) async throws -> StockSearchResponseDTO {
-        try await provider.request(StockSearchTarget.search(request))
+    public func fetch() async throws -> RemoteDataSourceInterface.PrinciplesResponseDTO {
+        try await provider.request(PrinciplesFetchTarget.fetch)
     }
 }
 
-enum StockSearchTarget {
-    case search(_ request: StockSearchRequestDTO)
+enum PrinciplesFetchTarget {
+    case fetch
 }
 
-extension StockSearchTarget: TargetType {
+extension PrinciplesFetchTarget: TargetType {
     var baseURL: String {
-        return Configuration.baseURL + "/api/v1/stock"
+        return Configuration.baseURL + "/api/v1/investment-principles"
     }
     
     var header: Alamofire.HTTPHeaders {
@@ -40,28 +41,28 @@ extension StockSearchTarget: TargetType {
     
     var method: Alamofire.HTTPMethod {
         switch self {
-        case .search:
+        case .fetch:
             return .get
         }
     }
     
     var path: String {
         switch self {
-        case .search:
-            return "/search"
+        case .fetch:
+            return ""
         }
     }
     
     var parameters: Networker.RequestParams? {
         switch self {
-        case .search(let request):
-            return .query(request)
+        case .fetch:
+            return nil
         }
     }
     
     var encoding: any Alamofire.ParameterEncoding {
         switch self {
-        case .search:
+        case .fetch:
             return makeEncoder(contentType: .json)
         }
     }
