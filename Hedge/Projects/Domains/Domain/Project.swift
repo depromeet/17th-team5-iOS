@@ -13,6 +13,7 @@ let project = Project.configure(
     product: .staticFramework,
     dependencies: [
         .Domain.Stock.implement,
+        .Domain.Retrospect.implement,
     ],
     hasTests: true
 )

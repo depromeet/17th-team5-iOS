@@ -94,7 +94,17 @@ extension TradeFeedbackFeature {
         _ state: inout State,
         _ action: View
     ) -> Effect<Action> {
-        return .none
+        switch action {
+        case .onAppear:
+            Log.debug("\(state.tradeData)")
+            return .none
+            
+        case .backButtonTapped:
+            return .none
+            
+        case .nextTapped:
+            return .none
+        }
     }
     
     // MARK: - Inner Core

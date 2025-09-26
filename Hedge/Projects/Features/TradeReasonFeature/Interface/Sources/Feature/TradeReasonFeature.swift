@@ -10,14 +10,21 @@ import Foundation
 import ComposableArchitecture
 import Core
 import StockDomainInterface
+import RetrospectDomainInterface
 import DesignKit
+import Shared
 
 @Reducer
 public struct TradeReasonFeature {
     private let coordinator: TradeReasonCoordinator
+    private let generateRetrospectUseCase: GenerateRetrospectUseCase
     
-    public init(coordinator: TradeReasonCoordinator) {
+    public init(
+        coordinator: TradeReasonCoordinator,
+        generateRetrospectUseCase: GenerateRetrospectUseCase
+    ) {
         self.coordinator = coordinator
+        self.generateRetrospectUseCase = generateRetrospectUseCase
     }
     
     @ObservableState
@@ -68,8 +75,12 @@ public struct TradeReasonFeature {
         case checklistShowTapped
         case checklistCloseTapped
         case checklistSelected(Set<Int>)
+        case generateSuccess(Int)
+        case generateFailure(Error)
     }
-    public enum AsyncAction { }
+    public enum AsyncAction {
+        case generateRetrospection
+    }
     public enum ScopeAction { }
     public enum DelegateAction {
         case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
@@ -131,10 +142,7 @@ extension TradeReasonFeature {
             )))
             
         case .nextTapped:
-            // This should go to a final screen (summary/completion), not back to principles
-            // For now, just pop back to home or show completion
-            coordinator.popToPrev()
-            return .none
+            return .send(.async(.generateRetrospection))
         }
     }
     
@@ -185,6 +193,27 @@ extension TradeReasonFeature {
             state.isChecklistShow = false
             state.selectedButton = nil
             return .none
+            
+        case .generateSuccess(let id):
+            Log.debug("\(id)")
+            let tradeData = TradeData(
+                id: id,
+                tradeType: .sell,
+                stockSymbol: "",
+                stockTitle: "",
+                stockMarket: "",
+                tradingPrice: "",
+                tradingQuantity: "",
+                tradingDate: "",
+                tradePrinciple: [],
+                retrospection: ""
+            )
+            coordinator.pushToFeedback(tradeData: tradeData)
+            return .none
+            
+        case .generateFailure(let error):
+            Log.error(error.localizedDescription)
+            return .none
         }
     }
     
@@ -194,7 +223,29 @@ extension TradeReasonFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-            
+        case .generateRetrospection:
+            return .run { [state] send in
+                let request = GenerateRetrospectRequest(
+                    symbol: state.stock.symbol,
+                    market: state.stock.market,
+                    orderType: OrderType(rawValue: state.tradeType.toRequest) ?? .buy,
+                    price: 10000,
+                    currency: "KRW",
+                    volume: 10,
+                    orderDate: "2025-09-13",
+                    returnRate: -15.67,
+                    content: state.reasonText,
+                    principleChecks: [],
+                    emotion: .confidence
+                )
+                
+                do {
+                    let response = try await generateRetrospectUseCase.execute(request)
+                    await send(.inner(.generateSuccess(response)))
+                } catch {
+                    await send(.inner(.generateFailure(error)))
+                }
+            }
         }
     }
     
