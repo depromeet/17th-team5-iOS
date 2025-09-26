@@ -111,6 +111,7 @@ struct TradeFeedbackView: View {
             }
             .onAppear {
                 UIScrollView.appearance().bounces = false
+                store.send(.view(.onAppear))
             }
             .onDisappear {
                 UIScrollView.appearance().bounces = true
@@ -527,10 +528,10 @@ extension View {
     }
 }
 
-#Preview {
-    let tradeData = TradeData(tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성123했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.")
-    
-    TradeFeedbackView(store: .init(initialState: TradeFeedbackFeature.State(tradeData: tradeData),
-                                   reducer: { TradeFeedbackFeature(coordinator: DefaultTradeHFeedbackCoordinator(navigationController: UINavigationController(), tradeData: tradeData))
-    }))
-}
+//#Preview {
+//    let tradeData = TradeData(id: 1, tradeType: .sell, stockSymbol: "", stockTitle: "삼성전자", stockMarket: "SAMSUNG", tradingPrice: "70,000", tradingQuantity: "10", tradingDate: "2025년 10월 25일", yield: "+10%", emotion: .impulse, tradePrinciple: ["1", "2", "3"], retrospection: "가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성123했습니다.가나다라 회고 작성했습니다.가나다라 회고 작성했습니다.")
+//    
+//    TradeFeedbackView(store: .init(initialState: TradeFeedbackFeature.State(tradeData: tradeData),
+//                                   reducer: { TradeFeedbackFeature(coordinator: DefaultTradeHFeedbackCoordinator(navigationController: UINavigationController(), tradeData: tradeData))
+//    }))
+//}
