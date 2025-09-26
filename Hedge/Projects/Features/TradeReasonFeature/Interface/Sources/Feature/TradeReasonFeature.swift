@@ -32,25 +32,18 @@ public struct TradeReasonFeature {
     public struct State: Equatable {
         public var tradeType: TradeType
         public var stock: StockSearch
-        public var tradingPrice: String
-        public var tradingQuantity: String
-        public var tradingDate: String
-        public var yield: String?
+        public var tradeHistory: TradeHistory
         public var selectedPrinciples: [Principle]
-        public var reasonText: String = ""
         public var selectedButton: FloatingButtonSelectType? = .generate
         public var emotionSelection: Int = 0
         public var isEmotionShow: Bool = false
         public var isChecklistShow: Bool = false
         public var checkedItems: Set<Int> = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, selectedPrinciples: [Principle]) {
+        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, selectedPrinciples: [Principle]) {
             self.tradeType = tradeType
             self.stock = stock
-            self.tradingPrice = tradingPrice
-            self.tradingQuantity = tradingQuantity
-            self.tradingDate = tradingDate
-            self.yield = yield
+            self.tradeHistory = tradeHistory
             self.selectedPrinciples = selectedPrinciples
         }
     }
@@ -86,7 +79,7 @@ public struct TradeReasonFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String)
+        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory)
     }
     
     public var body: some Reducer<State, Action> {
@@ -224,13 +217,13 @@ extension TradeReasonFeature {
                     symbol: state.stock.symbol,
                     market: state.stock.market,
                     orderType: OrderType(rawValue: state.tradeType.toRequest) ?? .buy,
-                    price: 10000,
-                    currency: "KRW",
-                    volume: 10,
-                    orderDate: "2025-09-13",
-                    returnRate: -15.67,
-                    content: state.reasonText,
-                    principleChecks: [],
+                    price: state.tradeHistory.tradingPrice.extractNumbers(),
+                    currency: state.tradeHistory.concurrency,
+                    volume: state.tradeHistory.tradingQuantity.extractNumbers(),
+                    orderDate: state.tradeHistory.tradingDate.toDateString(),
+                    returnRate: state.tradeHistory.yield?.extractDecimalNumber() ?? 0,
+                    content: state.tradeHistory.reasonText,
+                    principleChecks: state.selectedPrinciples.map { PrincipleCheck(principleId: $0.id, isFollowed: true) },
                     emotion: .confidence
                 )
                 
@@ -260,15 +253,11 @@ extension TradeReasonFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToPrinciples(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield, let reasonText):
+        case .pushToPrinciples(let tradeType, let stock, let tradeHistory):
             coordinator.pushToPrinciples(
                 tradeType: tradeType,
                 stock: stock,
-                tradingPrice: tradingPrice,
-                tradingQuantity: tradingQuantity,
-                tradingDate: tradingDate,
-                yield: yield,
-                reasonText: reasonText
+                tradeHistory: tradeHistory
             )
             return .none
         }

@@ -39,8 +39,8 @@ struct TradeReasonInputView: View {
                             HedgeTopView(
                                 symbolImage: Image.hedgeUI.stockThumbnailDemo,
                                 title: store.state.stock.title,
-                                description: "\(store.state.tradingPrice)・\(store.state.tradingQuantity) \(store.state.tradeType == .buy ? "매수" : "매도")",
-                                footnote: store.state.tradingDate,
+                                description: "\(store.state.tradeHistory.tradingPrice)・\(store.state.tradeHistory.tradingQuantity) \(store.state.tradeType == .buy ? "매수" : "매도")",
+                                footnote: store.state.tradeHistory.tradingDate,
                                 buttonImage: Image.hedgeUI.pencil,
                                 buttonImageOnTapped: nil
                             )
@@ -114,7 +114,7 @@ struct TradeReasonInputView: View {
                 if let selectedButton = store.state.selectedButton {
                     switch selectedButton {
                     case .generate:
-                        AIGenerateView(date: store.state.tradingDate, contents: .constant("")) {
+                        AIGenerateView(date: store.state.tradeHistory.tradingDate, contents: .constant("")) {
                             store.send(.inner(.aiGenerateCloseTapped))
                         }
                         .padding(.horizontal, 10)

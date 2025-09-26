@@ -29,6 +29,7 @@ public struct TradeHistoryFeature {
         public var tradingQuantity: String = ""
         public var tradingDate: String = ""
         public var yield: String = ""
+        public var selectedConcurrency: Int = 0
         public var reasonText: String = ""
         public var stock: StockSearch
         public var tradeType: TradeType
@@ -154,14 +155,13 @@ extension TradeHistoryFeature {
     ) -> Effect<Action> {
         switch action {
         case .pushToPrinciples(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield):
+            let concurrency = state.selectedConcurrency == 0 ? "KRW" : "USD"
+            let tradeHistory = TradeHistory(tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, concurrency: concurrency, reasonText: state.reasonText)
+            
             coordinator.pushToPrinciples(
                 tradeType: tradeType,
                 stock: stock,
-                tradingPrice: tradingPrice,
-                tradingQuantity: tradingQuantity,
-                tradingDate: tradingDate,
-                yield: yield,
-                reasonText: state.reasonText
+                tradeHistory: tradeHistory
             )
             return .none
         }

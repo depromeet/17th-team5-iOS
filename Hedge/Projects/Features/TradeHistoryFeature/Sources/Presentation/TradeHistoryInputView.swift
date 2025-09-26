@@ -65,13 +65,17 @@ public struct TradeHistoryInputView: View {
                 let price = store.tradingPrice.extractDecimalNumber()
                 let quantity = Double(store.tradingQuantity.extractNumbers())
                 let total = String(price * quantity).toDecimalStringWithDecimal()
-                return "총 \(total) \(store.tradeType == .buy ? "매수" : "매도")"
+                let prefix = store.state.selectedConcurrency == 0 ? "" : "$"
+                let suffix = store.state.selectedConcurrency == 0 ? "원" : ""
+                return "총 \(prefix)\(total)\(suffix) \(store.tradeType == .buy ? "매수" : "매도")"
             }
         } else {
             let price = store.tradingPrice.extractDecimalNumber()
             let quantity = Double(store.tradingQuantity.extractNumbers())
             let total = String(price * quantity).toDecimalStringWithDecimal()
-            return "총 \(total) \(store.tradeType == .buy ? "매수" : "매도")"
+            let prefix = store.state.selectedConcurrency == 0 ? "" : "$"
+            let suffix = store.state.selectedConcurrency == 0 ? "원" : ""
+            return "총 \(prefix)\(total)\(suffix) \(store.tradeType == .buy ? "매수" : "매도")"
         }
     }
     
@@ -147,7 +151,7 @@ extension TradeHistoryInputView {
     @ViewBuilder
     private var textFieldGroup: some View {
         VStack(spacing: 0) {
-            HedgeTradeTextField(inputText: $store.tradingPrice, focusedID: $focusedID)
+            HedgeTradeTextField(inputText: $store.tradingPrice, focusedID: $focusedID, selectedIndex: $store.state.selectedConcurrency)
                 .type(.buyPrice)
             
             RoundedRectangle(cornerSize: .zero)

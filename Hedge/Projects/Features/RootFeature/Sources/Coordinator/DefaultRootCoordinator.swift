@@ -71,50 +71,39 @@ extension DefaultRootCoordinator {
         tradeHistoryCoordinator.start()
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, tradePrinciple: [Principle]) {
+    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle]) {
         
         let tradeReasonCoordinator = DefaultTradeReasonCoordinator(
             navigationController: navigationController,
             tradeType: tradeType,
             stock: stock,
-            tradingPrice: tradingPrice,
-            tradingQuantity: tradingQuantity,
-            tradingDate: tradingDate,
-            yield: yield,
+            tradeHistory: tradeHistory,
             selectedPrinciples: tradePrinciple
         )
         tradeReasonCoordinator.parentCoordinator = self
         tradeReasonCoordinator.start()
     }
     
-    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
+    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
         let principlesCoordinator = DefaultPrinciplesCoordinator(
             navigationController: navigationController,
             tradeType: tradeType,
             stock: stock,
-            tradingPrice: tradingPrice,
-            tradingQuantity: tradingQuantity,
-            tradingDate: tradingDate,
-            yield: yield,
-            reasonText: reasonText
+            tradeHistory: tradeHistory
         )
         principlesCoordinator.parentCoordinator = self
         principlesCoordinator.start()
     }
     
-    public func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
-        let principlesCoordinator = DefaultPrinciplesCoordinator(
-            navigationController: navigationController,
-            tradeType: tradeType,
-            stock: stock,
-            tradingPrice: tradingPrice,
-            tradingQuantity: tradingQuantity,
-            tradingDate: tradingDate,
-            yield: yield,
-            reasonText: reasonText
-        )
-        principlesCoordinator.parentCoordinator = self
-        principlesCoordinator.start()
+    public func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
+        // let principlesCoordinator = DefaultPrinciplesCoordinator(
+        //     navigationController: navigationController,
+        //     tradeType: tradeType,
+        //     stock: stock,
+        //     tradeHistory: tradeHistory
+        // )
+        // principlesCoordinator.parentCoordinator = self
+        // principlesCoordinator.start()
     }
     
     public func pushToFeedback(tradeData: TradeData) {

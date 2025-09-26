@@ -19,18 +19,20 @@ public struct HedgeTradeTextField: View {
     @FocusState private var textFieldFocused: Bool
     @Binding private var inputText: String
     @Binding private var focusedID: String?
+    @Binding private var selectedIndex: Int
     @State private var state: HedgeTextFieldState = .idle
-    @State private var selectedIndex: Int = 0
     
     private var id: String = HedgeTextFieldType.buyPrice.rawValue
     private var type: HedgeTextFieldType = .buyPrice
     
     public init(
         inputText: Binding<String>,
-        focusedID: Binding<String?>
+        focusedID: Binding<String?>,
+        selectedIndex: Binding<Int> = .constant(0)
     ) {
         self._inputText = inputText
         self._focusedID = focusedID
+        self._selectedIndex = selectedIndex
     }
     
     public var body: some View {

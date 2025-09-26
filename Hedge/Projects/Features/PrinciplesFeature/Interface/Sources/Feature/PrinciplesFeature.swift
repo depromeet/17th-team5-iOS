@@ -29,21 +29,13 @@ public struct PrinciplesFeature {
         public var selectedPrinciples: Set<Int> = []
         public var tradeType: TradeType
         public var stock: StockSearch
-        public var tradingPrice: String
-        public var tradingQuantity: String
-        public var tradingDate: String
-        public var yield: String?
-        public var reasonText: String
+        public var tradeHistory: TradeHistory
         public var principles: [Principle] = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, reasonText: String) {
+        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
             self.tradeType = tradeType
             self.stock = stock
-            self.tradingPrice = tradingPrice
-            self.tradingQuantity = tradingQuantity
-            self.tradingDate = tradingDate
-            self.yield = yield
-            self.reasonText = reasonText
+            self.tradeHistory = tradeHistory
         }
     }
     
@@ -74,7 +66,7 @@ public struct PrinciplesFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?, tradePrinciple: [Principle])
+        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle])
     }
     
     public var body: some Reducer<State, Action> {
@@ -142,10 +134,7 @@ extension PrinciplesFeature {
             return .send(.delegate(.pushToTradeReason(
                 tradeType: state.tradeType,
                 stock: state.stock,
-                tradingPrice: state.tradingPrice,
-                tradingQuantity: state.tradingQuantity,
-                tradingDate: state.tradingDate,
-                yield: state.yield,
+                tradeHistory: state.tradeHistory,
                 tradePrinciple: selectedPrinciples
             )))
             
@@ -153,10 +142,7 @@ extension PrinciplesFeature {
             return .send(.delegate(.pushToTradeReason(
                 tradeType: state.tradeType,
                 stock: state.stock,
-                tradingPrice: state.tradingPrice,
-                tradingQuantity: state.tradingQuantity,
-                tradingDate: state.tradingDate,
-                yield: state.yield,
+                tradeHistory: state.tradeHistory,
                 tradePrinciple: [] // Empty array for skip
             )))
         }
@@ -215,14 +201,11 @@ extension PrinciplesFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToTradeReason(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield, let tradePrinciple):
+        case .pushToTradeReason(let tradeType, let stock, let tradeHistory, let tradePrinciple):
             coordinator.pushToTradeReason(
                 tradeType: tradeType,
                 stock: stock,
-                tradingPrice: tradingPrice,
-                tradingQuantity: tradingQuantity,
-                tradingDate: tradingDate,
-                yield: yield,
+                tradeHistory: tradeHistory,
                 tradePrinciple: tradePrinciple
             )
             return .none
