@@ -404,7 +404,7 @@ extension TradeFeedbackView {
     
     @ViewBuilder
     private var principleView: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
                 Rectangle()
                     .frame(width: 22, height: 22)
@@ -416,10 +416,6 @@ extension TradeFeedbackView {
                 
                 Spacer()
             }
-            
-            Rectangle()
-                .frame(height: 16)
-                .foregroundStyle(.clear)
             
             ForEach(Array((store.state.feedback?.principle ?? []).enumerated()), id: \.offset) { index, principle in
                 VStack(spacing: 0) {
