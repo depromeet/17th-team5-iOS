@@ -14,18 +14,18 @@ import RetrospectDomainInterface
 import PrinciplesDomainInterface
 import DesignKit
 import Shared
+import AnalysisDomainInterface
 
 @Reducer
 public struct TradeReasonFeature {
     private let coordinator: TradeReasonCoordinator
-    private let generateRetrospectUseCase: GenerateRetrospectUseCase
+    private let generateRetrospectUseCase: GenerateRetrospectUseCase = DIContainer.resolve(GenerateRetrospectUseCase.self)
+    private let analysisUseCase: AnalysisUseCase = DIContainer.resolve(AnalysisUseCase.self)
     
     public init(
-        coordinator: TradeReasonCoordinator,
-        generateRetrospectUseCase: GenerateRetrospectUseCase
+        coordinator: TradeReasonCoordinator
     ) {
         self.coordinator = coordinator
-        self.generateRetrospectUseCase = generateRetrospectUseCase
     }
     
     @ObservableState
@@ -79,9 +79,12 @@ public struct TradeReasonFeature {
         case checkListApproveTapped
         case generateSuccess(Int)
         case generateFailure(Error)
+        case analysisSuccess(String)
+        case analysisFailure(Error)
     }
     public enum AsyncAction {
         case generateRetrospection
+        case fetchAnalysis
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -129,7 +132,7 @@ extension TradeReasonFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .none
+            return .send(.async(.fetchAnalysis))
             
         case .backButtonTapped:
             coordinator.popToPrev()
@@ -213,6 +216,15 @@ extension TradeReasonFeature {
         case .generateFailure(let error):
             Log.error(error.localizedDescription)
             return .none
+            
+        case .analysisSuccess(let text):
+            Log.debug("\(text)")
+            state.text = text
+            return .none
+            
+        case .analysisFailure(let error):
+            Log.error(error.localizedDescription)
+            return .none
         }
     }
     
@@ -222,6 +234,21 @@ extension TradeReasonFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
+        case .fetchAnalysis:
+            return .run { [state] send in
+                
+                do {
+                    let response = try await analysisUseCase.execute(
+                        market: state.stock.market,
+                        symbol: state.stock.symbol,
+                        time: state.tradeHistory.tradingDate.toDateTimeString()
+                    )
+                    await send(.inner(.analysisSuccess(response)))
+                } catch {
+                    await send(.inner(.analysisFailure(error)))
+                }
+            }
+            
         case .generateRetrospection:
             return .run { [state] send in
                 let checks = state.principles.map { PrincipleCheck(principleId: $0.id, isFollowed: true) }

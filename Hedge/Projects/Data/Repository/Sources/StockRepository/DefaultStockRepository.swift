@@ -1,5 +1,5 @@
 //
-//  StockRepository.swift
+//  DefaultStockRepository.swift
 //  Repository
 //
 //  Created by Junyoung on 9/18/25.

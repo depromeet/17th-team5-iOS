@@ -22,7 +22,6 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var parentCoordinator: RootCoordinator?
     
-    private let generateRetrospectUseCase = DIContainer.resolve(GenerateRetrospectUseCase.self)
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradeHistory: TradeHistory
@@ -51,8 +50,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
                 initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, principles: principles, selectedPrinciples: selectedPrinciples),
                 reducer: {
                     TradeReasonFeature(
-                        coordinator: self,
-                        generateRetrospectUseCase: generateRetrospectUseCase
+                        coordinator: self
                     )
                 }
             )

@@ -12,11 +12,13 @@ import DesignKit
 
 // MARK: - Emotion
 public enum TradeEmotion: Int, CaseIterable, Equatable {
-    case confidence
-    case conviction
-    case neutral
-    case impulse
+    
     case anxious
+    case impulse
+    case neutral
+    case conviction
+    case confidence
+    
     
     public var value: String {
         switch self {
