@@ -45,6 +45,9 @@ extension HedgeUI where Base == Image {
     public static var generateIcon: Image { asset(#function) }
     public static var generateCloseIcon: Image { asset(#function) }
     public static var principle: Image { asset(#function) }
+    
+    // MARK: Size 28
+    public static var closeBottomSheet: Image { asset(#function) }
 
     // MARK: Size 30
     public static var error: Image { asset(#function) }
@@ -52,7 +55,8 @@ extension HedgeUI where Base == Image {
     // MARK: Size 32
     public static var toastWarn: Image { asset(#function) }
     public static var toastCheck: Image { asset(#function) }
-    
+    public static var slider: Image { asset(#function) }
+
     // MARK: Size 35
     public static var anxious: Image { asset(#function) }
     public static var anxiousOff: Image { asset(#function) }

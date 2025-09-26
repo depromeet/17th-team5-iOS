@@ -15,18 +15,21 @@ public struct HedgeBottomSheet<Content: View>: View {
     let primaryTitle: String
     let onPrimary: () -> Void
     let content: () -> Content
+    let onClose: (() -> Void)?
     
     public init(
         isPresented: Binding<Bool>,
         title: String,
         primaryTitle: String,
         onPrimary: @escaping () -> Void,
+        onClose: (() -> Void)? = nil,          // ← new
         @ViewBuilder content: @escaping () -> Content
     ) {
         self._isPresented = isPresented
         self.title = title
         self.primaryTitle = primaryTitle
         self.onPrimary = onPrimary
+        self.onClose = onClose
         self.content = content
     }
     
@@ -52,10 +55,13 @@ public struct HedgeBottomSheet<Content: View>: View {
                                 .font(.body1Semibold)
                                 .foregroundStyle(Color.hedgeUI.textTitle)
                             Spacer()
-                            Button { isPresented = false } label: {
-                                Image.hedgeUI.closeFill
+                            Button {
+                                onClose?()
+                                isPresented = false
+                            } label: {
+                                Image.hedgeUI.closeBottomSheet
                                     .resizable()
-                                    .frame(width: 20, height: 20)
+                                    .frame(width: 28, height: 28)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -98,69 +104,6 @@ private struct StatefulPreviewWrapper<Value, Content: View>: View {
     var body: some View { content($value) }
 }
 
-// MARK: - Emotion content (middle-only)
-public struct EmotionContent: View {
-    @Binding var selection: Int
-
-    private let labels = ["불안","충동","무덤무상","자신감","확신"]
-    private let icons  = ["😟","😣","😐","😊","😎"]
-    
-    public init(selection: Binding<Int>) {
-        self._selection = selection
-    }
-
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Faces row
-            HStack(spacing: 18) {
-                ForEach(labels.indices, id: \.self) { i in
-                    Text(icons[i])
-                        .font(.system(size: 28))
-                        .frame(width: 35, height: 35)
-                        .background(
-                            Group {
-                                if selection == i {
-                                    Circle()
-                                        .fill(Color.white)
-                                        .frame(width: 48, height: 48)
-                                        .shadow(color: .black.opacity(0.08), radius: 10, y: 2)
-                                }
-                            }
-                        )
-                        .scaleEffect(selection == i ? 1.05 : 1.0)
-                        .opacity(selection == i ? 1.0 : 0.35)
-                        .onTapGesture { selection = i }
-                        .animation(.easeInOut(duration: 0.15), value: selection)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 18) // gap to slider
-            .padding(.top, 30)
-
-            Slider(
-                value: Binding(
-                    get: { Double(selection) },
-                    set: { selection = Int($0.rounded()) }
-                ),
-                in: 0...4, step: 1
-            )
-            .frame(height: 32)
-            .tint(Color.hedgeUI.brandPrimary)
-            .padding(.bottom, 8)
-
-            // Labels under slider
-            HStack {
-                ForEach(labels.indices, id: \.self) { i in
-                    Text(labels[i])
-                        .font(.caption2)
-                        .foregroundStyle(i == selection ? Color.hedgeUI.textTitle : Color.hedgeUI.textSecondary)
-                        .frame(maxWidth: .infinity)
-                }
-            }
-            .padding(.bottom, 4)
-        }
-    }
-}
 
 // MARK: - Checklist content (middle-only)
 public struct ChecklistContent: View {
@@ -212,32 +155,6 @@ public struct ChecklistContent: View {
                 }
             }
             .padding(.bottom, 4) // breathing room above footer
-        }
-    }
-}
-
-// MARK: - Previews (DesignKit scaffold version)
-#Preview("BottomSheet – Emotions (DesignKit Scaffold)") {
-    StatefulPreviewWrapper(false) { show in
-        // model state for the content
-        StatefulPreviewWrapper(2) { selection in
-            ZStack {
-                Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-                HedgeTextButton("Show Emotions") { show.wrappedValue = true }
-            }
-            .overlay(
-                HedgeBottomSheet(
-                    isPresented: show,
-                    title: "당시 어떤 감정이었나요?",
-                    primaryTitle: "기록하기",
-                    onPrimary: {
-                        let labels = ["불안","충동","무덤무상","자신감","확신"]
-                        print("mood:", labels[selection.wrappedValue])  // simulate save
-                    }
-                ) {
-                    EmotionContent(selection: selection) // middle-only
-                }
-            )
         }
     }
 }
