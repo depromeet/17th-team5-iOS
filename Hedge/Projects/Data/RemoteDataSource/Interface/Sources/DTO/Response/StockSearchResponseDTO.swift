@@ -17,16 +17,16 @@ public struct StockSearchResponseDTO: Decodable {
 }
 
 public struct StockSearchDataResponseDTO: Decodable {
-    public let symbol: String
-    public let title: String
+    public let code: String
+    public let companyName: String
     public let market: String
 }
 
 extension StockSearchDataResponseDTO {
     public func toDomain() -> StockSearch {
         return StockSearch(
-            symbol: symbol,
-            title: title,
+            symbol: code,
+            title: companyName,
             market: market
         )
     }

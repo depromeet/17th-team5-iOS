@@ -29,8 +29,8 @@ public struct Provider: ProviderProtocol {
     /// Token이 없을 때 요청하는 Provider
     public static let plain: Provider = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 5
-        configuration.timeoutIntervalForResource = 5
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 15
         let session = Session(configuration: configuration)
         return Provider(session: session)
     }()
