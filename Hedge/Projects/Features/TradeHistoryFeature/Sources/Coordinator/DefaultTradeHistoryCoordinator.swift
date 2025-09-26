@@ -51,4 +51,8 @@ public final class DefaultTradeHistoryCoordinator: TradeHistoryCoordinator {
     public func popToPrev() {
         navigationController.popViewController(animated: true)
     }
+    
+    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+        parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)
+    }
 }

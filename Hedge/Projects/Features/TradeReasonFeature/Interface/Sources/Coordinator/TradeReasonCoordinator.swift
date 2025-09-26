@@ -7,9 +7,11 @@
 //
 
 import Foundation
-
 import Core
+import StockDomainInterface
 
 public protocol TradeReasonCoordinator: Coordinator {
-    
+    func popToPrev()
+    func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
+    func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
 }
