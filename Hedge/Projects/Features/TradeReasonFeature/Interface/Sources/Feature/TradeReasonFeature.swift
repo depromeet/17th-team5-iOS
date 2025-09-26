@@ -1,41 +1,41 @@
 //
-//  TradeHistoryFeature.swift
-//  TradeHistoryFeature
+//  TradeReasonFeature.swift
+//  TradeReasonFeatureInterface
 //
-//  Created by Junyoung on 9/14/25.
-//  Copyright © 2025 SampleCompany. All rights reserved.
+//  Created by Dongjoo Lee on 9/23/25.
+//  Copyright © 2025 HedgeCompany. All rights reserved.
 //
 
 import Foundation
-
 import ComposableArchitecture
-
 import Core
-import Shared
-
 import StockDomainInterface
 
 @Reducer
-public struct TradeHistoryFeature {
-    private let coordinator: TradeHistoryCoordinator
+public struct TradeReasonFeature {
+    private let coordinator: TradeReasonCoordinator
     
-    public init(coordinator: TradeHistoryCoordinator) {
+    public init(coordinator: TradeReasonCoordinator) {
         self.coordinator = coordinator
     }
     
     @ObservableState
     public struct State: Equatable {
-        public var tradingPrice: String = ""
-        public var tradingQuantity: String = ""
-        public var tradingDate: String = ""
-        public var yield: String = ""
-        public var reasonText: String = ""
-        public var stock: StockSearch
         public var tradeType: TradeType
+        public var stock: StockSearch
+        public var tradingPrice: String
+        public var tradingQuantity: String
+        public var tradingDate: String
+        public var yield: String
+        public var reasonText: String = ""
         
-        public init(tradeType: TradeType, stock: StockSearch) {
+        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String) {
             self.tradeType = tradeType
             self.stock = stock
+            self.tradingPrice = tradingPrice
+            self.tradingQuantity = tradingQuantity
+            self.tradingDate = tradingDate
+            self.yield = yield
         }
     }
     
@@ -53,14 +53,12 @@ public struct TradeHistoryFeature {
         case backButtonTapped
         case nextTapped
     }
-    public enum InnerAction {
-    }
-    public enum AsyncAction {
-        
-    }
+    
+    public enum InnerAction { }
+    public enum AsyncAction { }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String)
+        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
     }
     
     public var body: some Reducer<State, Action> {
@@ -70,7 +68,7 @@ public struct TradeHistoryFeature {
     }
 }
 
-extension TradeHistoryFeature {
+extension TradeReasonFeature {
     // MARK: - Reducer Core
     func reducerCore(
         _ state: inout State,
@@ -107,18 +105,22 @@ extension TradeHistoryFeature {
             return .none
             
         case .backButtonTapped:
-            coordinator.popToPrev()
-            return .none
-            
-        case .nextTapped:
+            // Go back to PrinciplesView
             return .send(.delegate(.pushToPrinciples(
                 tradeType: state.tradeType,
                 stock: state.stock,
                 tradingPrice: state.tradingPrice,
                 tradingQuantity: state.tradingQuantity,
                 tradingDate: state.tradingDate,
-                yield: state.yield
+                yield: state.yield,
+                reasonText: state.reasonText
             )))
+            
+        case .nextTapped:
+            // This should go to a final screen (summary/completion), not back to principles
+            // For now, just pop back to home or show completion
+            coordinator.popToPrev()
+            return .none
         }
     }
     
@@ -128,6 +130,7 @@ extension TradeHistoryFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
+            
         }
     }
     
@@ -136,7 +139,9 @@ extension TradeHistoryFeature {
         _ state: inout State,
         _ action: AsyncAction
     ) -> Effect<Action> {
-        
+        switch action {
+            
+        }
     }
     
     // MARK: - Scope Core
@@ -144,7 +149,9 @@ extension TradeHistoryFeature {
         _ state: inout State,
         _ action: ScopeAction
     ) -> Effect<Action> {
-        
+        switch action {
+            
+        }
     }
     
     // MARK: - Delegate Core
@@ -153,7 +160,7 @@ extension TradeHistoryFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToPrinciples(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield):
+        case .pushToPrinciples(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield, let reasonText):
             coordinator.pushToPrinciples(
                 tradeType: tradeType,
                 stock: stock,
@@ -161,7 +168,7 @@ extension TradeHistoryFeature {
                 tradingQuantity: tradingQuantity,
                 tradingDate: tradingDate,
                 yield: yield,
-                reasonText: state.reasonText
+                reasonText: reasonText
             )
             return .none
         }

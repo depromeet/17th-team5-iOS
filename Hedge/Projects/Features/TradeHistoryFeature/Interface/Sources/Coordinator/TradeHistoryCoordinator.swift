@@ -7,9 +7,10 @@
 //
 
 import Foundation
-
 import Core
+import StockDomainInterface
 
 public protocol TradeHistoryCoordinator: Coordinator {
     func popToPrev()
+    func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
 }
