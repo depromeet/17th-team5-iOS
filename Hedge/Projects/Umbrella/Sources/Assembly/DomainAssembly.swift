@@ -13,6 +13,9 @@ import Swinject
 import StockDomainInterface
 import StockDomain
 
+import PrinciplesDomainInterface
+import PrinciplesDomain
+
 public struct DomainAssembly: Assembly {
     public init() {}
     
@@ -23,6 +26,14 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchStockSearch(repository: stockRepository)
+        }
+        
+        container.register(FetchPrinciplesUseCase.self) { resolver in
+            guard let principlesRepository = resolver.resolve(PrinciplesRepository.self) else {
+                fatalError("Could not resolve StockRepository")
+            }
+            
+            return FetchPrinciples(repository: principlesRepository)
         }
     }
 }

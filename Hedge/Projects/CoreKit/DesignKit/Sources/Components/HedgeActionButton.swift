@@ -52,10 +52,10 @@ public struct HedgeActionButton: View {
                 Text(title)
                     .font(size.font)
                     .foregroundStyle(isEnabled ? color.textColor : color.disableTextColor)
+                    .padding(.horizontal, size.horizontalPadding)
+                    .padding(.vertical, size.verticalPadding)
             }
         }
-        .padding(.vertical, size.verticalPadding)
-        .padding(.horizontal, size.horizontalPadding)
         .background(isEnabled ? color.backgroundColor : color.disableBackgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: size.cornerRadius))
     }

@@ -14,6 +14,7 @@ import RemoteDataSourceInterface
 import RemoteDataSource
 import Repository
 import StockDomainInterface
+import PrinciplesDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -23,6 +24,13 @@ public struct DataAssembly: Assembly {
         container.register(StockRepository.self) { _ in
             DefaultStockRepository(
                 dataSource: DefaultStockSearchDataSource()
+            )
+        }
+        
+        // PrinciplesRepository
+        container.register(PrinciplesRepository.self) { _ in
+            DefaultPrinciplesRepository(
+                dataSource: DefaultsPrinciplesDataSource()
             )
         }
     }

@@ -7,13 +7,18 @@
 //
 
 import Foundation
+
 import ComposableArchitecture
 import Core
 import StockDomainInterface
+import PrinciplesDomainInterface
+import Shared
 
 @Reducer
 public struct PrinciplesFeature {
     private let coordinator: PrinciplesCoordinator
+    
+    private let fetchPrinciplesUseCase = DIContainer.resolve(FetchPrinciplesUseCase.self)
     
     public init(coordinator: PrinciplesCoordinator) {
         self.coordinator = coordinator
@@ -29,6 +34,7 @@ public struct PrinciplesFeature {
         public var tradingDate: String
         public var yield: String
         public var reasonText: String
+        public var principles: [Principle] = []
         
         public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
             self.tradeType = tradeType
@@ -58,9 +64,14 @@ public struct PrinciplesFeature {
         case skipTapped
     }
     
-    public enum InnerAction { }
+    public enum InnerAction {
+        case fetchPrinciplesSuccess([Principle])
+        case failure(Error)
+    }
     
-    public enum AsyncAction { }
+    public enum AsyncAction {
+        case fetchPrinciples
+    }
     public enum ScopeAction { }
     public enum DelegateAction {
         case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String])
@@ -87,7 +98,7 @@ extension PrinciplesFeature {
             return viewCore(&state, action)
             
         case .inner(let action):
-            return .none
+            return innerCore(&state, action)
             
         case .async(let action):
             return asyncCore(&state, action)
@@ -107,7 +118,9 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .none
+            return .run { send in
+                await send(.async(.fetchPrinciples))
+            }
             
         case .backButtonTapped:
             coordinator.popToPrev()
@@ -144,11 +157,6 @@ extension PrinciplesFeature {
             )))
             
         case .skipTapped:
-            print("🚀 SKIP BUTTON TAPPED!")
-            print("   TradeType: \(state.tradeType)")
-            print("   Stock: \(state.stock.title)")
-            print("   Sending delegate action...")
-            // Skip principles - pass empty principles array and go directly to TradeReason
             return .send(.delegate(.pushToTradeReason(
                 tradeType: state.tradeType,
                 stock: state.stock,
@@ -169,7 +177,16 @@ extension PrinciplesFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-            
+        case .fetchPrinciples:
+            return .run { send in
+                do {
+                    let response = try await fetchPrinciplesUseCase.execute()
+                    await send(.inner(.fetchPrinciplesSuccess(response)))
+                } catch {
+                    await send(.inner(.failure(error)))
+                }
+                
+            }
         }
     }
     
@@ -183,6 +200,23 @@ extension PrinciplesFeature {
         }
     }
     
+    // MARK: - Inner Core
+    func innerCore(
+        _ state: inout State,
+        _ action: InnerAction
+    ) -> Effect<Action> {
+        switch action {
+        case .fetchPrinciplesSuccess(let response):
+            dump(response)
+            state.principles = response
+            return .none
+            
+        case .failure(let error):
+            Log.error("error: \(error)")
+            return .none
+        }
+    }
+    
     // MARK: - Delegate Core
     func delegateCore(
         _ state: inout State,
@@ -190,11 +224,6 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .pushToTradeReason(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield, let emotion, let tradePrinciple):
-            print("🎯 DELEGATE: pushToTradeReason received!")
-            print("   TradeType: \(tradeType)")
-            print("   Stock: \(stock.title)")
-            print("   Principles: \(tradePrinciple)")
-            print("   Calling coordinator.pushToTradeReason...")
             coordinator.pushToTradeReason(
                 tradeType: tradeType,
                 stock: stock,
@@ -205,7 +234,6 @@ extension PrinciplesFeature {
                 emotion: emotion,
                 tradePrinciple: tradePrinciple
             )
-            print("   ✅ Coordinator call completed")
             return .none
         }
     }

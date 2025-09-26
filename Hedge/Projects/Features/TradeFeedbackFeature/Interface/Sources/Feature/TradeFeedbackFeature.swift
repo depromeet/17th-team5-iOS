@@ -26,7 +26,7 @@ public struct TradeFeedbackFeature {
     @ObservableState
     public struct State: Equatable {
         public var tradeData: TradeData
-        public var feedback: Feedback? = nil
+        public var feedback: Feedback? = .mock()
         
         public init(tradeData: TradeData) {
             self.tradeData = tradeData

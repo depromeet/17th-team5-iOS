@@ -39,7 +39,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     }
     
     public func start() {
-            let principlesView = PrinciplesView(
+            let principlesView = PrinciplesContainerView(
                 store: .init(
                     initialState: PrinciplesFeature.State(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText),
                     reducer: {
@@ -57,21 +57,9 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     }
     
     public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String]) {
-        // Print the trade data being passed
-        print("🚀 Navigating to TradeReason with data:")
-        print("   TradeType: \(tradeType.rawValue)")
-        print("   Stock: \(stock.title) (\(stock.symbol))")
-        print("   Price: \(tradingPrice)")
-        print("   Quantity: \(tradingQuantity)")
-        print("   Date: \(tradingDate)")
-        print("   Yield: \(yield)")
-        print("   Emotion: \(emotion)")
-        print("   Principles: \(tradePrinciple)")
-        print("   Parent coordinator: \(parentCoordinator != nil ? "✅ Set" : "❌ NIL")")
         
         // Navigate to TradeReason using parent coordinator
         if let parent = parentCoordinator {
-            print("   Calling parent.pushToTradeReason...")
             parent.pushToTradeReason(
                 tradeType: tradeType,
                 stock: stock,

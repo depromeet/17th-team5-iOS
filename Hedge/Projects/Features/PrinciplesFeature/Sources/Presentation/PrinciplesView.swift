@@ -1,125 +1,101 @@
-import SwiftUI
-import ComposableArchitecture
-import DesignKit
-import PrinciplesFeatureInterface
-import StockDomainInterface
+//
+//  PrinciplesView.swift
+//  PrinciplesFeature
+//
+//  Created by 이중엽 on 9/27/25.
+//  Copyright © 2025 HedgeCompany. All rights reserved.
+//
 
-@ViewAction(for: PrinciplesFeature.self)
+import SwiftUI
+
+import DesignKit
+import PrinciplesDomainInterface
+
 public struct PrinciplesView: View {
-    @Bindable public var store: StoreOf<PrinciplesFeature>
     
-    public init(store: StoreOf<PrinciplesFeature>) {
-        self.store = store
-    }
+    @Binding var selectedPrinciples: Set<Int>
+    @Binding var principles: [Principle]
+    var onPrincipleTapped: ((Int) -> Void)? = nil
+    var onCompleteTapped: (() -> Void)? = nil
     
     public var body: some View {
-        PrinciplesChecklistView(store: store)
-            .onAppear {
-                send(.onAppear)
-            }
-    }
-}
-
-// MARK: - Principles Checklist View
-@ViewAction(for: PrinciplesFeature.self)
-struct PrinciplesChecklistView: View {
-    @Bindable var store: StoreOf<PrinciplesFeature>
-    
-    private let principles = [
-        "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기",
-        "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
-        "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기",
-        "분산 투자 원칙을 지키고 감정적 결정을 피하기",
-        "리스크를 관리하며 손절 기준을 미리 정해두기"
-    ]
-    
-    private var dynamicTitle: String {
-        let count = store.selectedPrinciples.count
-        let tradeTypeText = store.tradeType.rawValue
-        return "\(tradeTypeText) 원칙 \(count)개 선택됨"
-    }
-    
-    var body: some View {
+        
         VStack(spacing: 0) {
-            HedgeNavigationBar(
-                buttonText: "건너뛰기",
-                onLeftButtonTap: {
-                    send(.skipTapped)
-                }
-            )
-            
-            VStack(spacing: 20) {
-                Text(dynamicTitle)
-                    .font(.h1Semibold)
-                    .foregroundStyle(Color.hedgeUI.textTitle)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 20)
-                
-                VStack(spacing: 12) {
-                    ForEach(principles.indices, id: \.self) { index in
-                        Button(action: {
-                            send(.principleToggled(index))
-                        }) {
-                            HStack {
-                                Text(principles[index])
-                                    .font(.body3Medium)
-                                    .foregroundColor(.primary)
-                                    .multilineTextAlignment(.leading)
-                                
-                                Spacer()
-                                
-                                if store.selectedPrinciples.contains(index) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(Color.hedgeUI.brandPrimary)
+            ScrollView {
+                ForEach(Array(principles.enumerated()), id: \.element) { index, principle in
+                    VStack(spacing: 0) {
+                        
+                        HStack(spacing: 0) {
+                            
+                            Image.hedgeUI.idleDemo
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                            
+                            Rectangle()
+                                .frame(width: 16, height: 32)
+                                .foregroundStyle(.clear)
+                            
+                            Text(principles[index].principle)
+                                .font(FontModel.body3Semibold)
+                                .foregroundStyle(Color.hedgeUI.grey900)
+                                .lineLimit(2)
+                            
+                            Spacer(minLength: 24)
+                            
+                            Group {
+                                if selectedPrinciples.contains(principle.id) {
+                                    Image.hedgeUI.check
                                 } else {
-                                    Image(systemName: "circle")
-                                        .foregroundColor(Color.hedgeUI.textSecondary)
+                                    Image.hedgeUI.uncheck
                                 }
                             }
-                            .padding()
-                            .background(Color.hedgeUI.neutralBgSecondary)
-                            .cornerRadius(8)
+                            .onTapGesture {
+                                onPrincipleTapped?(principle.id)
+                            }
+                        }
+                        .padding(.vertical, 22)
+                        .padding(.horizontal, 24)
+                        
+                        if index < (principles.count) - 1 {
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                                .padding(.leading, 24)
                         }
                     }
                 }
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                HedgeActionButton("다음") {
-                    send(.completeTapped)
-                }
-                .size(.medium)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 34)
             }
+            
+            HedgeBottomCTAButton()
+                .style(.oneButton(title: "기록하기", onTapped: {
+                    onCompleteTapped?()
+                }))
         }
-        .background(Color.hedgeUI.backgroundWhite.ignoresSafeArea())
     }
 }
 
 #Preview {
-    PrinciplesView(store: .init(
-        initialState: PrinciplesFeature.State(
-            tradeType: .sell,
-            stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-            tradingPrice: "70,000",
-            tradingQuantity: "10",
-            tradingDate: "2025년 9월 26일",
-            yield: "+10%",
-            reasonText: "기업 실적이 좋아 보여서"
-        ),
-        reducer: {
-            PrinciplesFeature(coordinator: DefaultPrinciplesCoordinator(
-                navigationController: UINavigationController(),
-                tradeType: .sell,
-                stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-                tradingPrice: "70,000",
-                tradingQuantity: "10",
-                tradingDate: "2025년 9월 26일",
-                yield: "+10%",
-                reasonText: "기업 실적이 좋아 보여서"
-            ))
+    
+    @Previewable @State var selectedPrinciples: Set<Int> = []
+    
+    PrinciplesView(
+        selectedPrinciples: $selectedPrinciples,
+        principles: .constant([
+            .init(id: 1, principle: "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기"),
+            .init(id: 2, principle: "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기"),
+            .init(id: 3, principle: "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기"),
+            .init(id: 4, principle: "분산 투자 원칙을 지키고 감정적 결정을 피하기"),
+            .init(id: 5, principle: "리스크를 관리하며 손절 기준을 미리 정해두기")
+        ]),
+        onPrincipleTapped: { principleId in
+            if selectedPrinciples.contains(principleId) {
+                selectedPrinciples.remove(principleId)
+            } else {
+                selectedPrinciples.insert(principleId)
+            }
+        },
+        onCompleteTapped: {
+            print("Complete tapped")
         }
-    ))
+    )
 }
