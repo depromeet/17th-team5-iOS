@@ -19,7 +19,7 @@ public struct DefaultAnalysisRepository: AnalysisRepository {
     }
     
     public func fetch(market: String, symbol: String, time: String) async throws -> String {
-        let request = AnalysisRequestDTO(market: market, symbol: symbol, time: time)
+        let request = AnalysisRequestDTO(market: market, symbol: symbol, time: "2025-09-27T08:37:00")
         return try await dataSource.fetch(request).data.text
     }
 }
