@@ -99,13 +99,17 @@ private struct StatefulPreviewWrapper<Value, Content: View>: View {
 }
 
 // MARK: - Emotion content (middle-only)
-private struct EmotionContent: View {
+public struct EmotionContent: View {
     @Binding var selection: Int
 
     private let labels = ["불안","충동","무덤무상","자신감","확신"]
     private let icons  = ["😟","😣","😐","😊","😎"]
+    
+    public init(selection: Binding<Int>) {
+        self._selection = selection
+    }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Faces row
             HStack(spacing: 18) {
@@ -159,12 +163,17 @@ private struct EmotionContent: View {
 }
 
 // MARK: - Checklist content (middle-only)
-private struct ChecklistContent: View {
+public struct ChecklistContent: View {
     @Binding var checked: Set<Int>
     
     let items: [String]
+    
+    public init(checked: Binding<Set<Int>>, items: [String]) {
+        self._checked = checked
+        self.items = items
+    }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0) {
             ForEach(items.indices, id: \.self) { i in
                 HStack(spacing: 12) {
