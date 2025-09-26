@@ -165,26 +165,26 @@ struct TradeReasonInputView: View {
     }
 }
 
-#Preview {
-    TradeReasonInputView(store: .init(
-        initialState: TradeReasonFeature.State(
-            tradeType: .sell,
-            stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-            tradingPrice: "70,000",
-            tradingQuantity: "10",
-            tradingDate: "2025년 9월 26일",
-            yield: "+10%"
-        ),
-        reducer: {
-            TradeReasonFeature(coordinator: DefaultTradeReasonCoordinator(
-                navigationController: UINavigationController(),
-                tradeType: .sell,
-                stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-                tradingPrice: "70,000",
-                tradingQuantity: "10",
-                tradingDate: "2025년 9월 26일",
-                yield: "+10%"
-            ))
-        }
-    ))
-}
+//#Preview {
+//    TradeReasonInputView(store: .init(
+//        initialState: TradeReasonFeature.State(
+//            tradeType: .sell,
+//            stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
+//            tradingPrice: "70,000",
+//            tradingQuantity: "10",
+//            tradingDate: "2025년 9월 26일",
+//            yield: "+10%"
+//        ),
+//        reducer: {
+//            TradeReasonFeature(coordinator: DefaultTradeReasonCoordinator(
+//                navigationController: UINavigationController(),
+//                tradeType: .sell,
+//                stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
+//                tradingPrice: "70,000",
+//                tradingQuantity: "10",
+//                tradingDate: "2025년 9월 26일",
+//                yield: "+10%"
+//            ))
+//        }
+//    ))
+//}

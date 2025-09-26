@@ -11,7 +11,7 @@ import Foundation
 import Alamofire
 
 import Networker
-import RemoteDataSourceInterface
+@preconcurrency import RemoteDataSourceInterface
 
 public struct DefaultStockSearchDataSource: StockDataSource {
     private let provider: Provider

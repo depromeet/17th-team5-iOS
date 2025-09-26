@@ -13,6 +13,9 @@ let project = Project.configure(
     product: .staticFramework,
     dependencies: [
         .Domain.Stock.implement,
+        .Domain.Principles.implement,
+        .Domain.Retrospect.implement,
+        .Domain.Feedback.implement,
     ],
     hasTests: true
 )
