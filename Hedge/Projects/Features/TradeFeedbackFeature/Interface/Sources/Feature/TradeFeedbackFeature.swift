@@ -14,13 +14,19 @@ import Core
 import Shared
 
 import StockDomainInterface
+import FeedbackDomainInterface
 
 @Reducer
 public struct TradeFeedbackFeature {
     private let coordinator: TradeFeedbackCoordinator
+    private let fetchFeedbackUseCase: FetchFeedbackUseCase
     
-    public init(coordinator: TradeFeedbackCoordinator) {
+    public init(
+        coordinator: TradeFeedbackCoordinator,
+        fetchFeedbackUseCase: FetchFeedbackUseCase
+    ) {
         self.coordinator = coordinator
+        self.fetchFeedbackUseCase = fetchFeedbackUseCase
     }
     
     @ObservableState
@@ -48,9 +54,11 @@ public struct TradeFeedbackFeature {
         case nextTapped
     }
     public enum InnerAction {
+        case fetchFeedbackSuccess(FeedbackData)
+        case fetchFeedbackFailure(Error)
     }
     public enum AsyncAction {
-        
+        case fetchFeedback(Int)
     }
     public enum ScopeAction { }
     public enum DelegateAction { }
@@ -97,7 +105,7 @@ extension TradeFeedbackFeature {
         switch action {
         case .onAppear:
             Log.debug("\(state.tradeData)")
-            return .none
+            return .send(.async(.fetchFeedback(state.tradeData.id)))
             
         case .backButtonTapped:
             return .none
@@ -112,7 +120,15 @@ extension TradeFeedbackFeature {
         _ state: inout State,
         _ action: InnerAction
     ) -> Effect<Action> {
-        
+        switch action {
+        case .fetchFeedbackSuccess(let response):
+            Log.debug("\(response)")
+            return .none
+            
+        case .fetchFeedbackFailure(let error):
+            Log.debug(error.localizedDescription)
+            return .none
+        }
     }
     
     // MARK: - Async Core
@@ -120,7 +136,17 @@ extension TradeFeedbackFeature {
         _ state: inout State,
         _ action: AsyncAction
     ) -> Effect<Action> {
-        
+        switch action {
+        case .fetchFeedback(let id):
+            return .run { send in
+                do {
+                    let response = try await fetchFeedbackUseCase.execute(id: id)
+                    await send(.inner(.fetchFeedbackSuccess(response)))
+                } catch {
+                    await send(.inner(.fetchFeedbackFailure(error)))
+                }
+            }
+        }
     }
     
     // MARK: - Scope Core

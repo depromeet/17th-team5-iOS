@@ -14,6 +14,8 @@ import StockDomainInterface
 import StockDomain
 import RetrospectDomainInterface
 import RetrospectDomain
+import FeedbackDomainInterface
+import FeedbackDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -33,6 +35,14 @@ public struct DomainAssembly: Assembly {
             }
             
             return GenerateRetrospect(retrospectRepository: repository)
+        }
+        
+        container.register(FetchFeedbackUseCase.self) { resolver in
+            guard let repository = resolver.resolve(FeedbackRepository.self) else {
+                fatalError("Could not resolve StockRepository")
+            }
+            
+            return FetchFeedback(feedbackRepository: repository)
         }
     }
 }
