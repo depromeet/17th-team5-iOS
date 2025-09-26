@@ -50,7 +50,7 @@ struct FontView: View {
                 
                 // Label1 Fonts
                 FontSection(title: "Label1 (14pt)") {
-                    FontRow(name: "label1Bold", fontModel: .label1Bold)
+                    FontRow(name: "label1Semibold", fontModel: .label1Semibold)
                     FontRow(name: "label1Medium", fontModel: .label1Medium)
                     FontRow(name: "label1Regular", fontModel: .label1Regular)
                 }
