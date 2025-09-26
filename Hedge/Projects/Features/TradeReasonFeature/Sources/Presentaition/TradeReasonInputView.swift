@@ -133,7 +133,7 @@ struct TradeReasonInputView: View {
                                 store.send(.inner(.emotionSelected(store.state.emotionSelection)))
                             }
                         ) {
-                            EmotionContent(selection: $store.state.emotionSelection) // middle-only
+                            EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
                         }
                     case .checklist:
                         HedgeBottomSheet(
