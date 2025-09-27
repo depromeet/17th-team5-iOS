@@ -152,7 +152,7 @@ extension TradeHistoryInputView {
     private var textFieldGroup: some View {
         VStack(spacing: 0) {
             HedgeTradeTextField(inputText: $store.tradingPrice, focusedID: $focusedID, selectedIndex: $store.state.selectedConcurrency)
-                .type(.buyPrice)
+                .type(store.state.tradeType == .buy ? .buyPrice : .sellPrice)
             
             RoundedRectangle(cornerSize: .zero)
                 .fill(firstDividerColor)
@@ -174,21 +174,23 @@ extension TradeHistoryInputView {
                 .sheet(isPresented: $showDatePicker) {
                     VStack {
                         DatePicker("날짜 선택", selection: $selectedDate, displayedComponents: .date)
-                            .datePickerStyle(.compact)
+                            .datePickerStyle(.graphical)
+                            .tint(Color.hedgeUI.brandPrimary)
                         
-                        Button("완료") {
-                            let formatter = DateFormatter()
-                            formatter.dateFormat = "yyyy-MM-dd"
-                            store.tradingDate = formatter.string(from: selectedDate)
-                            focusedID = nil
-                            showDatePicker = false
-                        }
+                        HedgeBottomCTAButton()
+                            .style(.oneButton(title: "완료", onTapped: {
+                                let formatter = DateFormatter()
+                                formatter.dateFormat = "yyyy-MM-dd"
+                                store.tradingDate = formatter.string(from: selectedDate)
+                                focusedID = nil
+                                showDatePicker = false
+                            }))
                     }
                     .onDisappear(perform: {
                         focusedID = nil
                         showDatePicker = false
                     })
-                    .presentationDetents([.height(100)])
+                    .presentationDetents([.medium])
                     .presentationBackground(.white)
                     .presentationCornerRadius(20)
                 }

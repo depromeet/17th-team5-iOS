@@ -54,7 +54,7 @@ public struct HedgeTradeTextField: View {
                     .font(.body1Semibold)
                     .foregroundStyle(Color.hedgeUI.textTitle)
                     .frame(height: 25)
-                    .keyboardType(.numberPad)
+                    .keyboardType(keyboardType)
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .offset(y: 5)),
                         removal: .opacity.combined(with: .offset(y: -5))
@@ -101,6 +101,14 @@ public struct HedgeTradeTextField: View {
     }
     
     // MARK: - Computed Properties
+    
+    /// 현재 타입과 선택된 인덱스에 따라 키보드 타입을 반환합니다.
+    private var keyboardType: UIKeyboardType {
+        if (type == .buyPrice || type == .sellPrice) && selectedIndex == 1 {
+            return .decimalPad
+        }
+        return .numberPad
+    }
     
     /// 현재 상태에 따라 표시할 텍스트를 반환합니다.
     private var displayText: String {
@@ -295,6 +303,10 @@ private extension HedgeTradeTextField {
     /// - Parameter input: 입력된 문자열
     /// - Returns: 숫자만 포함된 문자열
     func numbersOnly(_ input: String) -> String {
+        // buyPrice, sellPrice에서 selectedIndex가 1($)일 때는 소수점도 허용
+        if (type == .buyPrice || type == .sellPrice) && selectedIndex == 1 {
+            return String(input.filter { $0.isNumber || $0 == "." })
+        }
         return String(input.filter { $0.isNumber })
     }
     
@@ -312,6 +324,12 @@ private extension HedgeTradeTextField {
             formatter.numberStyle = .decimal
             formatter.groupingSeparator = ","
             formatter.usesGroupingSeparator = true
+            
+            // selectedIndex가 1($)일 때는 소수점 자릿수 제한
+            if selectedIndex == 1 {
+                formatter.minimumFractionDigits = 0
+                formatter.maximumFractionDigits = 2
+            }
             
             let formattedNumber = formatter.string(from: NSDecimalNumber(decimal: decimal)) ?? numbers
             
