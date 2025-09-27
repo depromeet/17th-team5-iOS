@@ -25,15 +25,22 @@ public struct TradeHistoryFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public var tradingPrice: String = ""
-        public var tradingQuantity: String = ""
-        public var tradingDate: String = ""
-        public var yield: String = ""
-        public var reasonText: String = ""
+        public var tradingPrice: String
+        public var tradingQuantity: String
+        public var tradingDate: String
+        public var yield: String
+        public var selectedConcurrency: Int
+        public var selectedYield: Int
         public var stock: StockSearch
         public var tradeType: TradeType
         
         public init(tradeType: TradeType, stock: StockSearch) {
+            self.tradingPrice = ""
+            self.tradingQuantity = ""
+            self.tradingDate = ""
+            self.yield = ""
+            self.selectedConcurrency = 0
+            self.selectedYield = 0
             self.tradeType = tradeType
             self.stock = stock
         }
@@ -60,7 +67,7 @@ public struct TradeHistoryFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String)
+        case pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String?)
     }
     
     public var body: some Reducer<State, Action> {
@@ -154,14 +161,13 @@ extension TradeHistoryFeature {
     ) -> Effect<Action> {
         switch action {
         case .pushToPrinciples(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield):
+            let concurrency = state.selectedConcurrency == 0 ? "KRW" : "USD"
+            let tradeHistory = TradeHistory(tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, concurrency: concurrency)
+            
             coordinator.pushToPrinciples(
                 tradeType: tradeType,
                 stock: stock,
-                tradingPrice: tradingPrice,
-                tradingQuantity: tradingQuantity,
-                tradingDate: tradingDate,
-                yield: yield,
-                reasonText: state.reasonText
+                tradeHistory: tradeHistory
             )
             return .none
         }

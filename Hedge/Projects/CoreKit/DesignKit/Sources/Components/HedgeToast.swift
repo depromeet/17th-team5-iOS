@@ -24,7 +24,7 @@ public struct HedgeToast: View {
     }
     
     public var body: some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 8) {
             if showIcon {
                 type.icon
                     .resizable()
@@ -37,8 +37,8 @@ public struct HedgeToast: View {
                 .foregroundStyle(type.textColor)
 
         }
-        .padding(.vertical, 15)
-        .padding(.leading, showIcon ? 11 : 20)
+        .padding(.vertical, 10)
+        .padding(.leading, showIcon ? 10 : 20)
         .padding(.trailing, 20)
         .background(
             RoundedRectangle(cornerRadius: 62, style: .continuous)

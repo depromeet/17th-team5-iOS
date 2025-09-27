@@ -31,4 +31,10 @@ public extension TargetDependency.Domain {
         public static let implement = domainDependency(target: name)
         public static let interface = domainInterfaceDependency(target: name)
     }
+
+    struct Analysis {
+        private static let name = "AnalysisDomain"
+        public static let implement = domainDependency(target: name)
+        public static let interface = domainInterfaceDependency(target: name)
+    }
 }
