@@ -48,7 +48,7 @@ extension StockSearchTarget: TargetType {
     var path: String {
         switch self {
         case .search:
-            return "/search"
+            return "/slice"
         }
     }
     

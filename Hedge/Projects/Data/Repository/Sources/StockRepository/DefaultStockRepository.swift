@@ -19,7 +19,7 @@ public struct DefaultStockRepository: StockRepository {
     }
     
     public func search(text: String) async throws -> [StockSearch] {
-        let request = StockSearchRequestDTO(query: text)
-        return try await dataSource.search(request).data.map { $0.toDomain() }
+        let request = StockSearchRequestDTO(companyName: text)
+        return try await dataSource.search(request).data.toDomain()
     }
 }
