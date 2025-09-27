@@ -30,6 +30,7 @@ public struct TradeHistoryFeature {
         public var tradingDate: String
         public var yield: String
         public var selectedConcurrency: Int
+        public var selectedYield: Int
         public var stock: StockSearch
         public var tradeType: TradeType
         
@@ -39,6 +40,7 @@ public struct TradeHistoryFeature {
             self.tradingDate = ""
             self.yield = ""
             self.selectedConcurrency = 0
+            self.selectedYield = 0
             self.tradeType = tradeType
             self.stock = stock
         }

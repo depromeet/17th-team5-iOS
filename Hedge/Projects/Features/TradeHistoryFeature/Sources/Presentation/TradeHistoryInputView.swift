@@ -112,7 +112,7 @@ public struct TradeHistoryInputView: View {
                     textFieldGroup
                 }
                 
-                HedgeTradeTextField(inputText: $store.yield, focusedID: $focusedID)
+                HedgeTradeTextField(inputText: $store.yield, focusedID: $focusedID, selectedIndex: $store.state.selectedYield)
                     .type(.yield)
                     .padding(.top, 12)
                     .padding(.horizontal, 20)
