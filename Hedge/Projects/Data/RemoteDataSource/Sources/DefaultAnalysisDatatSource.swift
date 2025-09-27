@@ -62,7 +62,7 @@ extension AnalysisTarget: TargetType {
     var encoding: any Alamofire.ParameterEncoding {
         switch self {
         case .fetch:
-            return makeEncoder(contentType: .json)
+            return URLEncoding.queryString
         }
     }
 }

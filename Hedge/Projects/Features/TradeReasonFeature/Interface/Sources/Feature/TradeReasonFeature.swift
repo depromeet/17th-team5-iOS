@@ -40,6 +40,7 @@ public struct TradeReasonFeature {
         public var isChecklistShow: Bool = false
         public var checkedItems: Set<Int> = []
         public var text: String = ""
+        public var contents: String? = nil
         public var emotion: TradeEmotion? = nil
         internal var checkedItemsTmp: Set<Int> = []
         
@@ -219,7 +220,7 @@ extension TradeReasonFeature {
             
         case .analysisSuccess(let text):
             Log.debug("\(text)")
-            state.text = text
+            state.contents = text
             return .none
             
         case .analysisFailure(let error):

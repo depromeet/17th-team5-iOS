@@ -21,6 +21,7 @@ public struct AnalysisRequestDTO: Encodable {
     ) {
         self.market = market
         self.symbol = symbol
-        self.time = time
+        // time 파라미터를 URL 인코딩
+        self.time = time.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? time
     }
 }

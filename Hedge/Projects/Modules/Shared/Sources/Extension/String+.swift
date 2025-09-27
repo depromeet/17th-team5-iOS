@@ -76,7 +76,7 @@ public extension String {
         return "\(year)-\(formattedMonth)-\(formattedDay)"
     }
     
-    /// 한국어 날짜 형식을 년월일시분초 형식으로 변환 (예: "2025년 10월 02일" -> "20251002221050")
+    /// 한국어 날짜 형식을 ISO 8601 형식으로 변환 (예: "2025년 10월 02일" -> "2025-09-27T10:30:00")
     func toDateTimeString() -> String {
         // 정규표현식을 사용하여 년, 월, 일 추출
         let pattern = #"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일"#
@@ -105,12 +105,12 @@ public extension String {
         let formattedMonth = month.count == 1 ? "0\(month)" : month
         let formattedDay = day.count == 1 ? "0\(day)" : day
         
-        // 현재 시간의 시, 분, 초를 가져옴
+        // 현재 시간을 ISO 8601 형식으로 변환
         let now = Date()
         let formatter = DateFormatter()
-        formatter.dateFormat = "HHmmss"
+        formatter.dateFormat = "HH:mm:ss"
         let timeString = formatter.string(from: now)
         
-        return "\(year)\(formattedMonth)\(formattedDay)\(timeString)"
+        return "\(year)-\(formattedMonth)-\(formattedDay)T\(timeString)"
     }
 }

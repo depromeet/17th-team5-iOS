@@ -164,7 +164,7 @@ struct TradeReasonInputView: View {
                 if let selectedButton = store.state.selectedButton {
                     switch selectedButton {
                     case .generate:
-                        AIGenerateView(date: store.state.tradeHistory.tradingDate, contents: .constant(nil)) {
+                        AIGenerateView(date: store.state.tradeHistory.tradingDate, contents: $store.state.contents) {
                             store.send(.inner(.aiGenerateCloseTapped))
                         }
                         .padding(.horizontal, 10)
