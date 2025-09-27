@@ -12,7 +12,8 @@ import SwiftUI
 extension HedgeUI where Base == Image {
     
     // MARK: Size 16
-    public static var plus: Image { asset(#function).renderingMode(.template) }
+    public static var plus: Image { asset(#function) }
+    public static var checkSimple: Image { asset(#function) }
     public static var anxiousSimple: Image { asset(#function) }
     public static var confidenceSimple: Image { asset(#function) }
     public static var convictionSimple: Image { asset(#function) }
@@ -48,13 +49,13 @@ extension HedgeUI where Base == Image {
     public static var generateIcon: Image { asset(#function) }
     public static var generateCloseIcon: Image { asset(#function) }
     public static var principle: Image { asset(#function) }
+    public static var check: Image { asset(#function) }
+    public static var uncheck: Image { asset(#function) }
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }
   
     // MARK: Size 30
-    public static var check: Image { asset(#function) }
-    public static var uncheck: Image { asset(#function) }
     public static var error: Image { asset(#function) }
     
     // MARK: Size 32

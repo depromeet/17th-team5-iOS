@@ -16,8 +16,8 @@ public enum TradeEmotion: Int, CaseIterable, Equatable {
     case anxious
     case impulse
     case neutral
-    case conviction
     case confidence
+    case conviction
     
     
     public var value: String {
@@ -32,6 +32,21 @@ public enum TradeEmotion: Int, CaseIterable, Equatable {
             return "충동"
         case .anxious:
             return "불안"
+        }
+    }
+    
+    public var engValue: String {
+        switch self {
+        case .confidence:
+            return "CONFIDENCE"
+        case .conviction:
+            return "CONVICTION"
+        case .neutral:
+            return "NEUTRAL"
+        case .impulse:
+            return "IMPULSE"
+        case .anxious:
+            return "ANXIOUS"
         }
     }
     

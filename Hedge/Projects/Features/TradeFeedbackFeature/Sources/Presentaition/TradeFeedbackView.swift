@@ -23,6 +23,8 @@ struct TradeFeedbackView: View {
     @State private var feedback: Feedback? = nil
     @State private var rotationAngle: Double = 0
     @State private var timer: Timer?
+    @State private var addedPrinciples: Set<Int> = []
+    @State private var showToast: Bool = false
     
     private let threshold: CGFloat = 150
     
@@ -120,6 +122,11 @@ struct TradeFeedbackView: View {
             .onDisappear {
                 UIScrollView.appearance().bounces = true
             }
+            .hedgeToast(
+                isPresented: $showToast,
+                message: "내 투자 원칙에 추가되었습니다",
+                type: .positive
+            )
         }
     }
 }
@@ -172,7 +179,7 @@ extension TradeFeedbackView {
                             .resizable()
                             .frame(width: 24, height: 24)
                         
-                        Text("\(emotion.rawValue) \(store.state.tradeData.tradeType == .buy ? "매도" : "매수")")
+                        Text("\(emotion.value) \(store.state.tradeData.tradeType == .buy ? "매도" : "매수")")
                             .font(FontModel.label1Semibold)
                     }
                 }
@@ -394,6 +401,7 @@ extension TradeFeedbackView {
             Text(store.state.feedback?.marketStatus ?? "")
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 32)
                 .padding(.horizontal, 20)
                 .background(Color.hedgeUI.neutralBgSecondary)
@@ -418,7 +426,9 @@ extension TradeFeedbackView {
                 Spacer()
             }
             
-            ForEach(Array((store.state.feedback?.principle ?? []).enumerated()), id: \.offset) { index, principle in
+            ForEach(Array((store.state.feedback?.principle ?? []).enumerated()), id: \.offset) {
+                index,
+                principle in
                 VStack(spacing: 0) {
                     
                     HStack(spacing: 0) {
@@ -429,12 +439,23 @@ extension TradeFeedbackView {
                         
                         Spacer(minLength: 40)
                         
-                        HedgeActionButton("추가", Image.hedgeUI.plus, Color.hedgeUI.neutralBgDefault) {
-                            
+                        HedgeActionButton(
+                            addedPrinciples.contains(index) ? "완료" : "추가",
+                            addedPrinciples.contains(index) ? Image.hedgeUI.checkSimple : Image.hedgeUI.plus,
+                            .white)
+                        {
+                            if addedPrinciples.contains(index) {
+                                // 이미 추가된 원칙이면 제거
+                                addedPrinciples.remove(index)
+                            } else {
+                                // 새로운 원칙 추가
+                                addedPrinciples.insert(index)
+                                showToast = true
+                            }
                         }
                         .size(.icon)
-                        .color(.primary)
                         .font(.label2Semibold)
+                        .disabled(addedPrinciples.contains(index))
                     }
                     
                     Rectangle()

@@ -208,6 +208,7 @@ extension TradeReasonFeature {
                 tradingPrice: state.tradeHistory.tradingPrice,
                 tradingQuantity: state.tradeHistory.tradingQuantity,
                 tradingDate: state.tradeHistory.tradingDate,
+                emotion: state.emotion,
                 tradePrinciple: principleChecks,
                 retrospection: state.text
             )
@@ -266,7 +267,7 @@ extension TradeReasonFeature {
                     returnRate: state.tradeHistory.yield?.extractDecimalNumber() ?? 0,
                     content: state.text,
                     principleChecks: principleChecks,
-                    emotion: .confidence
+                    emotion: Emotion(rawValue: (state.emotion?.engValue) ?? Emotion.neutral.rawValue) ?? .neutral
                 )
                 
                 do {
