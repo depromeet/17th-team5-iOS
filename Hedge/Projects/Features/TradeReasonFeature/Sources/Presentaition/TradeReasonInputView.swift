@@ -159,7 +159,9 @@ struct TradeReasonInputView: View {
             }
             
             VStack(spacing: 0) {
-                Spacer()
+                if !isFocused {
+                    Spacer()
+                }
                 
                 if let selectedButton = store.state.selectedButton {
                     switch selectedButton {
@@ -201,8 +203,13 @@ struct TradeReasonInputView: View {
                             })
                     }
                 }
+                
+                if isFocused {
+                    Spacer()
+                }
             }
         }
+        .animation(.easeInOut(duration: 0.5), value: isFocused)
         .onAppear {
             store.send(.view(.onAppear))
         }
