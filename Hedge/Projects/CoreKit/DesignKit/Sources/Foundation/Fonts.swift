@@ -27,11 +27,11 @@ public struct HedgeFont {
 
 
 public struct FontModel {
-    let font: HedgeFont.Pretendard
-    let size: CGFloat
-    let lineHeight: CGFloat
+    public let font: HedgeFont.Pretendard
+    public let size: CGFloat
+    public let lineHeight: CGFloat
     
-    init(
+    public init(
         font: HedgeFont.Pretendard,
         size: CGFloat,
         lineHeight: CGFloat = 1

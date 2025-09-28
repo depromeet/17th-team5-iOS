@@ -20,22 +20,15 @@ struct TradeReasonInputView: View {
         self.store = store
     }
     
-    @State var text: String = ""
     @FocusState private var isFocused: Bool
-    
-    let items = [
-        "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기",
-        "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
-        "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기",
-        "분산 투자 원칙을 지키고 감정적 결정을 피하기",
-        "리스크를 관리하며 손절 기준을 미리 정해두기"
-    ]
     
     var body: some View {
         
         ZStack {
             VStack(spacing: 0) {
-                HedgeNavigationBar(buttonText: "완료", onRightButtonTap:  {
+                HedgeNavigationBar(buttonText: "완료", onLeftButtonTap: {
+                    store.send(.view(.backButtonTapped))
+                }, onRightButtonTap:  {
                     store.send(.view(.nextTapped))
                 })
                 
@@ -45,8 +38,8 @@ struct TradeReasonInputView: View {
                             HedgeTopView(
                                 symbolImage: Image.hedgeUI.stockThumbnailDemo,
                                 title: store.state.stock.title,
-                                description: "\(store.state.tradingPrice)원・\(store.state.tradingQuantity)주 \(store.state.tradeType == .buy ? "매수" : "매도")",
-                                footnote: store.state.tradingDate,
+                                description: "\(store.state.tradeHistory.tradingPrice)・\(store.state.tradeHistory.tradingQuantity) \(store.state.tradeType == .buy ? "매수" : "매도")",
+                                footnote: store.state.tradeHistory.tradingDate,
                                 buttonImage: Image.hedgeUI.pencil,
                                 buttonImageOnTapped: nil
                             )
@@ -56,19 +49,70 @@ struct TradeReasonInputView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(maxWidth: .infinity)
                             
-                            Rectangle()
-                                .frame(height: 16)
-                                .foregroundStyle(.clear)
+                            
+                            if !store.state.checkedItems.isEmpty || store.state.emotion != nil {
+                                Rectangle()
+                                    .frame(height: 16)
+                                    .foregroundStyle(.clear)
+                                
+                                HStack(spacing: 8) {
+                                    if let emotion = store.state.emotion {
+                                        HStack(spacing: 4) {
+                                            emotion.simpleImage
+                                                .resizable()
+                                                .frame(width: 16, height: 16)
+                                            
+                                            Text(emotion.value)
+                                                .font(FontModel.caption1Semibold)
+                                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                        }
+                                        .padding(.vertical, 8)
+                                        .padding(.leading, 6)
+                                        .padding(.trailing, 8)
+                                        .background(Color.hedgeUI.neutralBgSecondary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
+                                    
+                                    if !store.state.checkedItems.isEmpty {
+                                        HStack(spacing: 4) {
+                                            Image.hedgeUI.principleSimple
+                                                .resizable()
+                                                .frame(width: 16, height: 16)
+                                            
+                                            Text("지킨 원칙 \(store.state.checkedItems.count)개")
+                                                .font(FontModel.caption1Semibold)
+                                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                        }
+                                        .padding(.vertical, 8)
+                                        .padding(.leading, 6)
+                                        .padding(.trailing, 8)
+                                        .background(Color.hedgeUI.neutralBgSecondary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 20)
+                                
+                                Rectangle()
+                                    .frame(height: 12)
+                                    .foregroundStyle(.clear)
+                                
+                            } else {
+                                Rectangle()
+                                    .frame(height: 16)
+                                    .foregroundStyle(.clear)
+                            }
                             
                             ZStack(alignment: .topLeading) {
-                                TextEditor(text: $text)
+                                TextEditor(text: $store.state.text)
                                     .focused($isFocused)
                                     .tint(.black)
                                     .font(FontModel.body3Medium)
                                     .foregroundStyle(Color.hedgeUI.textTitle)
                                     .scrollContentBackground(.hidden)
                                 
-                                if text.isEmpty && !isFocused {
+                                if store.state.text.isEmpty && !isFocused {
                                     Text("매매 근거를 작성해보세요")
                                         .font(FontModel.body3Medium)
                                         .foregroundStyle(Color.hedgeUI.textAssistive)
@@ -85,7 +129,7 @@ struct TradeReasonInputView: View {
                             .id("textEditorArea") // TextEditor 영역에 ID 부여
                         }
                     }
-                    .onChange(of: text) { _, newValue in
+                    .onChange(of: store.state.text) { _, newValue in
                         if isFocused && !newValue.isEmpty {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 proxy.scrollTo("textEditorArea", anchor: .bottom)
@@ -115,12 +159,14 @@ struct TradeReasonInputView: View {
             }
             
             VStack(spacing: 0) {
-                Spacer()
+                if !isFocused {
+                    Spacer()
+                }
                 
                 if let selectedButton = store.state.selectedButton {
                     switch selectedButton {
                     case .generate:
-                        AIGenerateView(date: store.state.tradingDate, contents: .constant("")) {
+                        AIGenerateView(date: store.state.tradeHistory.tradingDate, contents: $store.state.contents) {
                             store.send(.inner(.aiGenerateCloseTapped))
                         }
                         .padding(.horizontal, 10)
@@ -131,60 +177,41 @@ struct TradeReasonInputView: View {
                             primaryTitle: "기록하기",
                             onPrimary: {
                                 store.send(.inner(.emotionSelected(store.state.emotionSelection)))
-                            }
-                        ) {
-                            EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
-                        }
+                            },
+                            onClose: {
+                                store.send(.inner(.emotionCloseTapped))
+                            }, content: {
+                                EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
+                            })
+                        
                     case .checklist:
                         HedgeBottomSheet(
                             isPresented: $store.state.isChecklistShow,
                             title: "투자 원칙",
                             primaryTitle: "기록하기",
                             onPrimary: {
-                                store.send(.inner(.checklistSelected(store.state.checkedItems)))
-                            }
-                        ) { 
-                            ChecklistContent(
-                                checked: $store.state.checkedItems, 
-                                items: [
-                                    "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기",
-                                    "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
-                                    "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기",
-                                    "분산 투자 원칙을 지키고 감정적 결정을 피하기",
-                                    "리스크를 관리하며 손절 기준을 미리 정해두기"
-                                ]
-                            ) 
-                        }
+                                store.send(.inner(.checkListApproveTapped))
+                            },
+                            onClose: {
+                                store.send(.inner(.checklistCloseTapped))
+                            }, content: {
+                                PrinciplesView(selectedPrinciples: $store.state.checkedItems,
+                                               principles: $store.state.principles)
+                                { selected in
+                                    store.send(.inner(.checklistTapped(id: selected)))
+                                }
+                            })
                     }
+                }
+                
+                if isFocused {
+                    Spacer()
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.5), value: isFocused)
         .onAppear {
             store.send(.view(.onAppear))
         }
     }
 }
-
-//#Preview {
-//    TradeReasonInputView(store: .init(
-//        initialState: TradeReasonFeature.State(
-//            tradeType: .sell,
-//            stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-//            tradingPrice: "70,000",
-//            tradingQuantity: "10",
-//            tradingDate: "2025년 9월 26일",
-//            yield: "+10%"
-//        ),
-//        reducer: {
-//            TradeReasonFeature(coordinator: DefaultTradeReasonCoordinator(
-//                navigationController: UINavigationController(),
-//                tradeType: .sell,
-//                stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-//                tradingPrice: "70,000",
-//                tradingQuantity: "10",
-//                tradingDate: "2025년 9월 26일",
-//                yield: "+10%"
-//            ))
-//        }
-//    ))
-//}

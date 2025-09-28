@@ -45,6 +45,7 @@ public struct Provider: ProviderProtocol {
             print(response.request?.url)
             
             if let error = response.error {
+                print(error)
                 throw makeHedgeError(error, data: response.data)
             }
             

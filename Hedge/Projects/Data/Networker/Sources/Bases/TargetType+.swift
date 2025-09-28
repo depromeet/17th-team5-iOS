@@ -37,7 +37,8 @@ public extension TargetType {
         switch parameters {
         case let .query(request):
             let params = request?.toDictionary() ?? [:]
-            var components = URLComponents(string: url.appendingPathComponent(path).absoluteString)
+            let fullURL = path.isEmpty ? url.absoluteString : url.appendingPathComponent(path).absoluteString
+            var components = URLComponents(string: fullURL)
             
             var queryItems: [URLQueryItem] = []
             

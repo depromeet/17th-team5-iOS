@@ -52,7 +52,7 @@ public final class DefaultTradeHistoryCoordinator: TradeHistoryCoordinator {
         navigationController.popViewController(animated: true)
     }
     
-    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
-        parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)
+    public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
+        parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory)
     }
 }

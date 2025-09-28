@@ -14,6 +14,7 @@ import TradeReasonFeatureInterface
 import RetrospectDomainInterface
 import StockDomainInterface
 import Shared
+import PrinciplesDomainInterface
 
 public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var navigationController: UINavigationController
@@ -21,40 +22,35 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var parentCoordinator: RootCoordinator?
     
-    private let generateRetrospectUseCase = DIContainer.resolve(GenerateRetrospectUseCase.self)
     private let tradeType: TradeType
     private let stock: StockSearch
-    private let tradingPrice: String
-    private let tradingQuantity: String
-    private let tradingDate: String
-    private let yield: String
+    private let tradeHistory: TradeHistory
+    private let principles: [Principle]
+    private let selectedPrinciples: Set<Int>
     
     public init(
         navigationController: UINavigationController,
         tradeType: TradeType,
         stock: StockSearch,
-        tradingPrice: String,
-        tradingQuantity: String,
-        tradingDate: String,
-        yield: String
+        tradeHistory: TradeHistory,
+        principles: [Principle],
+        selectedPrinciples: Set<Int>
     ) {
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
-        self.tradingPrice = tradingPrice
-        self.tradingQuantity = tradingQuantity
-        self.tradingDate = tradingDate
-        self.yield = yield
+        self.tradeHistory = tradeHistory
+        self.principles = principles
+        self.selectedPrinciples = selectedPrinciples
     }
     
     public func start() {
         let tradeReasonInputView = TradeReasonInputView(
             store: .init(
-                initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield),
+                initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, principles: principles, selectedPrinciples: selectedPrinciples),
                 reducer: {
                     TradeReasonFeature(
-                        coordinator: self,
-                        generateRetrospectUseCase: generateRetrospectUseCase
+                        coordinator: self
                     )
                 }
             )
@@ -71,25 +67,17 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public func pushToPrinciples(
         tradeType: TradeType,
         stock: StockSearch,
-        tradingPrice: String,
-        tradingQuantity: String,
-        tradingDate: String,
-        yield: String,
-        reasonText: String
+        tradeHistory: TradeHistory
     ) {
-        parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)
+        parentCoordinator?.pushToPrinciples(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory)
     }
     
     public func showEmotionSelection(
         tradeType: TradeType,
         stock: StockSearch,
-        tradingPrice: String,
-        tradingQuantity: String,
-        tradingDate: String,
-        yield: String,
-        reasonText: String
+        tradeHistory: TradeHistory
     ) {
-        parentCoordinator?.showEmotionSelection(tradeType: tradeType, stock: stock, tradingPrice: tradingPrice, tradingQuantity: tradingQuantity, tradingDate: tradingDate, yield: yield, reasonText: reasonText)
+        parentCoordinator?.showEmotionSelection(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory)
     }
     
     public func pushToFeedback(tradeData: TradeData) {

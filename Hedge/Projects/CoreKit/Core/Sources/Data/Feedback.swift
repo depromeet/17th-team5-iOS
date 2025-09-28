@@ -19,6 +19,12 @@ public struct Feedback: Equatable {
     public let marketStatus: String
     public let principle: [(String, String)]
     
+    public init(summary: String, marketStatus: String, principle: [(String, String)]) {
+        self.summary = summary
+        self.marketStatus = marketStatus
+        self.principle = principle
+    }
+    
     public static func mock() -> Self {
         return Feedback(summary: "사실 몇 줄까지 나올지 모르겠음 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까?",
                         marketStatus: "최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지",

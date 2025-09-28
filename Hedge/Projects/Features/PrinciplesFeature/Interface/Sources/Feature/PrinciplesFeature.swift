@@ -29,21 +29,13 @@ public struct PrinciplesFeature {
         public var selectedPrinciples: Set<Int> = []
         public var tradeType: TradeType
         public var stock: StockSearch
-        public var tradingPrice: String
-        public var tradingQuantity: String
-        public var tradingDate: String
-        public var yield: String
-        public var reasonText: String
+        public var tradeHistory: TradeHistory
         public var principles: [Principle] = []
         
-        public init(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String) {
+        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
             self.tradeType = tradeType
             self.stock = stock
-            self.tradingPrice = tradingPrice
-            self.tradingQuantity = tradingQuantity
-            self.tradingDate = tradingDate
-            self.yield = yield
-            self.reasonText = reasonText
+            self.tradeHistory = tradeHistory
         }
     }
     
@@ -74,7 +66,7 @@ public struct PrinciplesFeature {
     }
     public enum ScopeAction { }
     public enum DelegateAction {
-        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String])
+        case pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>)
     }
     
     public var body: some Reducer<State, Action> {
@@ -135,37 +127,21 @@ extension PrinciplesFeature {
             return .none
             
         case .completeTapped:
-            // Convert selected principles to strings
-            let principles = [
-                "주가가 오르는 흐름이면 매수, 하락 흐름이면 매도하기",
-                "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
-                "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기",
-                "분산 투자 원칙을 지키고 감정적 결정을 피하기",
-                "리스크를 관리하며 손절 기준을 미리 정해두기"
-            ]
-            let selectedPrinciples = state.selectedPrinciples.map { principles[$0] }
-            
             return .send(.delegate(.pushToTradeReason(
                 tradeType: state.tradeType,
                 stock: state.stock,
-                tradingPrice: state.tradingPrice,
-                tradingQuantity: state.tradingQuantity,
-                tradingDate: state.tradingDate,
-                yield: state.yield,
-                emotion: .neutral, // Default emotion since we're not handling emotions here
-                tradePrinciple: selectedPrinciples
+                tradeHistory: state.tradeHistory,
+                tradePrinciple: state.principles,
+                selectedPrinciples: state.selectedPrinciples
             )))
             
         case .skipTapped:
             return .send(.delegate(.pushToTradeReason(
                 tradeType: state.tradeType,
                 stock: state.stock,
-                tradingPrice: state.tradingPrice,
-                tradingQuantity: state.tradingQuantity,
-                tradingDate: state.tradingDate,
-                yield: state.yield,
-                emotion: .neutral, // Default emotion
-                tradePrinciple: [] // Empty array for skip
+                tradeHistory: state.tradeHistory,
+                tradePrinciple: [],
+                selectedPrinciples: [] // Empty array for skip
             )))
         }
     }
@@ -207,7 +183,6 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrinciplesSuccess(let response):
-            dump(response)
             state.principles = response
             return .none
             
@@ -223,16 +198,13 @@ extension PrinciplesFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         switch action {
-        case .pushToTradeReason(let tradeType, let stock, let tradingPrice, let tradingQuantity, let tradingDate, let yield, let emotion, let tradePrinciple):
+        case .pushToTradeReason(let tradeType, let stock, let tradeHistory, let tradePrinciple, let selectedPrinciples):
             coordinator.pushToTradeReason(
                 tradeType: tradeType,
                 stock: stock,
-                tradingPrice: tradingPrice,
-                tradingQuantity: tradingQuantity,
-                tradingDate: tradingDate,
-                yield: yield,
-                emotion: emotion,
-                tradePrinciple: tradePrinciple
+                tradeHistory: tradeHistory,
+                tradePrinciple: tradePrinciple,
+                selectedPrinciples: selectedPrinciples
             )
             return .none
         }
