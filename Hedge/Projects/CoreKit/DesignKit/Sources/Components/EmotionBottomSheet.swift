@@ -85,7 +85,6 @@ private struct StepSlider: View {
             let H = geo.size.height
             let thumb: CGFloat = 40
             let trackH: CGFloat = 36
-            let epsilon: CGFloat = 1.0 // small gap to avoid any peek-under
 
             // Compute in the same padded region as faces/labels
             let count = max(steps, 2)
@@ -94,9 +93,6 @@ private struct StepSlider: View {
             let stepSpacing = usable / CGFloat(count - 1)
             let leftCenter = horizontalPadding + thumb / 2
             let cx = leftCenter + CGFloat(selection) * stepSpacing
-
-            // Fill width measured from track's left edge (flat right edge, clamped)
-            let fillWidth = max(0, min(cx - horizontalPadding - thumb / 2, trackWidth))
 
             ZStack {
                 // Build once
@@ -122,17 +118,14 @@ private struct StepSlider: View {
                 //    includes the left inset & “meet” so it kisses the knob
                     .overlay(alignment: .leading) {
                         let leftInset = trackH / 2
-                        let meet: CGFloat = 6
                         let fillWidth = max(
                             0,
-                            min(cx - horizontalPadding - thumb / 2 + meet + leftInset,
-                                trackWidth + leftInset)
+                            min(cx - horizontalPadding - thumb / 2 + leftInset, trackWidth + leftInset)
                         )
-
                         Capsule()
                             .fill(Color.hedgeUI.brandPrimary)
                             .frame(width: fillWidth, height: trackH)
-                            .offset(x: leftInset/2)
+                            .padding(.horizontal, horizontalPadding)
                     }
 
                 // Thumb (white circle with "pause" bars)
@@ -142,14 +135,16 @@ private struct StepSlider: View {
                     .shadow(color: .black.opacity(0.08), radius: 8, y: 2)
                     .overlay(
                         HStack(spacing: 4) {
-                            Capsule().fill(Color.hedgeUI.textSecondary).frame(width: 4, height: 14)
-                            Capsule().fill(Color.hedgeUI.textSecondary).frame(width: 4, height: 14)
+                            Capsule().fill(Color.hedgeUI.grey200).frame(width: 4, height: 14)
+                            Capsule().fill(Color.hedgeUI.grey200).frame(width: 4, height: 14)
                         }
                     )
                     .position(x: cx, y: H / 2)
                     .highPriorityGesture(dragGesture(width: W, leftCenter: leftCenter, stepSpacing: stepSpacing))
             }
-            // Optional: animate fill/position when selection snaps
+            .mask(
+                Capsule().frame(height: trackH).padding(.horizontal, horizontalPadding)
+            )
             .animation(.easeInOut(duration: 0.15), value: selection)
         }
     }
