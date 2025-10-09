@@ -176,6 +176,7 @@ extension TradeHistoryInputView {
                         DatePicker("날짜 선택", selection: $selectedDate, displayedComponents: .date)
                             .datePickerStyle(.graphical)
                             .tint(Color.hedgeUI.brandPrimary)
+                            .padding(.top, 10)
                         
                         HedgeBottomCTAButton()
                             .style(.oneButton(title: "완료", onTapped: {

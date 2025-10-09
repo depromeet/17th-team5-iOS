@@ -44,10 +44,17 @@ struct TradeReasonInputView: View {
                                 buttonImageOnTapped: nil
                             )
                             
-                            Image.hedgeUI.tmpChart
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(maxWidth: .infinity)
+                            if store.state.tradeType == .buy {
+                                Image.hedgeUI.chartDemoBuy
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(maxWidth: .infinity)
+                            } else {
+                                Image.hedgeUI.tmpChart
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(maxWidth: .infinity)
+                            }
                             
                             
                             if !store.state.checkedItems.isEmpty || store.state.emotion != nil {
