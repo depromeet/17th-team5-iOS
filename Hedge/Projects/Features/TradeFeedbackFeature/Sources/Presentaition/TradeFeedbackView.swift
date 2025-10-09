@@ -55,13 +55,23 @@ struct TradeFeedbackView: View {
                     footnote: store.state.tradeData.tradingDate
                 )
                 
-                Image.hedgeUI.tmpChart
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: imageHeight, alignment: .top)
-                    .clipped()
-                    .animation(.easeInOut(duration: 0.3), value: imageHeight)
+                if store.tradeData.tradeType == .buy {
+                    Image.hedgeUI.chartDemoBuy
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: imageHeight, alignment: .top)
+                        .clipped()
+                        .animation(.easeInOut(duration: 0.3), value: imageHeight)
+                } else {
+                    Image.hedgeUI.tmpChart
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: imageHeight, alignment: .top)
+                        .clipped()
+                        .animation(.easeInOut(duration: 0.3), value: imageHeight)
+                }
                 
                 Rectangle()
                     .frame(height: 10)
