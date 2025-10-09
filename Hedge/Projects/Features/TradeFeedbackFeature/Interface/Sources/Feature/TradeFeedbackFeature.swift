@@ -32,7 +32,7 @@ public struct TradeFeedbackFeature {
     @ObservableState
     public struct State: Equatable {
         public var tradeData: TradeData
-        public var feedback: Feedback? = nil
+        public var feedback: Feedback? = .mock()
         
         public init(tradeData: TradeData) {
             self.tradeData = tradeData
@@ -108,7 +108,6 @@ extension TradeFeedbackFeature {
             return .send(.async(.fetchFeedback(state.tradeData.id)))
             
         case .backButtonTapped:
-            coordinator.popToPrev()
             return .none
             
         case .nextTapped:
@@ -124,15 +123,6 @@ extension TradeFeedbackFeature {
         switch action {
         case .fetchFeedbackSuccess(let response):
             Log.debug("\(response)")
-            var principles: [(String, String)] = []
-            response.aiRecommendedPrinciples.forEach { dataArr in
-                if let data = dataArr.first {
-                    let principle = (data.key, data.value)
-                    principles.append(principle)
-                }
-            }
-            
-            state.feedback = Feedback(summary: response.summary, marketStatus: response.marketCondition, principle: principles)
             return .none
             
         case .fetchFeedbackFailure(let error):

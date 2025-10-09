@@ -9,9 +9,8 @@
 import Foundation
 import Core
 import StockDomainInterface
-import PrinciplesDomainInterface
 
 public protocol PrinciplesCoordinator: Coordinator {
     func popToPrev()
-    func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>)
+    func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String])
 }

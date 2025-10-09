@@ -13,7 +13,6 @@ import ComposableArchitecture
 
 import TradeHistoryFeatureInterface
 import DesignKit
-import Shared
 
 @ViewAction(for: TradeHistoryFeature.self)
 public struct TradeHistoryInputView: View {
@@ -50,35 +49,6 @@ public struct TradeHistoryInputView: View {
         return Color.hedgeUI.grey200
     }
     
-    private var description: String {
-        if let focusedID, let type = HedgeTradeTextField.HedgeTextFieldType(rawValue: focusedID) {
-            switch type {
-            case .buyPrice:
-                return "얼마에 매수하셨나요?"
-            case .sellPrice:
-                return "얼마에 매도하셨나요?"
-            case .quantity:
-                return "몇 주 \(store.tradeType.rawValue)하셨나요?"
-            case .tradeDate:
-                return "언제 \(store.tradeType.rawValue)하셨나요?"
-            case .yield:
-                let price = store.tradingPrice.extractDecimalNumber()
-                let quantity = Double(store.tradingQuantity.extractNumbers())
-                let total = String(price * quantity).toDecimalStringWithDecimal()
-                let prefix = store.state.selectedConcurrency == 0 ? "" : "$"
-                let suffix = store.state.selectedConcurrency == 0 ? "원" : ""
-                return "총 \(prefix)\(total)\(suffix) \(store.tradeType == .buy ? "매수" : "매도")"
-            }
-        } else {
-            let price = store.tradingPrice.extractDecimalNumber()
-            let quantity = Double(store.tradingQuantity.extractNumbers())
-            let total = String(price * quantity).toDecimalStringWithDecimal()
-            let prefix = store.state.selectedConcurrency == 0 ? "" : "$"
-            let suffix = store.state.selectedConcurrency == 0 ? "원" : ""
-            return "총 \(prefix)\(total)\(suffix) \(store.tradeType == .buy ? "매수" : "매도")"
-        }
-    }
-    
     // MARK: - Initializer
     
     public init(
@@ -98,21 +68,19 @@ public struct TradeHistoryInputView: View {
                 }
             
             VStack(spacing: 0) {
-                HedgeNavigationBar(buttonText: "", onLeftButtonTap:  {
-                    send(.backButtonTapped)
-                })
+                HedgeNavigationBar(buttonText: "", onLeftButtonTap: nil)
                 
                 VStack(spacing: 16) {
                     HedgeTopView(
-                        symbolImage: Image.hedgeUI.stockThumbnailDemo,
+                        symbolImage: Image.hedgeUI.buyDemo,
                         title: store.stock.title,
-                        description: description
+                        description: store.stock.market
                     )
                     
                     textFieldGroup
                 }
                 
-                HedgeTradeTextField(inputText: $store.yield, focusedID: $focusedID, selectedIndex: $store.state.selectedYield)
+                HedgeTradeTextField(inputText: $store.yield, focusedID: $focusedID)
                     .type(.yield)
                     .padding(.top, 12)
                     .padding(.horizontal, 20)
@@ -151,8 +119,8 @@ extension TradeHistoryInputView {
     @ViewBuilder
     private var textFieldGroup: some View {
         VStack(spacing: 0) {
-            HedgeTradeTextField(inputText: $store.tradingPrice, focusedID: $focusedID, selectedIndex: $store.state.selectedConcurrency)
-                .type(store.state.tradeType == .buy ? .buyPrice : .sellPrice)
+            HedgeTradeTextField(inputText: $store.tradingPrice, focusedID: $focusedID)
+                .type(.buyPrice)
             
             RoundedRectangle(cornerSize: .zero)
                 .fill(firstDividerColor)
@@ -174,23 +142,21 @@ extension TradeHistoryInputView {
                 .sheet(isPresented: $showDatePicker) {
                     VStack {
                         DatePicker("날짜 선택", selection: $selectedDate, displayedComponents: .date)
-                            .datePickerStyle(.graphical)
-                            .tint(Color.hedgeUI.brandPrimary)
+                            .datePickerStyle(.compact)
                         
-                        HedgeBottomCTAButton()
-                            .style(.oneButton(title: "완료", onTapped: {
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "yyyy-MM-dd"
-                                store.tradingDate = formatter.string(from: selectedDate)
-                                focusedID = nil
-                                showDatePicker = false
-                            }))
+                        Button("완료") {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "yyyy-MM-dd"
+                            store.tradingDate = formatter.string(from: selectedDate)
+                            focusedID = nil
+                            showDatePicker = false
+                        }
                     }
                     .onDisappear(perform: {
                         focusedID = nil
                         showDatePicker = false
                     })
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(100)])
                     .presentationBackground(.white)
                     .presentationCornerRadius(20)
                 }

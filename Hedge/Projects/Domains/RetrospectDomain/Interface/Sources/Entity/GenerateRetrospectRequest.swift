@@ -70,7 +70,7 @@ public struct PrincipleCheck {
 public enum Emotion: String {
     case confidence = "CONFIDENCE"
     case conviction = "CONVICTION"
-    case neutral = "MINDLESSNESS"
+    case neutral = "NEUTRAL"
     case impulse = "IMPULSE"
     case anxious = "ANXIOUS"
 }

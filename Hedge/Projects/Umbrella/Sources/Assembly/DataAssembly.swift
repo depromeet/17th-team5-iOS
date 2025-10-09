@@ -17,7 +17,6 @@ import StockDomainInterface
 import PrinciplesDomainInterface
 import RetrospectDomainInterface
 import FeedbackDomainInterface
-import AnalysisDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -34,8 +33,6 @@ public struct DataAssembly: Assembly {
         container.register(PrinciplesRepository.self) { _ in
             DefaultPrinciplesRepository(
                 dataSource: DefaultsPrinciplesDataSource()
-            )
-        }
               
         container.register(RetrospectRepository.self) { _ in
             DefaultRetrospectRepository(
@@ -46,13 +43,6 @@ public struct DataAssembly: Assembly {
         container.register(FeedbackRepository.self) { _ in
             DefaultFeedbackRepository(
                 dataSource: DefaultFeedbackDataSource()
-            )
-        }
-        
-        // AnalysisRepository
-        container.register(AnalysisRepository.self) { _ in
-            DefaultAnalysisRepository(
-                dataSource: DefaultAnalysisDataSource()
             )
         }
     }

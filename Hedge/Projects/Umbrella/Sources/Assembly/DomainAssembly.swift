@@ -19,8 +19,6 @@ import FeedbackDomain
 
 import PrinciplesDomainInterface
 import PrinciplesDomain
-import AnalysisDomainInterface
-import AnalysisDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -56,14 +54,6 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchPrinciples(repository: principlesRepository)
-        }
-        
-        container.register(AnalysisUseCase.self) { resolver in
-            guard let repository = resolver.resolve(AnalysisRepository.self) else {
-                fatalError("Could not resolve AnalysisRepository")
-            }
-            
-            return Analysis(repository: repository)
         }
     }
 }

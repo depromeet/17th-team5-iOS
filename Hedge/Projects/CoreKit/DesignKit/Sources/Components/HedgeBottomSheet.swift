@@ -72,11 +72,14 @@ public struct HedgeBottomSheet<Content: View>: View {
                             .padding(.bottom, 24)
                         
                         // Footer
-                        HedgeBottomCTAButton()
-                            .style(.oneButton(title: "기록하기", onTapped: {
-                                onPrimary()
-                                isPresented = false
-                            }))
+                        HedgeActionButton(primaryTitle) {
+                            onPrimary()
+                            isPresented = false
+                        }
+                        .size(.medium)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 24)
+                        .padding(.bottom, 10) // safe-area handled automatically
                     }
                     .background(
                         RoundedRectangle(cornerRadius: 24, style: .continuous)

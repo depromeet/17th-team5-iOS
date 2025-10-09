@@ -24,7 +24,7 @@ public struct StockRow: View {
     
     public var body: some View {
         HStack(spacing: 16) {
-            Image.hedgeUI.stockThumbnailDemo
+            KFImage(URL(string: symbol))
                 .resizable()
                 .frame(width: 32, height: 32)
                 .clipShape(Circle())

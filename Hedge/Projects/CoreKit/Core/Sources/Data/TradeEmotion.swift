@@ -11,44 +11,12 @@ import SwiftUI
 import DesignKit
 
 // MARK: - Emotion
-public enum TradeEmotion: Int, CaseIterable, Equatable {
-    
-    case anxious
-    case impulse
-    case neutral
-    case confidence
-    case conviction
-    
-    
-    public var value: String {
-        switch self {
-        case .confidence:
-            return "자신감"
-        case .conviction:
-            return "확신"
-        case .neutral:
-            return "무념무상"
-        case .impulse:
-            return "충동"
-        case .anxious:
-            return "불안"
-        }
-    }
-    
-    public var engValue: String {
-        switch self {
-        case .confidence:
-            return "CONFIDENCE"
-        case .conviction:
-            return "CONVICTION"
-        case .neutral:
-            return "NEUTRAL"
-        case .impulse:
-            return "IMPULSE"
-        case .anxious:
-            return "ANXIOUS"
-        }
-    }
+public enum TradeEmotion: String, CaseIterable, Equatable {
+    case confidence = "자신감"
+    case conviction = "확신"
+    case neutral = "무념무상"
+    case impulse = "충동"
+    case anxious = "불안"
     
     public var onImage: Image {
         switch self {
@@ -92,21 +60,6 @@ public enum TradeEmotion: Int, CaseIterable, Equatable {
             return .hedgeUI.impulse
         case .anxious:
             return .hedgeUI.anxious
-        }
-    }
-    
-    public var simpleImage: Image {
-        switch self {
-        case .confidence:
-            return .hedgeUI.confidenceSimple
-        case .conviction:
-            return .hedgeUI.convictionSimple
-        case .neutral:
-            return .hedgeUI.neutralSimple
-        case .impulse:
-            return .hedgeUI.impulseSimple
-        case .anxious:
-            return .hedgeUI.anxiousSimple
         }
     }
 }

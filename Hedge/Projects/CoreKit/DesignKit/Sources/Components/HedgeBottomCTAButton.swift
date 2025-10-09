@@ -35,33 +35,11 @@ public struct HedgeBottomCTAButton: View {
         ) {
             switch style {
             case .oneButton(let title, let onTapped):
-                // HedgeActionButton(title) {
-                //     onTapped()
-                // }
-                // .size(.large)
-                // .color(.primary)
-                
-                Button {
+                HedgeActionButton(title) {
                     onTapped()
-                } label: {
-                    HStack() {
-                        Spacer()
-                        
-                        Text(title)
-                            .font(FontModel.body1Semibold)
-                            .foregroundStyle(Color.hedgeUI.textWhite)
-                        
-                        Spacer()
-                    }
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 16)
                 }
-                .foregroundStyle(Color.hedgeUI.textWhite)
-                .background(Color.hedgeUI.brandPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                
-                
-
+                .size(.large)
+                .color(.primary)
                 
             case .twoButton(let leftTitle, let rightTitle, let leftOnTapped, let rightOnTapped):
                 HStack(spacing: 9) {

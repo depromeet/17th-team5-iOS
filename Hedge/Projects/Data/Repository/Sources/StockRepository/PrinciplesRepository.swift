@@ -1,5 +1,5 @@
 //
-//  DefaultPrinciplesRepository.swift
+//  PrinciplesRepository.swift
 //  Repository
 //
 //  Created by 이중엽 on 9/26/25.

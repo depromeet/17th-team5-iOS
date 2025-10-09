@@ -9,13 +9,12 @@
 import Foundation
 
 import StockDomainInterface
-import PrinciplesDomainInterface
 
 public protocol RootCoordinator: Coordinator {
     func pushToStockSearch(with tradeType: TradeType)
     func pushToTradeHistory(tradeType: TradeType, stock: StockSearch)
-    func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>)
-    func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory)
-    func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory)
+    func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, emotion: TradeEmotion, tradePrinciple: [String])
+    func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
+    func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradingPrice: String, tradingQuantity: String, tradingDate: String, yield: String, reasonText: String)
     func pushToFeedback(tradeData: TradeData)
 }

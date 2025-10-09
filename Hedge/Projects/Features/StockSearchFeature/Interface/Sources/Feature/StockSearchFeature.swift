@@ -78,18 +78,13 @@ extension StockSearchFeature {
         switch action {
         case .binding(\.searchText):
             let text = state.searchText
-            
-            // 최소 입력 길이 체크 (2글자 이상)
-            guard text.count >= 2 else { 
-                return .none 
-            }
-            
             return .run { send in
+                guard !text.isEmpty else { return }
                 await send(.async(.fetchStockSearch(text)))
             }
             .debounce(
                 id: CancelID.searchDebounce,
-                for: 0.8,
+                for: 0.5,
                 scheduler: RunLoop.main
             )
             

@@ -9,13 +9,9 @@
 import Foundation
 
 public struct StockSearchRequestDTO: Encodable {
-    let companyName: String
-    let nextCursor: String?
-    let size: Int
+    let query: String
     
-    public init(companyName: String, nextCursor: String? = nil, size: Int = 10) {
-        self.companyName = companyName
-        self.nextCursor = nextCursor
-        self.size = size
+    public init(query: String) {
+        self.query = query
     }
 }

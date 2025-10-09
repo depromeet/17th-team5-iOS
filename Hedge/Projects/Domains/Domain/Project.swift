@@ -16,7 +16,6 @@ let project = Project.configure(
         .Domain.Principles.implement,
         .Domain.Retrospect.implement,
         .Domain.Feedback.implement,
-        .Domain.Analysis.implement,
     ],
     hasTests: true
 )

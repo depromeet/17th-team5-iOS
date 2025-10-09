@@ -59,7 +59,7 @@ public struct HomeView: View {
                         HStack(spacing: 8) {
                             Image.hedgeUI.sellDemo
                             
-                            Text("매도 회고하기")
+                            Text("매수 회고하기")
                                 .font(FontModel.body2Semibold)
                                 .foregroundStyle(Color.hedgeUI.textPrimary)
                         }

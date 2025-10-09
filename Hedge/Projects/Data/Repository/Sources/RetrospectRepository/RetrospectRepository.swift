@@ -1,10 +1,12 @@
 //
-//  DefaultRetrospectRepository.swift
+//  RetrospectRepository.swift
 //  Repository
 //
 //  Created by Junyoung on 9/26/25.
 //  Copyright © 2025 HedgeCompany. All rights reserved.
 //
+
+import Foundation
 
 import Foundation
 

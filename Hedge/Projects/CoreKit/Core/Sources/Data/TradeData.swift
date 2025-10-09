@@ -8,8 +8,6 @@
 
 import Foundation
 
-import PrinciplesDomainInterface
-
 public struct TradeData: Equatable {
     private let uuid: UUID = UUID()
     public var id: Int
@@ -22,7 +20,7 @@ public struct TradeData: Equatable {
     public var tradingDate: String
     public var yield: String?
     public var emotion: TradeEmotion?
-    public var tradePrinciple: [Principle]
+    public var tradePrinciple: [String]
     public var retrospection: String
     
     public init(
@@ -36,7 +34,7 @@ public struct TradeData: Equatable {
         tradingDate: String,
         yield: String? = nil,
         emotion: TradeEmotion? = nil,
-        tradePrinciple: [Principle],
+        tradePrinciple: [String],
         retrospection: String
     ) {
         self.id = id
