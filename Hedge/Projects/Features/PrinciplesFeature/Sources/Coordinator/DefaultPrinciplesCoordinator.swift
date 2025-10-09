@@ -10,6 +10,7 @@ import UIKit
 import SwiftUI
 import ComposableArchitecture
 import Core
+import Shared
 import PrinciplesFeatureInterface
 import StockDomainInterface
 import PrinciplesDomainInterface
@@ -23,25 +24,33 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradeHistory: TradeHistory
+    private let viewBuilder: PrinciplesViewBuilderProtocol
+    private let fetchPrinciplesUseCase = DIContainer.resolve(FetchPrinciplesUseCase.self)
     
-    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
+    public init(
+        navigationController: UINavigationController,
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradeHistory: TradeHistory,
+        viewBuilder: PrinciplesViewBuilderProtocol
+    ) {
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
+        self.viewBuilder = viewBuilder
     }
     
     public func start() {
-            let principlesView = PrinciplesContainerView(
-                store: .init(
-                    initialState: PrinciplesFeature.State(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory),
-                    reducer: {
-                        PrinciplesFeature(coordinator: self)
-                    }
-                )
-            )
+        let principlesContainerView = viewBuilder.build(
+            coordinator: self,
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory,
+            fetchPrinciplesUseCase: fetchPrinciplesUseCase
+        )
         
-        let viewController = UIHostingController(rootView: principlesView)
+        let viewController = UIHostingController(rootView: AnyView(principlesContainerView))
         navigationController.pushViewController(viewController, animated: true)
     }
     

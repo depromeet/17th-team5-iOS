@@ -21,3 +21,17 @@ public struct FetchPrinciples: FetchPrinciplesUseCase {
         return try await repository.fetch()
     }
 }
+
+public struct MockFetchPrinciples: FetchPrinciplesUseCase {
+    public init() {}
+    
+    public func execute() async throws -> [Principle] {
+        return [
+            Principle(id: 0, principle: "첫번째 레슨"),
+            Principle(id: 1, principle: "두번째 레슨"),
+            Principle(id: 2, principle: "세번째 레슨"),
+            Principle(id: 3, principle: "네번째 레슨"),
+            Principle(id: 4, principle: "다섯번째 레슨")
+        ]
+    }
+}

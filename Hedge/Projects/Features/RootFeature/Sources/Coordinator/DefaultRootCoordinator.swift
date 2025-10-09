@@ -90,7 +90,8 @@ extension DefaultRootCoordinator {
             navigationController: navigationController,
             tradeType: tradeType,
             stock: stock,
-            tradeHistory: tradeHistory
+            tradeHistory: tradeHistory,
+            viewBuilder: PrinciplesViewBuilder()
         )
         principlesCoordinator.parentCoordinator = self
         principlesCoordinator.start()
