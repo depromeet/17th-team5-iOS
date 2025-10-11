@@ -173,39 +173,8 @@ struct TradeReasonInputView: View {
                             intent.aiGenerateCloseTapped()
                         }
                         .padding(.horizontal, 10)
-                    case .emotion:
-                        HedgeBottomSheet(
-                            isPresented: $container.model.isEmotionShow,
-                            title: "당시 어떤 감정이었나요?",
-                            primaryTitle: "기록하기",
-                            onPrimary: {
-                                intent.emotionSelected(for: state.emotionSelection)
-                            },
-                            onClose: {
-                                intent.emotionCloseTapped()
-                            }, content: {
-                                EmotionBottomSheet(selection: $container.model.emotionSelection) // middle-only
-                            })
-                        
-                    case .checklist:
-                        HedgeBottomSheet(
-                            isPresented: $container.model.isChecklistShow,
-                            title: "투자 원칙",
-                            primaryTitle: "기록하기",
-                            onPrimary: {
-                                intent.checkListApproveTapped()
-                            },
-                            onClose: {
-                                intent.checklistCloseTapped()
-                            },
-                            content: {
-                                AnyView(
-                                    state.principleBuilder.buildView(
-                                        principles: $container.model.principles,
-                                        selectedPrinciples: $container.model.checkedItems
-                                    )
-                                )
-                            })
+                    default:
+                        EmptyView()
                     }
                 }
                 
@@ -217,6 +186,17 @@ struct TradeReasonInputView: View {
         .animation(.easeInOut(duration: 0.5), value: isFocused)
         .onAppear {
             intent.onAppear()
+        }
+        .hedgeBottomSheet(isPresented: $container.model.isEmotionShow) {
+            EmotionBottomSheet(selection: $container.model.emotionSelection) // middle-only
+        }
+        .hedgeBottomSheet(isPresented: $container.model.isChecklistShow, ratio: 0.8) {
+            AnyView(
+                state.principleBuilder.buildView(
+                    principles: $container.model.principles,
+                    selectedPrinciples: $container.model.checkedItems
+                )
+            )
         }
     }
 }

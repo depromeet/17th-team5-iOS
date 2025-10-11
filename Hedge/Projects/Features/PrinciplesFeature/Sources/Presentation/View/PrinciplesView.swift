@@ -17,53 +17,50 @@ public struct PrinciplesView: View {
     @Binding var principles: [Principle]
     
     public var body: some View {
-        
         VStack(spacing: 0) {
-            ScrollView {
-                ForEach(Array(principles.enumerated()), id: \.element) { index, principle in
-                    VStack(spacing: 0) {
+            ForEach(Array(principles.enumerated()), id: \.element) { index, principle in
+                VStack(spacing: 0) {
+                    
+                    HStack(spacing: 0) {
                         
-                        HStack(spacing: 0) {
-                            
-                            Image.hedgeUI.idleDemo
-                                .resizable()
-                                .frame(width: 32, height: 32)
-                            
-                            Rectangle()
-                                .frame(width: 16, height: 32)
-                                .foregroundStyle(.clear)
-                            
-                            Text(principles[index].principle)
-                                .font(FontModel.body3Semibold)
-                                .foregroundStyle(Color.hedgeUI.grey900)
-                                .lineLimit(2)
-                            
-                            Spacer(minLength: 24)
-                            
-                            Group {
-                                if selectedPrinciples.contains(principle.id) {
-                                    Image.hedgeUI.check
-                                } else {
-                                    Image.hedgeUI.uncheck
-                                }
-                            }
-                            .onTapGesture {
-                                if selectedPrinciples.contains(principle.id) {
-                                    selectedPrinciples.remove(principle.id)
-                                } else {
-                                    selectedPrinciples.insert(principle.id)
-                                }
+                        Image.hedgeUI.idleDemo
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                        
+                        Rectangle()
+                            .frame(width: 16, height: 32)
+                            .foregroundStyle(.clear)
+                        
+                        Text(principles[index].principle)
+                            .font(FontModel.body3Semibold)
+                            .foregroundStyle(Color.hedgeUI.grey900)
+                            .lineLimit(2)
+                        
+                        Spacer(minLength: 24)
+                        
+                        Group {
+                            if selectedPrinciples.contains(principle.id) {
+                                Image.hedgeUI.check
+                            } else {
+                                Image.hedgeUI.uncheck
                             }
                         }
-                        .padding(.vertical, 22)
-                        .padding(.horizontal, 24)
-                        
-                        if index < (principles.count) - 1 {
-                            Rectangle()
-                                .frame(height: 1)
-                                .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                                .padding(.leading, 24)
+                        .onTapGesture {
+                            if selectedPrinciples.contains(principle.id) {
+                                selectedPrinciples.remove(principle.id)
+                            } else {
+                                selectedPrinciples.insert(principle.id)
+                            }
                         }
+                    }
+                    .padding(.vertical, 22)
+                    .padding(.horizontal, 24)
+                    
+                    if index < (principles.count) - 1 {
+                        Rectangle()
+                            .frame(height: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.leading, 24)
                     }
                 }
             }

@@ -211,17 +211,17 @@ private extension Comparable {
                 Button("Show Emotion Sheet") { showSheet = true }
                     .padding(.top, 40)
             }
-            .overlay(
-                HedgeBottomSheet(
-                    isPresented: $showSheet,
-                    title: "당시 어떤 감정이었나요?",
-                    primaryTitle: "기록하기",
-                    onPrimary: { print("selected:", sel) },
-                    onClose: { print("closeing") }
-                ) {
-                    EmotionBottomSheet(selection: $sel) // already has the 9pt horizontal padding
-                }
-            )
+//            .overlay(
+//                HedgeBottomSheet(
+//                    isPresented: $showSheet,
+//                    title: "당시 어떤 감정이었나요?",
+//                    primaryTitle: "기록하기",
+//                    onPrimary: { print("selected:", sel) },
+//                    onClose: { print("closeing") }
+//                ) {
+//                    EmotionBottomSheet(selection: $sel) // already has the 9pt horizontal padding
+//                }
+//            )
         }
     }
     return SheetDemo()
@@ -240,17 +240,9 @@ private extension Comparable {
                 Button("Show Emotion Sheet") { showSheet = true }
                     .padding(.top, 40)
             }
-            .overlay(
-                HedgeBottomSheet(
-                    isPresented: $showSheet,
-                    title: "당시 어떤 감정이었나요?",
-                    primaryTitle: "기록하기",
-                    onPrimary: { print("selected:", sel) }
-                ) {
-                    // Do NOT add extra horizontal padding here—component already has 20
-                    EmotionBottomSheet(selection: $sel)
-                }
-            )
+            .hedgeBottomSheet(isPresented: $showSheet) {
+                EmotionBottomSheet(selection: $sel)
+            }
         }
     }
     return SheetDemo()

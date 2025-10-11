@@ -27,10 +27,12 @@ public struct PrinciplesContainerView: View {
 
 extension PrinciplesContainerView {
     private var principleView: some View {
-        PrinciplesView(
-            selectedPrinciples: $container.model.selectedPrinciples,
-            principles: $container.model.principles
-        )
+        ScrollView {
+            PrinciplesView(
+                selectedPrinciples: $container.model.selectedPrinciples,
+                principles: $container.model.principles
+            )
+        }
     }
     
     private var navigationView: some View {
