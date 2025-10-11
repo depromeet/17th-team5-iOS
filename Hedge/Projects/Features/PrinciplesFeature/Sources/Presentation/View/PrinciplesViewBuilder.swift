@@ -16,7 +16,7 @@ import PrinciplesDomainInterface
 public struct PrinciplesViewBuilder: PrinciplesViewBuilderProtocol {
     public init() {}
     
-    public func build(
+    public func buildContainer(
         coordinator: PrinciplesCoordinator?,
         tradeType: TradeType,
         stock: StockSearch,
@@ -40,5 +40,15 @@ public struct PrinciplesViewBuilder: PrinciplesViewBuilderProtocol {
         )
         
         return PrinciplesContainerView(container: container)
+    }
+    
+    public func buildView(
+        principles: Binding<[Principle]>,
+        selectedPrinciples: Binding<Set<Int>>
+    ) -> any View {
+        PrinciplesView(
+            selectedPrinciples: selectedPrinciples,
+            principles: principles
+        )
     }
 }

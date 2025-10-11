@@ -7,11 +7,13 @@ import StockDomainInterface
 import TradeFeedbackFeatureInterface
 import FeedbackDomainInterface
 
-public final class DefaultTradeHFeedbackCoordinator: TradeFeedbackCoordinator {
+public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     public var navigationController: UINavigationController
-    
     public var childCoordinators: [Coordinator] = []
-    public var parentCoordinator: RootCoordinator?
+    public var type: CoordinatorType = .tradeFeedback
+    public weak var parentCoordinator: RootCoordinator?
+    public weak var finishDelegate: CoordinatorFinishDelegate?
+    
     public let tradeData: TradeData
     private let fetchFeedbackUseCase = DIContainer.resolve(FetchFeedbackUseCase.self)
     
@@ -42,6 +44,6 @@ public final class DefaultTradeHFeedbackCoordinator: TradeFeedbackCoordinator {
     }
     
     public func popToPrev() {
-        navigationController.popViewController(animated: true)
+        finish()
     }
 }

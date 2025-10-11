@@ -82,6 +82,7 @@ extension PrinciplesModel {
     }
     
     private func moveToReason() {
+        print(coordinator)
         coordinator?.pushToTradeReason(
             tradeType: tradeType,
             stock: stock,

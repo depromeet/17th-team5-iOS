@@ -17,9 +17,10 @@ import PrinciplesDomainInterface
 
 public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public var navigationController: UINavigationController
-    
     public var childCoordinators: [Coordinator] = []
-    public var parentCoordinator: RootCoordinator?
+    public var type: CoordinatorType = .principles
+    public weak var parentCoordinator: RootCoordinator?
+    public weak var finishDelegate: CoordinatorFinishDelegate?
     
     private let tradeType: TradeType
     private let stock: StockSearch
@@ -42,7 +43,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     }
     
     public func start() {
-        let principlesContainerView = viewBuilder.build(
+        let principlesContainerView = viewBuilder.buildContainer(
             coordinator: self,
             tradeType: tradeType,
             stock: stock,
@@ -55,22 +56,23 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     }
     
     public func popToPrev() {
-        navigationController.popViewController(animated: true)
+        finish()
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>) {
-        
-        // Navigate to TradeReason using parent coordinator
-        if let parent = parentCoordinator {
-            parent.pushToTradeReason(
-                tradeType: tradeType,
-                stock: stock,
-                tradeHistory: tradeHistory,
-                tradePrinciple: tradePrinciple,
-                selectedPrinciples: selectedPrinciples
-            )
-        } else {
-            print("   ❌ ERROR: parentCoordinator is nil!")
-        }
+    /// 매매 근거 기록하기 화면 이동
+    public func pushToTradeReason(
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradeHistory: TradeHistory,
+        tradePrinciple: [Principle],
+        selectedPrinciples: Set<Int>
+    ) {
+        parentCoordinator?.pushToTradeReason(
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory,
+            tradePrinciple: tradePrinciple,
+            selectedPrinciples: selectedPrinciples
+        )
     }
 }

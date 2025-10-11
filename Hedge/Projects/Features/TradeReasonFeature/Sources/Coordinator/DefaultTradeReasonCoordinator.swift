@@ -15,18 +15,25 @@ import RetrospectDomainInterface
 import StockDomainInterface
 import Shared
 import PrinciplesDomainInterface
+import AnalysisDomainInterface
+import PrinciplesFeatureInterface
 
 public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     public var navigationController: UINavigationController
-    
     public var childCoordinators: [Coordinator] = []
-    public var parentCoordinator: RootCoordinator?
+    public var type: CoordinatorType = .tradeReason
+    public weak var parentCoordinator: RootCoordinator?
+    public weak var finishDelegate: CoordinatorFinishDelegate?
     
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradeHistory: TradeHistory
     private let principles: [Principle]
     private let selectedPrinciples: Set<Int>
+    private let principleBuilder: PrinciplesViewBuilderProtocol
+    private let tradeReasonBuilder: TradeReasonViewBuilderProtocol
+    private let generateRetrospectUseCase = DIContainer.resolve(GenerateRetrospectUseCase.self)
+    private let analysisUseCase = DIContainer.resolve(AnalysisUseCase.self)
     
     public init(
         navigationController: UINavigationController,
@@ -34,34 +41,40 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         stock: StockSearch,
         tradeHistory: TradeHistory,
         principles: [Principle],
-        selectedPrinciples: Set<Int>
+        selectedPrinciples: Set<Int>,
+        principleBuilder: PrinciplesViewBuilderProtocol,
+        tradeReasonBuilder: TradeReasonViewBuilderProtocol
     ) {
+        
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
         self.principles = principles
         self.selectedPrinciples = selectedPrinciples
+        self.principleBuilder = principleBuilder
+        self.tradeReasonBuilder = tradeReasonBuilder
     }
     
     public func start() {
-        let tradeReasonInputView = TradeReasonInputView(
-            store: .init(
-                initialState: TradeReasonFeature.State(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, principles: principles, selectedPrinciples: selectedPrinciples),
-                reducer: {
-                    TradeReasonFeature(
-                        coordinator: self
-                    )
-                }
-            )
+        let tradeReasonInputView = tradeReasonBuilder.build(
+            coordinator: self,
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory,
+            principles: principles,
+            selectedPrinciples: selectedPrinciples,
+            principleBuilder: principleBuilder,
+            analysisUseCase: analysisUseCase,
+            generateRetrospectUseCase: generateRetrospectUseCase
         )
         
-        let viewController = UIHostingController(rootView: tradeReasonInputView)
+        let viewController = UIHostingController(rootView: AnyView(tradeReasonInputView))
         navigationController.pushViewController(viewController, animated: true)
     }
     
     public func popToPrev() {
-        navigationController.popViewController(animated: true)
+        finish()
     }
     
     public func pushToPrinciples(

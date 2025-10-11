@@ -21,6 +21,7 @@ public protocol PrinciplesModelProtocol {
 }
 
 // MARK: - Intent Action
+
 public protocol PrinciplesModelActionProtocol: AnyObject {
     func onAppear() async throws
     func backButtonTapped()

@@ -64,8 +64,6 @@ public struct PrinciplesView: View {
                     }
                 }
             }
-            
-            
         }
     }
 }

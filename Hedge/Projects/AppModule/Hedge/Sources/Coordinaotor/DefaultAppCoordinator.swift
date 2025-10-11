@@ -13,8 +13,9 @@ import Core
 import RootFeature
 
 final class DefaultAppCoordinator: AppCoordinator {
+    var finishDelegate: CoordinatorFinishDelegate?
+    var type: CoordinatorType = .app
     var navigationController: UINavigationController
-    
     var childCoordinators: [Coordinator] = []
     
     public init(navigationController: UINavigationController) {

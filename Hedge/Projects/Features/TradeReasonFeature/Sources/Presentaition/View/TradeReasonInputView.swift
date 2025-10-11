@@ -7,18 +7,21 @@
 //
 
 import SwiftUI
+
 import ComposableArchitecture
 import DesignKit
 import TradeReasonFeatureInterface
 import StockDomainInterface
+import Core
+
+import PrinciplesFeatureInterface
 
 struct TradeReasonInputView: View {
     
-    @Bindable public var store: StoreOf<TradeReasonFeature>
+    @StateObject var container: MVIContainer<TradeReasonIntentProtocol, TradeReasonModelProtocol>
     
-    public init(store: StoreOf<TradeReasonFeature>) {
-        self.store = store
-    }
+    private var intent: TradeReasonIntentProtocol { container.intent }
+    private var state: TradeReasonModelProtocol { container.model }
     
     @FocusState private var isFocused: Bool
     
@@ -27,9 +30,9 @@ struct TradeReasonInputView: View {
         ZStack {
             VStack(spacing: 0) {
                 HedgeNavigationBar(buttonText: "완료", onLeftButtonTap: {
-                    store.send(.view(.backButtonTapped))
+                    intent.backButtonTapped()
                 }, onRightButtonTap:  {
-                    store.send(.view(.nextTapped))
+                    intent.nextTapped()
                 })
                 
                 ScrollViewReader { proxy in
@@ -37,9 +40,9 @@ struct TradeReasonInputView: View {
                         VStack(spacing: 0) {
                             HedgeTopView(
                                 symbolImage: Image.hedgeUI.stockThumbnailDemo,
-                                title: store.state.stock.title,
-                                description: "\(store.state.tradeHistory.tradingPrice)・\(store.state.tradeHistory.tradingQuantity) \(store.state.tradeType == .buy ? "매수" : "매도")",
-                                footnote: store.state.tradeHistory.tradingDate,
+                                title: state.stock.title,
+                                description: "\(state.tradeHistory.tradingPrice)・\(state.tradeHistory.tradingQuantity) \(state.tradeType == .buy ? "매수" : "매도")",
+                                footnote: state.tradeHistory.tradingDate,
                                 buttonImage: Image.hedgeUI.pencil,
                                 buttonImageOnTapped: nil
                             )
@@ -50,13 +53,13 @@ struct TradeReasonInputView: View {
                                 .frame(maxWidth: .infinity)
                             
                             
-                            if !store.state.checkedItems.isEmpty || store.state.emotion != nil {
+                            if !state.checkedItems.isEmpty || state.emotion != nil {
                                 Rectangle()
                                     .frame(height: 16)
                                     .foregroundStyle(.clear)
                                 
                                 HStack(spacing: 8) {
-                                    if let emotion = store.state.emotion {
+                                    if let emotion = state.emotion {
                                         HStack(spacing: 4) {
                                             emotion.simpleImage
                                                 .resizable()
@@ -73,13 +76,13 @@ struct TradeReasonInputView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 10))
                                     }
                                     
-                                    if !store.state.checkedItems.isEmpty {
+                                    if !state.checkedItems.isEmpty {
                                         HStack(spacing: 4) {
                                             Image.hedgeUI.principleSimple
                                                 .resizable()
                                                 .frame(width: 16, height: 16)
                                             
-                                            Text("지킨 원칙 \(store.state.checkedItems.count)개")
+                                            Text("지킨 원칙 \(state.checkedItems.count)개")
                                                 .font(FontModel.caption1Semibold)
                                                 .foregroundStyle(Color.hedgeUI.textTitle)
                                         }
@@ -105,14 +108,14 @@ struct TradeReasonInputView: View {
                             }
                             
                             ZStack(alignment: .topLeading) {
-                                TextEditor(text: $store.state.text)
+                                TextEditor(text: $container.model.text)
                                     .focused($isFocused)
                                     .tint(.black)
                                     .font(FontModel.body3Medium)
                                     .foregroundStyle(Color.hedgeUI.textTitle)
                                     .scrollContentBackground(.hidden)
                                 
-                                if store.state.text.isEmpty && !isFocused {
+                                if state.text.isEmpty && !isFocused {
                                     Text("매매 근거를 작성해보세요")
                                         .font(FontModel.body3Medium)
                                         .foregroundStyle(Color.hedgeUI.textAssistive)
@@ -129,7 +132,7 @@ struct TradeReasonInputView: View {
                             .id("textEditorArea") // TextEditor 영역에 ID 부여
                         }
                     }
-                    .onChange(of: store.state.text) { _, newValue in
+                    .onChange(of: state.text) { _, newValue in
                         if isFocused && !newValue.isEmpty {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 proxy.scrollTo("textEditorArea", anchor: .bottom)
@@ -146,14 +149,14 @@ struct TradeReasonInputView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                FloatingToolbar(selectedButton: $store.state.selectedButton) { selectedType in
+                FloatingToolbar(selectedButton: $container.model.selectedButton) { selectedType in
                     switch selectedType {
                     case .generate:
                         break
                     case .emotion:
-                        store.send(.inner(.emotionShowTapped))
+                        intent.emotionShowTapped()
                     case .checklist:
-                        store.send(.inner(.checklistShowTapped))
+                        intent.checklistShowTapped()
                     }
                 }
             }
@@ -163,42 +166,43 @@ struct TradeReasonInputView: View {
                     Spacer()
                 }
                 
-                if let selectedButton = store.state.selectedButton {
+                if let selectedButton = state.selectedButton {
                     switch selectedButton {
                     case .generate:
-                        AIGenerateView(date: store.state.tradeHistory.tradingDate, contents: $store.state.contents) {
-                            store.send(.inner(.aiGenerateCloseTapped))
+                        AIGenerateView(date: state.tradeHistory.tradingDate, contents: $container.model.contents) {
+                            intent.aiGenerateCloseTapped()
                         }
                         .padding(.horizontal, 10)
                     case .emotion:
                         HedgeBottomSheet(
-                            isPresented: $store.state.isEmotionShow,
+                            isPresented: $container.model.isEmotionShow,
                             title: "당시 어떤 감정이었나요?",
                             primaryTitle: "기록하기",
                             onPrimary: {
-                                store.send(.inner(.emotionSelected(store.state.emotionSelection)))
+                                intent.emotionSelected(for: state.emotionSelection)
                             },
                             onClose: {
-                                store.send(.inner(.emotionCloseTapped))
+                                intent.emotionCloseTapped()
                             }, content: {
-                                EmotionBottomSheet(selection: $store.state.emotionSelection) // middle-only
+                                EmotionBottomSheet(selection: $container.model.emotionSelection) // middle-only
                             })
                         
                     case .checklist:
                         HedgeBottomSheet(
-                            isPresented: $store.state.isChecklistShow,
+                            isPresented: $container.model.isChecklistShow,
                             title: "투자 원칙",
                             primaryTitle: "기록하기",
                             onPrimary: {
-                                store.send(.inner(.checkListApproveTapped))
+                                intent.checkListApproveTapped()
                             },
                             onClose: {
-                                store.send(.inner(.checklistCloseTapped))
+                                intent.checklistCloseTapped()
                             }, content: {
-                                PrinciplesView(selectedPrinciples: $store.state.checkedItems,
-                                               principles: $store.state.principles)
-                                { selected in
-                                    store.send(.inner(.checklistTapped(id: selected)))
+                                PrinciplesView(
+                                    selectedPrinciples: $container.model.checkedItems,
+                                    principles: $container.model.principles
+                                ) { selected in
+                                    intent.checklistTapped(for: selected)
                                 }
                             })
                     }
@@ -211,7 +215,7 @@ struct TradeReasonInputView: View {
         }
         .animation(.easeInOut(duration: 0.5), value: isFocused)
         .onAppear {
-            store.send(.view(.onAppear))
+            intent.onAppear()
         }
     }
 }
