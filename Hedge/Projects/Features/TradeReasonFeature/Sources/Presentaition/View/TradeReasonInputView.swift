@@ -197,13 +197,14 @@ struct TradeReasonInputView: View {
                             },
                             onClose: {
                                 intent.checklistCloseTapped()
-                            }, content: {
-                                PrinciplesView(
-                                    selectedPrinciples: $container.model.checkedItems,
-                                    principles: $container.model.principles
-                                ) { selected in
-                                    intent.checklistTapped(for: selected)
-                                }
+                            },
+                            content: {
+                                AnyView(
+                                    state.principleBuilder.buildView(
+                                        principles: $container.model.principles,
+                                        selectedPrinciples: $container.model.checkedItems
+                                    )
+                                )
                             })
                     }
                 }

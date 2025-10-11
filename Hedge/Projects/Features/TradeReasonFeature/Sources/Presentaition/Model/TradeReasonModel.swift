@@ -33,8 +33,10 @@ public final class TradeReasonModel: ObservableObject, TradeReasonModelProtocol 
     @Published public var emotion: TradeEmotion? = nil
     @Published public var principlesView: any View = AnyView(EmptyView())
     
+    public let principleBuilder: PrinciplesViewBuilderProtocol
+    
     weak var coordinator: TradeReasonCoordinator?
-    private let principleBuilder: PrinciplesViewBuilderProtocol
+    
     private let analysisUseCase: AnalysisUseCase
     private let generateRetrospectUseCase: GenerateRetrospectUseCase
     private var checkedItemsTmp: Set<Int> = []
@@ -123,27 +125,6 @@ extension TradeReasonModel: TradeReasonModelActionProtocol {
 }
 
 extension TradeReasonModel {
-    private func makePrincipleView() {
-        principlesView = principleBuilder.buildView(
-            principles: .init(
-                get: {
-                    self.principles
-                },
-                set: { principles in
-                    self.principles = principles
-                }
-            ),
-            selectedPrinciples: .init(
-                get: {
-                    self.checkedItems
-                },
-                set: { selected in
-                    self.checkedItems = selected
-                }
-            )
-        )
-    }
-    
     private func fetchAnalysis() async throws {
         do {
             let response = try await analysisUseCase.execute(

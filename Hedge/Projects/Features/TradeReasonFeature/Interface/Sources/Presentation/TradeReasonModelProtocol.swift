@@ -30,6 +30,7 @@ public protocol TradeReasonModelProtocol {
     var contents: String? { get set }
     var emotion: TradeEmotion? { get }
     var principlesView: any View { get }
+    var principleBuilder: PrinciplesViewBuilderProtocol { get }
 }
 
 // MARK: - Intent Action

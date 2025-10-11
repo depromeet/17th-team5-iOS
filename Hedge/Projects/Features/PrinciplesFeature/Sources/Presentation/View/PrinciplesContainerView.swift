@@ -29,10 +29,7 @@ extension PrinciplesContainerView {
     private var principleView: some View {
         PrinciplesView(
             selectedPrinciples: $container.model.selectedPrinciples,
-            principles: $container.model.principles,
-            onPrincipleTapped: { principleId in
-                intent.principleToggled(index: principleId)
-            }
+            principles: $container.model.principles
         )
     }
     

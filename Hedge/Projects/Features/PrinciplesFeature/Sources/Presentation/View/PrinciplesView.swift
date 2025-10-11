@@ -15,7 +15,6 @@ public struct PrinciplesView: View {
     
     @Binding var selectedPrinciples: Set<Int>
     @Binding var principles: [Principle]
-    var onPrincipleTapped: ((Int) -> Void)? = nil
     
     public var body: some View {
         
@@ -49,7 +48,11 @@ public struct PrinciplesView: View {
                                 }
                             }
                             .onTapGesture {
-                                onPrincipleTapped?(principle.id)
+                                if selectedPrinciples.contains(principle.id) {
+                                    selectedPrinciples.remove(principle.id)
+                                } else {
+                                    selectedPrinciples.insert(principle.id)
+                                }
                             }
                         }
                         .padding(.vertical, 22)
@@ -92,14 +95,7 @@ public struct PrinciplesView: View {
                 .init(id: 3, principle: "단기 등락에 흔들리지 말고 기업의 장기 성장성에 집중하기"),
                 .init(id: 4, principle: "분산 투자 원칙을 지키고 감정적 결정을 피하기"),
                 .init(id: 5, principle: "리스크를 관리하며 손절 기준을 미리 정해두기")
-            ]),
-            onPrincipleTapped: { principleId in
-                if selectedPrinciples.contains(principleId) {
-                    selectedPrinciples.remove(principleId)
-                } else {
-                    selectedPrinciples.insert(principleId)
-                }
-            }
+            ])
         )
     }
 }

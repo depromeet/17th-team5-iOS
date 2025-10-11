@@ -55,7 +55,6 @@ public final class DefaultRootCoordinator: RootCoordinator {
         
         let viewController = UIHostingController(rootView: tabView)
         navigationController.viewControllers = [viewController]
-        pushToTradeHistory(tradeType: .buy, stock: .init(symbol: "", title: "", market: ""))
     }
     
     public func pushToStockSearch(with tradeType: TradeType) {
