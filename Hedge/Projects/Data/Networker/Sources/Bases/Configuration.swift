@@ -10,5 +10,5 @@ import Foundation
 
 // TODO: 추후 XCConfig 이동
 public enum Configuration {
-    public static let baseURL: String = "http://13.209.109.151:8080"
+    public static let baseURL: String = "http://foodiy.iptime.org:28080"
 }
