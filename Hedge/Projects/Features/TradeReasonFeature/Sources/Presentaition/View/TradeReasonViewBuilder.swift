@@ -36,13 +36,16 @@ public struct TradeReasonViewBuilder: TradeReasonViewBuilderProtocol {
             tradeHistory: tradeHistory,
             principles: principles,
             selectedPrinciples: selectedPrinciples,
-            principleBuilder: principleBuilder,
+            principleBuilder: principleBuilder
+        )
+        
+        var intent = TradeReasonIntent(
+            state: model,
+            modelAction: model,
             analysisUseCase: analysisUseCase,
             generateRetrospectUseCase: generateRetrospectUseCase
         )
-        model.coordinator = coordinator
-        
-        let intent = TradeReasonIntent(modelAction: model)
+        intent.coordinator = coordinator
         
         let container = MVIContainer(
             intent: intent as TradeReasonIntentProtocol,

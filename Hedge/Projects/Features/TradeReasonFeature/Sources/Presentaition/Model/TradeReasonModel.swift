@@ -28,17 +28,11 @@ public final class TradeReasonModel: ObservableObject, TradeReasonModelProtocol 
     @Published public var isEmotionShow: Bool = false
     @Published public var isChecklistShow: Bool = false
     @Published public var checkedItems: Set<Int> = []
-    @Published public var text: String = ""
     @Published public var contents: String? = nil
     @Published public var emotion: TradeEmotion? = nil
-    @Published public var principlesView: any View = AnyView(EmptyView())
+    @Published public var text: String = ""
     
     public let principleBuilder: PrinciplesViewBuilderProtocol
-    
-    weak var coordinator: TradeReasonCoordinator?
-    
-    private let analysisUseCase: AnalysisUseCase
-    private let generateRetrospectUseCase: GenerateRetrospectUseCase
     private var checkedItemsTmp: Set<Int> = []
     
     public init(
@@ -47,9 +41,7 @@ public final class TradeReasonModel: ObservableObject, TradeReasonModelProtocol 
         tradeHistory: TradeHistory,
         principles: [Principle],
         selectedPrinciples: Set<Int>,
-        principleBuilder: PrinciplesViewBuilderProtocol,
-        analysisUseCase: AnalysisUseCase,
-        generateRetrospectUseCase: GenerateRetrospectUseCase
+        principleBuilder: PrinciplesViewBuilderProtocol
     ) {
         self.tradeType = tradeType
         self.stock = stock
@@ -58,138 +50,116 @@ public final class TradeReasonModel: ObservableObject, TradeReasonModelProtocol 
         self.checkedItems = selectedPrinciples
         self.checkedItemsTmp = selectedPrinciples
         self.principleBuilder = principleBuilder
-        self.analysisUseCase = analysisUseCase
-        self.generateRetrospectUseCase = generateRetrospectUseCase
     }
 }
 
+// MARK: - Binding Properties
+
+extension TradeReasonModel {
+    public var textBinding: Binding<String> {
+        Binding (
+            get: { self.text },
+            set: { self.text = $0 }
+        )
+    }
+    
+    public var selectedButtonBinding: Binding<FloatingButtonSelectType?> {
+        Binding (
+            get: { self.selectedButton },
+            set: { self.selectedButton = $0 }
+        )
+    }
+
+    public var emotionSelectionBinding: Binding<Int> {
+        Binding (
+            get: { self.emotionSelection },
+            set: { self.emotionSelection = $0 }
+        )
+    }
+
+    public var isEmotionShowBinding: Binding<Bool> {
+        Binding (
+            get: { self.isEmotionShow },
+            set: { self.isEmotionShow = $0 }
+        )
+    }
+    
+    public var principlesBinding: Binding<[Principle]> {
+        Binding (
+            get: { self.principles },
+            set: { self.principles = $0 }
+        )
+    }
+    
+    public var isChecklistShowBinding: Binding<Bool> {
+        Binding (
+            get: { self.isChecklistShow },
+            set: { self.isChecklistShow = $0 }
+        )
+    }
+    
+    public var checkedItemsBinding: Binding<Set<Int>> {
+        Binding (
+            get: { self.checkedItems },
+            set: { self.checkedItems = $0 }
+        )
+    }
+    
+    public var contentsBinding: Binding<String?> {
+        Binding (
+            get: { self.contents },
+            set: { self.contents = $0 }
+        )
+    }
+}
+
+// MARK: - Model Actions
+
 extension TradeReasonModel: TradeReasonModelActionProtocol {
-    public func onAppear() {
-        Task {
-            try await fetchAnalysis()
-        }
-    }
-    
-    public func backButtonTapped() {
-        coordinator?.popToPrev()
-    }
-    
-    public func nextTapped() {
-        Task {
-            try await generateRetrospection()
-        }
-    }
-    
-    public func aiGenerateCloseTapped() {
+    public func dismissAIGenerate() {
         selectedButton = nil
     }
     
-    public func emotionShowTapped() {
+    public func presentEmotion() {
         isEmotionShow = true
     }
     
-    public func emotionSelected(for index: Int) {
+    public func dismissEmotion() {
+        isEmotionShow = false
+        selectedButton = nil
+    }
+    
+    public func selectEmotion(for index: Int) {
         emotion = TradeEmotion(rawValue: index)
         isEmotionShow = false
         selectedButton = nil
     }
     
-    public func emotionCloseTapped() {
-        isEmotionShow = false
-        selectedButton = nil
-    }
-    
-    public func checklistShowTapped() {
+    public func presentChecklist() {
         isChecklistShow = true
     }
     
-    public func checkListApproveTapped() {
+    public func confirmCheckList() {
         checkedItemsTmp = checkedItems
         isChecklistShow = false
         selectedButton = nil
     }
     
-    public func checklistCloseTapped() {
+    public func dismissChecklist() {
         checkedItems = checkedItemsTmp
         isChecklistShow = false
         selectedButton = nil
     }
     
-    public func checklistTapped(for id: Int) {
+    public func selectChecklist(for id: Int) {
         if checkedItems.contains(id) {
             checkedItems.remove(id)
         } else {
             checkedItems.insert(id)
         }
     }
-}
-
-extension TradeReasonModel {
-    private func fetchAnalysis() async throws {
-        do {
-            let response = try await analysisUseCase.execute(
-                market: stock.market,
-                symbol: stock.symbol,
-                time: tradeHistory.tradingDate.toDateTimeString()
-            )
-            analysisSuccess(with: response)
-        } catch {
-            handleError(with: error)
-        }
-    }
     
-    private func generateRetrospection() async throws {
-        let checks = principles.map { PrincipleCheck(principleId: $0.id, isFollowed: true) }
-        let principleChecks = checks.filter { checkedItems.contains($0.principleId) }
-        
-        let request = GenerateRetrospectRequest(
-            symbol: stock.symbol,
-            market: stock.market,
-            orderType: OrderType(rawValue: tradeType.toRequest) ?? .buy,
-            price: tradeHistory.tradingPrice.extractNumbers(),
-            currency: tradeHistory.concurrency,
-            volume: tradeHistory.tradingQuantity.extractNumbers(),
-            orderDate: tradeHistory.tradingDate.toDateString(),
-            returnRate: tradeHistory.yield?.extractDecimalNumber() ?? 0,
-            content: text,
-            principleChecks: principleChecks,
-            emotion: Emotion(rawValue: (emotion?.engValue) ?? Emotion.neutral.rawValue) ?? .neutral
-        )
-        
-        do {
-            let response = try await generateRetrospectUseCase.execute(request)
-            generateSuccess(with: response)
-        } catch {
-            handleError(with: error)
-        }
-    }
-    
-    private func analysisSuccess(with response: String) {
+    public func fetchAnalysisContent(with text: String) {
         contents = text
-    }
-    
-    private func generateSuccess(with id: Int) {
-        Log.debug("\(id)")
-        let checks = principles
-        let principleChecks = checks.filter { checkedItems.contains($0.id) }
-        
-        let tradeData = TradeData(
-            id: id,
-            tradeType: tradeType,
-            stockSymbol: stock.symbol,
-            stockTitle: stock.title,
-            stockMarket: stock.market,
-            tradingPrice: tradeHistory.tradingPrice,
-            tradingQuantity: tradeHistory.tradingQuantity,
-            tradingDate: tradeHistory.tradingDate,
-            emotion: emotion,
-            tradePrinciple: principleChecks,
-            retrospection: text
-        )
-        coordinator?.pushToFeedback(tradeData: tradeData)
-    }
-    
-    private func handleError(with error: Error) {
-        Log.error(error.localizedDescription)
     }
 }

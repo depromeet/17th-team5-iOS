@@ -21,33 +21,39 @@ public protocol TradeReasonModelProtocol {
     var stock: StockSearch { get }
     var tradeHistory: TradeHistory { get }
     var principles: [Principle] { get set }
-    var selectedButton: FloatingButtonSelectType? { get set }
-    var emotionSelection: Int { get set }
-    var isEmotionShow: Bool { get set }
-    var isChecklistShow: Bool { get set }
-    var checkedItems: Set<Int> { get set }
-    var text: String { get set }
-    var contents: String? { get set }
+    var selectedButton: FloatingButtonSelectType? { get }
+    var emotionSelection: Int { get }
+    var isEmotionShow: Bool { get }
+    var isChecklistShow: Bool { get }
+    var checkedItems: Set<Int> { get }
+    var text: String { get }
+    var contents: String? { get }
     var emotion: TradeEmotion? { get }
-    var principlesView: any View { get }
     var principleBuilder: PrinciplesViewBuilderProtocol { get }
+    
+    var principlesBinding: Binding<[Principle]> { get }
+    var textBinding: Binding<String> { get }
+    var selectedButtonBinding: Binding<FloatingButtonSelectType?> { get }
+    var emotionSelectionBinding: Binding<Int> { get }
+    var isEmotionShowBinding: Binding<Bool> { get }
+    var isChecklistShowBinding: Binding<Bool> { get }
+    var checkedItemsBinding: Binding<Set<Int>> { get }
+    var contentsBinding: Binding<String?> { get }
 }
 
 // MARK: - Intent Action
 
 public protocol TradeReasonModelActionProtocol: AnyObject {
-    func onAppear()
-    func backButtonTapped()
-    func nextTapped()
+    func dismissAIGenerate()
     
-    func aiGenerateCloseTapped()
+    func presentEmotion()
+    func dismissEmotion()
+    func selectEmotion(for index: Int)
     
-    func emotionShowTapped()
-    func emotionSelected(for index: Int)
-    func emotionCloseTapped()
+    func presentChecklist()
+    func dismissChecklist()
+    func confirmCheckList()
+    func selectChecklist(for id: Int)
     
-    func checklistShowTapped()
-    func checkListApproveTapped()
-    func checklistCloseTapped()
-    func checklistTapped(for id: Int)
+    func fetchAnalysisContent(with text: String)
 }

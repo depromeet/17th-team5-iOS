@@ -26,7 +26,6 @@ struct TradeReasonInputView: View {
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        
         ZStack {
             VStack(spacing: 0) {
                 HedgeNavigationBar(buttonText: "완료", onLeftButtonTap: {
@@ -108,7 +107,7 @@ struct TradeReasonInputView: View {
                             }
                             
                             ZStack(alignment: .topLeading) {
-                                TextEditor(text: $container.model.text)
+                                TextEditor(text: state.textBinding)
                                     .focused($isFocused)
                                     .tint(.black)
                                     .font(FontModel.body3Medium)
@@ -149,7 +148,7 @@ struct TradeReasonInputView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                FloatingToolbar(selectedButton: $container.model.selectedButton) { selectedType in
+                FloatingToolbar(selectedButton: state.selectedButtonBinding) { selectedType in
                     switch selectedType {
                     case .generate:
                         break
@@ -169,7 +168,7 @@ struct TradeReasonInputView: View {
                 if let selectedButton = state.selectedButton {
                     switch selectedButton {
                     case .generate:
-                        AIGenerateView(date: state.tradeHistory.tradingDate, contents: $container.model.contents) {
+                        AIGenerateView(date: state.tradeHistory.tradingDate, contents: state.contentsBinding) {
                             intent.aiGenerateCloseTapped()
                         }
                         .padding(.horizontal, 10)
@@ -187,14 +186,14 @@ struct TradeReasonInputView: View {
         .onAppear {
             intent.onAppear()
         }
-        .hedgeBottomSheet(isPresented: $container.model.isEmotionShow) {
-            EmotionBottomSheet(selection: $container.model.emotionSelection) // middle-only
+        .hedgeBottomSheet(isPresented: state.isEmotionShowBinding) {
+            EmotionBottomSheet(selection: state.emotionSelectionBinding)
         }
-        .hedgeBottomSheet(isPresented: $container.model.isChecklistShow, ratio: 0.8) {
+        .hedgeBottomSheet(isPresented: state.isChecklistShowBinding, ratio: 0.8) {
             AnyView(
                 state.principleBuilder.buildView(
-                    principles: $container.model.principles,
-                    selectedPrinciples: $container.model.checkedItems
+                    principles: state.principlesBinding,
+                    selectedPrinciples: state.checkedItemsBinding
                 )
             )
         }
