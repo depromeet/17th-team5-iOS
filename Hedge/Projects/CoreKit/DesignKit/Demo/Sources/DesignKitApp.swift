@@ -103,9 +103,15 @@ struct ContentView: View {
                             }
                         }
                         
-                        NavigationLink(destination: FloatingToolbar{_ in}) {
+//                        NavigationLink(destination: FloatingToolbar{_ in}) {
+//                            HStack {
+//                                Text("FloatingToolbar")
+//                            }
+//                        }
+                        
+                        NavigationLink(destination: BottomSheetView()) {
                             HStack {
-                                Text("FloatingToolbar")
+                                Text("BottomSheet")
                             }
                         }
                     }

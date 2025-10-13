@@ -10,58 +10,69 @@ import UIKit
 import SwiftUI
 import ComposableArchitecture
 import Core
+import Shared
 import PrinciplesFeatureInterface
 import StockDomainInterface
 import PrinciplesDomainInterface
 
 public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public var navigationController: UINavigationController
-    
     public var childCoordinators: [Coordinator] = []
-    public var parentCoordinator: RootCoordinator?
+    public var type: CoordinatorType = .principles
+    public weak var parentCoordinator: RootCoordinator?
+    public weak var finishDelegate: CoordinatorFinishDelegate?
     
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradeHistory: TradeHistory
+    private let viewBuilder: PrinciplesViewBuilderProtocol
+    private let fetchPrinciplesUseCase = DIContainer.resolve(FetchPrinciplesUseCase.self)
     
-    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
+    public init(
+        navigationController: UINavigationController,
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradeHistory: TradeHistory,
+        viewBuilder: PrinciplesViewBuilderProtocol
+    ) {
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
+        self.viewBuilder = viewBuilder
     }
     
     public func start() {
-            let principlesView = PrinciplesContainerView(
-                store: .init(
-                    initialState: PrinciplesFeature.State(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory),
-                    reducer: {
-                        PrinciplesFeature(coordinator: self)
-                    }
-                )
-            )
+        let principlesContainerView = viewBuilder.buildContainer(
+            coordinator: self,
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory,
+            fetchPrinciplesUseCase: fetchPrinciplesUseCase
+        )
         
-        let viewController = UIHostingController(rootView: principlesView)
+        let viewController = UIHostingController(rootView: AnyView(principlesContainerView))
         navigationController.pushViewController(viewController, animated: true)
     }
     
     public func popToPrev() {
-        navigationController.popViewController(animated: true)
+        finish()
     }
     
-    public func pushToTradeReason(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, tradePrinciple: [Principle], selectedPrinciples: Set<Int>) {
-        
-        // Navigate to TradeReason using parent coordinator
-        if let parent = parentCoordinator {
-            parent.pushToTradeReason(
-                tradeType: tradeType,
-                stock: stock,
-                tradeHistory: tradeHistory,
-                tradePrinciple: tradePrinciple,
-                selectedPrinciples: selectedPrinciples
-            )
-        } else {
-            print("   ❌ ERROR: parentCoordinator is nil!")
-        }
+    /// 매매 근거 기록하기 화면 이동
+    public func pushToTradeReason(
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradeHistory: TradeHistory,
+        tradePrinciple: [Principle],
+        selectedPrinciples: Set<Int>
+    ) {
+        parentCoordinator?.pushToTradeReason(
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory,
+            tradePrinciple: tradePrinciple,
+            selectedPrinciples: selectedPrinciples
+        )
     }
 }

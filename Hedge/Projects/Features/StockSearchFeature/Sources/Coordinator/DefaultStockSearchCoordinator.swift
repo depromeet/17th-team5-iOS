@@ -18,9 +18,10 @@ import StockDomainInterface
 
 public final class DefaultStockSearchCoordinator: StockSearchCoordinator {
     public var navigationController: UINavigationController
-    
     public var childCoordinators: [Coordinator] = []
-    public var parentCoordinator: RootCoordinator?
+    public var type: CoordinatorType = .stockSearch
+    public weak var parentCoordinator: RootCoordinator?
+    public weak var finishDelegate: CoordinatorFinishDelegate?
     
     public var tradeType: TradeType
     
@@ -51,7 +52,7 @@ public final class DefaultStockSearchCoordinator: StockSearchCoordinator {
     }
     
     public func popToPrev() {
-        navigationController.popViewController(animated: true)
+        finish()
     }
     
     public func pushToTradeHistory(tradeType: TradeType, stock: StockSearch) {

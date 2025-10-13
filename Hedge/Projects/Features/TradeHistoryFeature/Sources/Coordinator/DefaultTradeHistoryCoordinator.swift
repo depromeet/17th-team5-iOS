@@ -15,9 +15,11 @@ import TradeHistoryFeatureInterface
 
 public final class DefaultTradeHistoryCoordinator: TradeHistoryCoordinator {
     public var navigationController: UINavigationController
-    
     public var childCoordinators: [Coordinator] = []
-    public var parentCoordinator: RootCoordinator?
+    public var type: CoordinatorType = .tradeHistory
+    public weak var parentCoordinator: RootCoordinator?
+    public weak var finishDelegate: CoordinatorFinishDelegate?
+    
     public let tradeType: TradeType
     public let stockSearch: StockSearch
     
@@ -49,7 +51,7 @@ public final class DefaultTradeHistoryCoordinator: TradeHistoryCoordinator {
     }
     
     public func popToPrev() {
-        navigationController.popViewController(animated: true)
+        finish()
     }
     
     public func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
