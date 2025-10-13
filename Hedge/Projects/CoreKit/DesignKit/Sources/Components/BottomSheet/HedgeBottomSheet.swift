@@ -33,6 +33,7 @@ struct BottomSheetContainer<Content: View>: View {
     @State private var contentHeight: CGFloat = 0
     @State private var dragOffset: CGFloat = 0
     @State private var offset: CGFloat = 0
+    @State private var isScrollable: Bool = false
     @Environment(\.safeAreaInsets) private var safeAreaInset
     
     var body: some View {
@@ -46,18 +47,22 @@ struct BottomSheetContainer<Content: View>: View {
                 Spacer()
             }
             .frame(height: headerHeight)
-            
-            content
-                .padding(.bottom, safeAreaInset.bottom)
-        }
-        .background(
-            GeometryReader { proxy in
-                Color.clear.onAppear {
-                    contentHeight = proxy.size.height
-                }
+            ScrollView {
+                content
+                    .padding(.bottom, safeAreaInset.bottom)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.onAppear {
+                                contentHeight = proxy.size.height + headerHeight
+                                isScrollable = contentHeight > maxHeight
+                            }
+                        }
+                    )
             }
-        )
-        .frame(height: min(contentHeight, maxHeight))
+            .scrollIndicators(.hidden)
+            .scrollDisabled(!isScrollable)
+        }
+        .frame(height: maxMainContentHeight())
         .frame(maxWidth: .infinity)
         .background(Color.hedgeUI.backgroundWhite)
         .clipShape(RoundedCorner(radius: cornerRadius, corners: [.topLeft, .topRight]))
@@ -81,6 +86,10 @@ struct BottomSheetContainer<Content: View>: View {
                 }
         )
         .transition(.move(edge: .bottom))
+    }
+    
+    private func maxMainContentHeight() -> CGFloat? {
+        return contentHeight > 0 ? min(contentHeight, maxHeight) : nil
     }
 }
 
