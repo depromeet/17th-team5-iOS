@@ -235,7 +235,7 @@ private extension Comparable {
                 Button("Show Emotion Sheet") { showSheet = true }
                     .padding(.top, 40)
             }
-            .hedgeBottomSheet(isPresented: $showSheet) {
+            .hedgeBottomSheet(isPresented: $showSheet, title: "감정 선택", maxHeight: 0.8) {
                 EmotionBottomSheet(selection: $sel)
             }
         }

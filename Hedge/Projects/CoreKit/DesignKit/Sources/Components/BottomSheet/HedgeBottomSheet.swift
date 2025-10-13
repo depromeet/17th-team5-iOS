@@ -8,30 +8,6 @@
 
 import SwiftUI
 
-/// 바텀시트 높이 설정 타입
-public enum BottomSheetHeight {
-    /// 화면 비율 기반 높이 (0.0 ~ 1.0)
-    case ratio(CGFloat)
-    /// 고정 높이 (pt)
-    case fixed(CGFloat)
-    
-    /// 컨텐츠 크기에 맞춰 자동 조절
-    case contentSize
-    
-    func calculate(screenHeight: CGFloat) -> CGFloat? {
-        switch self {
-        case .ratio(let ratio):
-            return screenHeight * min(max(ratio, 0), 1)
-        case .fixed(let height):
-            return min(height, screenHeight)
-        case .contentSize:
-            return nil
-        }
-    }
-}
-
-// MARK: - Components
-
 /// 바텀시트 배경 딤
 struct BottomSheetDimBackground: View {
     let onTap: () -> Void
@@ -46,33 +22,43 @@ struct BottomSheetDimBackground: View {
 
 /// 바텀시트 컨테이너
 struct BottomSheetContainer<Content: View>: View {
-    let height: CGFloat?
+    let title: String
+    let maxHeight: CGFloat
     let cornerRadius: CGFloat
-    let topPadding: CGFloat
     let onDragEnded: (DragGesture.Value) -> Void
     let minDismissOffset: CGFloat
     let content: Content
+    let headerHeight: CGFloat = 62
     
+    @State private var contentHeight: CGFloat = 0
     @State private var dragOffset: CGFloat = 0
     @State private var offset: CGFloat = 0
     @Environment(\.safeAreaInsets) private var safeAreaInset
     
     var body: some View {
-        ZStack {
-            if let height = height {
-                ScrollView(showsIndicators: false) {
-                    content
-                        .frame(maxWidth: .infinity)
-                }
-                .padding(.top, topPadding)
-                .frame(height: height + safeAreaInset.bottom)
-                
-            } else {
-                content
-                    .padding(.top, topPadding)
-                    .padding(.bottom, safeAreaInset.bottom)
+        VStack(spacing: 0) {
+            HStack {
+                Text(title)
+                    .font(.h2Semibold)
+                    .foregroundStyle(Color.hedgeUI.grey900)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 26)
+                Spacer()
             }
+            .frame(height: headerHeight)
+            
+            content
+                .padding(.bottom, safeAreaInset.bottom)
         }
+        .background(
+            GeometryReader { proxy in
+                Color.clear.onAppear {
+                    contentHeight = proxy.size.height
+                }
+            }
+        )
+        .frame(height: min(contentHeight, maxHeight))
+        .frame(maxWidth: .infinity)
         .background(Color.hedgeUI.backgroundWhite)
         .clipShape(RoundedCorner(radius: cornerRadius, corners: [.topLeft, .topRight]))
         .offset(y: offset + dragOffset)

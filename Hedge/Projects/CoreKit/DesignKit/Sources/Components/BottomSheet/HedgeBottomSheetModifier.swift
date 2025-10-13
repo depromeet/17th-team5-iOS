@@ -10,26 +10,28 @@ import SwiftUI
 
 public struct HedgeBottomSheetModifier<SheetContent: View>: ViewModifier {
     @Binding var isPresented: Bool
-    let height: BottomSheetHeight
+    let title: String
+    let maxHeight: CGFloat
     let sheetContent: () -> SheetContent
     
     @State private var lastOffset: CGFloat = 0
     
-    private let minDismissOffset: CGFloat = 150
-    private let topPadding: CGFloat = 22
+    private let minDismissOffset: CGFloat = 100
     private let cornerRadius: CGFloat = 24
-    private let screenHeight = UIScreen.main.bounds.height
-    private let sheetHeight: CGFloat?
+    private var screenHeight: CGFloat {
+        UIScreen.main.bounds.height * maxHeight
+    }
     
     public init(
         isPresented: Binding<Bool>,
-        height: BottomSheetHeight,
+        title: String,
+        maxHeight: CGFloat,
         @ViewBuilder sheetContent: @escaping () -> SheetContent
     ) {
         self._isPresented = isPresented
-        self.height = height
+        self.maxHeight = maxHeight
         self.sheetContent = sheetContent
-        sheetHeight = height.calculate(screenHeight: screenHeight)
+        self.title = title
     }
     
     public func body(content: Content) -> some View {
@@ -43,9 +45,9 @@ public struct HedgeBottomSheetModifier<SheetContent: View>: ViewModifier {
                     )
                     
                     BottomSheetContainer(
-                        height: sheetHeight,
+                        title: title,
+                        maxHeight: screenHeight,
                         cornerRadius: cornerRadius,
-                        topPadding: topPadding,
                         onDragEnded: handleDragEnded,
                         minDismissOffset: minDismissOffset,
                         content: sheetContent()

@@ -17,23 +17,10 @@ struct BottomSheetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .hedgeBottomSheet(isPresented: $isPresented, ratio: 0.8) {
+        .hedgeBottomSheet(isPresented: $isPresented, title: "타이틀", maxHeight: 0.8) {
             VStack {
                 Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                Text("hi my name is junyoung")
-                HStack {
-                    Text("hi my name is junyoung")
-                    Spacer()
-                    Text("hi my name is junyoung")
-                }
+                    .frame(height: 50)
             }
         }
     }
