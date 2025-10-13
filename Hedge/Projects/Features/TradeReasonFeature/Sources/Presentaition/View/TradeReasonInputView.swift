@@ -193,10 +193,10 @@ struct TradeReasonInputView: View {
         .onAppear {
             intent.onAppear()
         }
-        .hedgeBottomSheet(isPresented: state.isEmotionShowBinding, title: "감정 선택", maxHeight: 0.9) {
+        .hedgeBottomSheet(isPresented: state.isEmotionShowBinding, title: "감정 선택", maxHeight: 0.85) {
             EmotionBottomSheet(selection: state.emotionSelectionBinding)
         }
-        .hedgeBottomSheet(isPresented: state.isChecklistShowBinding, title: "체크리스트", maxHeight: 0.9) {
+        .hedgeBottomSheet(isPresented: state.isChecklistShowBinding, title: "체크리스트", maxHeight: 0.85) {
             AnyView(
                 state.principleBuilder.buildView(
                     principles: state.principlesBinding,
