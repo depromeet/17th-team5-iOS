@@ -46,7 +46,7 @@ struct TradeReasonInputView: View {
                                 buttonImageOnTapped: nil
                             )
                             
-                            if store.state.tradeType == .buy {
+                            if state.tradeType == .buy {
                                 Image.hedgeUI.chartDemoBuy
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
@@ -193,10 +193,10 @@ struct TradeReasonInputView: View {
         .onAppear {
             intent.onAppear()
         }
-        .hedgeBottomSheet(isPresented: state.isEmotionShowBinding) {
+        .hedgeBottomSheet(isPresented: state.isEmotionShowBinding, title: "감정 선택", maxHeight: 0.85) {
             EmotionBottomSheet(selection: state.emotionSelectionBinding)
         }
-        .hedgeBottomSheet(isPresented: state.isChecklistShowBinding, ratio: 0.8) {
+        .hedgeBottomSheet(isPresented: state.isChecklistShowBinding, title: "체크리스트", maxHeight: 0.85) {
             AnyView(
                 state.principleBuilder.buildView(
                     principles: state.principlesBinding,
