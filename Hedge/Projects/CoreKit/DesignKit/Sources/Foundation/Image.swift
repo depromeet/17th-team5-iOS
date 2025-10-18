@@ -75,6 +75,14 @@ extension HedgeUI where Base == Image {
     public static var neutral: Image { asset(#function) }
     public static var neutralOff: Image { asset(#function) }
     
+    // MARK: Size 40
+    public static var keep: Image { asset(#function) }
+    public static var keepDisabled: Image { asset(#function) }
+    public static var normal: Image { asset(#function) }
+    public static var normalDisabled: Image { asset(#function) }
+    public static var notKeep: Image { asset(#function) }
+    public static var notKeepDisabled: Image { asset(#function) }
+    
     // MARK: Size 48
     public static var anxiousOn: Image { asset(#function) }
     public static var confidenceOn: Image { asset(#function) }
