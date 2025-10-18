@@ -46,7 +46,7 @@ struct TradeReasonInputView: View {
                                 buttonImageOnTapped: nil
                             )
                             
-                            if store.state.tradeType == .buy {
+                            if state.tradeType == .buy {
                                 Image.hedgeUI.chartDemoBuy
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)

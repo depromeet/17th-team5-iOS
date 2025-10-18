@@ -1,0 +1,182 @@
+import Foundation
+
+import ComposableArchitecture
+
+import Core
+import Shared
+
+import StockDomainInterface
+import PrinciplesDomainInterface
+
+@Reducer
+public struct PrincipleReviewFeature {
+    
+    public enum Evaluation {
+        case keep
+        case normal
+        case notKeep
+    }
+    
+    public init() {
+        
+    }
+    
+    @ObservableState
+    public struct State: Equatable {
+        public var tradeType: TradeType
+        public var stock: StockSearch
+        public var tradeHistory: TradeHistory
+        public var principles: [Principle]
+        public var selectedEvaluation: Evaluation? = nil
+        public var principleDetailShown: Bool = false
+        // public var text: String = ""
+        
+        public var totalIndex: Int {
+            principles.count
+        }
+        
+        private var selectedIndex: Int = 0
+        
+        public var selectedPrinciple: Principle {
+            principles[selectedIndex]
+        }
+        
+        // public var textBinding: Binding<String> {
+        //     Binding (
+        //         get: { self.text },
+        //         set: { self.text = $0 }
+        //     )
+        // }
+        
+        public init(tradeType: TradeType,
+                    stock: StockSearch,
+                    tradeHistory: TradeHistory,
+                    principles: [Principle]) {
+            self.tradeType = tradeType
+            self.stock = stock
+            self.tradeHistory = tradeHistory
+            self.principles = principles
+        }
+    }
+    
+    public enum Action: FeatureAction, ViewAction, BindableAction {
+        case binding(BindingAction<State>)
+        case view(View)
+        case inner(InnerAction)
+        case async(AsyncAction)
+        case scope(ScopeAction)
+        case delegate(DelegateAction)
+    }
+    
+    public enum View {
+        case onAppear
+        case backButtonTapped
+        case keepButtonTapped
+        case normalButtonTapped
+        case notKeepButtonTapped
+        case pricipleToggleButtonTapped
+    }
+    public enum InnerAction {
+        
+    }
+    public enum AsyncAction {
+        
+    }
+    public enum ScopeAction { }
+    public enum DelegateAction { }
+    
+    // MARK: - Debounce ID
+    private enum CancelID { case searchDebounce }
+    
+    public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
+        Reduce(reducerCore)
+    }
+}
+
+extension PrincipleReviewFeature {
+    // MARK: - Reducer Core
+    func reducerCore(
+        _ state: inout State,
+        _ action: Action
+    ) -> Effect<Action> {
+        switch action {
+        case .binding:
+            return .none
+            
+        case .view(let action):
+            return viewCore(&state, action)
+            
+        case .inner(let action):
+            return innerCore(&state, action)
+            
+        case .async(let action):
+            return asyncCore(&state, action)
+            
+        case .scope(let action):
+            return scopeCore(&state, action)
+            
+        case .delegate(let action):
+            return delegateCore(&state, action)
+        }
+    }
+    
+    // MARK: - View Core
+    func viewCore(
+        _ state: inout State,
+        _ action: View
+    ) -> Effect<Action> {
+        switch action {
+        case .onAppear:
+            return .none
+            
+        case .backButtonTapped:
+            return .none
+        case .keepButtonTapped:
+            state.selectedEvaluation = state.selectedEvaluation == .keep ? nil : .keep
+            return .none
+        case .normalButtonTapped:
+            state.selectedEvaluation = state.selectedEvaluation == .normal ? nil : .normal
+            return .none
+        case .notKeepButtonTapped:
+            state.selectedEvaluation = state.selectedEvaluation == .notKeep ? nil : .notKeep
+            return .none
+        case .pricipleToggleButtonTapped:
+            state.principleDetailShown.toggle()
+            return .none
+        }
+    }
+    
+    // MARK: - Inner Core
+    func innerCore(
+        _ state: inout State,
+        _ action: InnerAction
+    ) -> Effect<Action> {
+        
+    }
+    
+    // MARK: - Async Core
+    func asyncCore(
+        _ state: inout State,
+        _ action: AsyncAction
+    ) -> Effect<Action> {
+        
+    }
+    
+    // MARK: - Scope Core
+    func scopeCore(
+        _ state: inout State,
+        _ action: ScopeAction
+    ) -> Effect<Action> {
+        
+    }
+    
+    // MARK: - Delegate Core
+    func delegateCore(
+        _ state: inout State,
+        _ action: DelegateAction
+    ) -> Effect<Action> {
+        
+    }
+}
