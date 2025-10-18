@@ -21,6 +21,9 @@ extension HedgeUI where Base == Image {
     public static var neutralSimple: Image { asset(#function) }
     public static var principleSimple: Image { asset(#function) }
     
+    // MARK: Size 18
+    public static var feedbackWarn: Image { asset(#function) }
+
     // MARK: Size 19
     public static var generate: Image { asset(#function) }
     
@@ -54,7 +57,10 @@ extension HedgeUI where Base == Image {
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }
-  
+    public static var circle: Image { asset(#function) }
+    public static var cross: Image { asset(#function) }
+    public static var triangle: Image { asset(#function) }
+
     // MARK: Size 30
     public static var error: Image { asset(#function) }
     
@@ -82,6 +88,12 @@ extension HedgeUI where Base == Image {
     public static var impulseOn: Image { asset(#function) }
     public static var neutralOn: Image { asset(#function) }
     
+    // MARK: Size xlarge
+    public static var emerald: Image { asset(#function) }
+    public static var gold: Image { asset(#function) }
+    public static var silver: Image { asset(#function) }
+    public static var bronze: Image { asset(#function) }
+
     // TODO: 임시 차트 이미지 추후 삭제
     public static var tmpChart: Image { asset(#function) }
     public static var buyDemo: Image { asset(#function) }
