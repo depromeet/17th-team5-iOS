@@ -29,7 +29,7 @@ public struct PrincipleReviewFeature {
         public var principles: [Principle]
         public var selectedEvaluation: Evaluation? = nil
         public var principleDetailShown: Bool = false
-        // public var text: String = ""
+        public var text: String = ""
         
         public var totalIndex: Int {
             principles.count
@@ -40,13 +40,6 @@ public struct PrincipleReviewFeature {
         public var selectedPrinciple: Principle {
             principles[selectedIndex]
         }
-        
-        // public var textBinding: Binding<String> {
-        //     Binding (
-        //         get: { self.text },
-        //         set: { self.text = $0 }
-        //     )
-        // }
         
         public init(tradeType: TradeType,
                     stock: StockSearch,

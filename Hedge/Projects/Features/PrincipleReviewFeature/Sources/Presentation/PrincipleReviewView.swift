@@ -40,31 +40,15 @@ public struct PrincipleReviewView: View {
                 .frame(height: 24)
                 .foregroundStyle(.clear)
             
-            PrincipleEvaluationView
+            principleEvaluationView
             
-            // ZStack(alignment: .topLeading) {
-            //     TextEditor(text: store.state.text)
-            //         .focused($isFocused)
-            //         .tint(.black)
-            //         .font(FontModel.body3Medium)
-            //         .foregroundStyle(Color.hedgeUI.textTitle)
-            //         .scrollContentBackground(.hidden)
-            //     
-            //     if state.text.isEmpty && !isFocused {
-            //         Text("매매 근거를 작성해보세요")
-            //             .font(FontModel.body3Medium)
-            //             .foregroundStyle(Color.hedgeUI.textAssistive)
-            //             .frame(maxWidth: .infinity, minHeight: 100, alignment: .topLeading)
-            //             .allowsHitTesting(false)
-            //             .offset(x: 8, y: 8) // UITextView 기본 textContainerInset 값
-            //     }
-            // }
-            // .onTapGesture {
-            //     isFocused = true
-            // }
-            // .padding(.horizontal, 12)
-            // .padding(.vertical, -8)
-            // .id("textEditorArea") // TextEditor 영역에 ID 부여
+            Rectangle()
+                .frame(height: 8)
+                .foregroundStyle(.clear)
+            
+            textInputView
+            
+            resourceButtonView
             
             Spacer()
         }
@@ -161,7 +145,7 @@ public struct PrincipleReviewView: View {
                .padding(.horizontal, 20)
     }
     
-    private var PrincipleEvaluationView: some View {
+    private var principleEvaluationView: some View {
         HStack(spacing: 8) {
             
             Button {
@@ -226,6 +210,50 @@ public struct PrincipleReviewView: View {
                     }
             }
             .buttonStyle(PlainButtonStyle())
+        }
+        .padding(.horizontal, 20)
+    }
+    
+    private var textInputView: some View {
+        ZStack(alignment: .topLeading) {
+            TextEditor(text: $store.state.text)
+                .focused($isFocused)
+                .tint(.black)
+                .font(FontModel.body3Medium)
+                .foregroundStyle(Color.hedgeUI.textTitle)
+                .scrollContentBackground(.hidden)
+            
+            if store.state.text.isEmpty && !isFocused {
+                Text("이유 남기기")
+                    .font(FontModel.body3Medium)
+                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .frame(minHeight: 54, alignment: .topLeading)
+                    .allowsHitTesting(false)
+                    .offset(x: 8, y: 8) // UITextView 기본 textContainerInset 값
+            }
+        }
+        .onTapGesture {
+            isFocused = true
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 24)
+        .padding(.bottom, 8)
+        .id("textEditorArea") // TextEditor 영역에 ID 부여
+    }
+    
+    private var resourceButtonView: some View {
+        HStack(spacing: 7) {
+            Image.hedgeUI.image
+                .renderingMode(.template)
+                .foregroundStyle(Color.hedgeUI.textAssistive)
+                .padding(4)
+            
+            Image.hedgeUI.link
+                .renderingMode(.template)
+                .foregroundStyle(Color.hedgeUI.textAssistive)
+                .padding(4)
+            
+            Spacer()
         }
         .padding(.horizontal, 20)
     }
