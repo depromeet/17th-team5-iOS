@@ -10,8 +10,9 @@ import Core
 public struct PrincipleReviewView: View {
     @Bindable public var store: StoreOf<PrincipleReviewFeature>
     @State private var isPresented: Bool = false
+    @State private var textEditorHeight: CGFloat = 22
+    
     @FocusState private var isFocused: Bool
-    @State private var textEditorHeight: CGFloat = 54
     
     public init(store: StoreOf<PrincipleReviewFeature>) {
         self.store = store
@@ -26,15 +27,40 @@ public struct PrincipleReviewView: View {
                         .foregroundStyle(Color.hedgeUI.textTitle)
                         .font(FontModel.body2Semibold)
                     
-                    HStack(alignment: .center, spacing: 4) {
-                        store.selectedEvaluation?.selectedImage
-                            .resizable()
-                            .frame(width: 18, height: 18)
-                    
-                        Text(store.selectedEvaluation?.title ?? "")
-                            .foregroundStyle(Color.hedgeUI.brandDarken)
-                            .font(FontModel.body3Semibold)
+                    if let evaluation = store.selectedEvaluation {
+                        HStack(alignment: .center, spacing: 4) {
+                            evaluation.selectedImage
+                                .resizable()
+                                .frame(width: 18, height: 18)
+                            
+                            Text(evaluation.title)
+                                .foregroundStyle(Color.hedgeUI.brandDarken)
+                                .font(FontModel.body3Semibold)
+                        }
+                    } else {
+                        HStack(alignment: .center, spacing: 3) {
+                            Image.hedgeUI.keepDisabled
+                                .resizable()
+                                .frame(width: 18, height: 18)
+                            
+                            Image.hedgeUI.normalDisabled
+                                .resizable()
+                                .frame(width: 18, height: 18)
+                            
+                            Image.hedgeUI.notKeepDisabled
+                                .resizable()
+                                .frame(width: 18, height: 18)
+                            
+                            Spacer()
+                                .frame(width: 1)
+                                .foregroundStyle(.clear)
+                        
+                            Text("선택 전")
+                                .foregroundStyle(Color.hedgeUI.textAssistive)
+                                .font(FontModel.body3Medium)
+                        }
                     }
+                    
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 20)
@@ -77,7 +103,9 @@ public struct PrincipleReviewView: View {
         .onAppear {
             send(.onAppear)
         }
-        // .animation(.easeInOut(duration: 0.3), value: isFocused)
+        .onTapGesture {
+            isFocused = false
+        }
     }
     
     private var navigationBar: some View {
@@ -243,7 +271,7 @@ public struct PrincipleReviewView: View {
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textTitle)
                 .scrollContentBackground(.hidden)
-                .frame(height: max(textEditorHeight, 22), alignment: .topLeading)
+                .frame(height: textEditorHeight, alignment: .topLeading)
             
             if store.state.text.isEmpty && !isFocused {
                 Text("이유 남기기")
