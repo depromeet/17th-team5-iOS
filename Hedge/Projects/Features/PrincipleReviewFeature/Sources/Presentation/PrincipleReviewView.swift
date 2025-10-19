@@ -11,68 +11,79 @@ public struct PrincipleReviewView: View {
     @Bindable public var store: StoreOf<PrincipleReviewFeature>
     @State private var isPresented: Bool = false
     @FocusState private var isFocused: Bool
+    @State private var textEditorHeight: CGFloat = 54
     
     public init(store: StoreOf<PrincipleReviewFeature>) {
         self.store = store
     }
     
     public var body: some View {
-        VStack(spacing: 0) {
-            navigationBar
+        VStack(alignment: .leading, spacing: 0) {
             
-            stockSummaryView
-            
-            Rectangle()
-                .frame(height: 1)
-                .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+            if isFocused {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(store.state.selectedPrinciple.principle)
+                        .foregroundStyle(Color.hedgeUI.textTitle)
+                        .font(FontModel.body2Semibold)
+                    
+                    HStack(alignment: .center, spacing: 4) {
+                        store.selectedEvaluation?.selectedImage
+                            .resizable()
+                            .frame(width: 18, height: 18)
+                    
+                        Text(store.selectedEvaluation?.title ?? "")
+                            .foregroundStyle(Color.hedgeUI.brandDarken)
+                            .font(FontModel.body3Semibold)
+                    }
+                }
+                .padding(.vertical, 12)
                 .padding(.horizontal, 20)
-            
-            Rectangle()
-                .frame(height: 16)
-                .foregroundStyle(.clear)
-                .padding(.horizontal, 20)
-            
-            principleSummaryView
-            
-            principleDetailView
-            
-            Rectangle()
-                .frame(height: 24)
-                .foregroundStyle(.clear)
-            
-            principleEvaluationView
-            
-            Rectangle()
-                .frame(height: 8)
-                .foregroundStyle(.clear)
+                
+                HedgeSpacer(height: 1)
+                    .color(Color.hedgeUI.neutralBgSecondary)
+                    .padding(.horizontal, 20)
+                
+            } else {
+                navigationBar
+                
+                stockSummaryView
+                
+                HedgeSpacer(height: 1)
+                    .color(Color.hedgeUI.neutralBgSecondary)
+                    .padding(.horizontal, 20)
+                
+                HedgeSpacer(height: 16)
+                    .padding(.horizontal, 20)
+                
+                // 원칙 요약
+                principleSummaryView
+                
+                // 원칙 상세
+                principleDetailView
+                
+                HedgeSpacer(height: 24)
+                
+                principleEvaluationView
+                
+                HedgeSpacer(height: 8)
+                
+                Spacer()
+            }
             
             textInputView
             
             resourceButtonView
-            
-            Spacer()
         }
         .onAppear {
             send(.onAppear)
         }
+        // .animation(.easeInOut(duration: 0.3), value: isFocused)
     }
     
     private var navigationBar: some View {
         HedgeNavigationBar(buttonText: "", onLeftButtonTap: {
             send(.backButtonTapped)
         })
-    }
-    
-    @ViewBuilder
-    private var principleDetailView: some View {
-        if store.state.principleDetailShown {
-            Text(store.state.selectedPrinciple.principle)
-                .font(FontModel.body3Medium)
-                .foregroundStyle(Color.hedgeUI.textAlternative)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 8)
-        }
     }
     
     private var stockSummaryView: some View {
@@ -108,7 +119,6 @@ public struct PrincipleReviewView: View {
         }
         .padding(.top, 12)
         .padding(.bottom, 16)
-        
     }
     
     private var principleSummaryView: some View {
@@ -122,10 +132,9 @@ public struct PrincipleReviewView: View {
             HStack(spacing: 0) {
                 Text(store.state.selectedPrinciple.principle)
                     .foregroundStyle(Color.hedgeUI.grey900)
-                    .font(FontModel.h1Semibold)
+                    .font(isFocused ? FontModel.body2Semibold : FontModel.h1Semibold)
                 
                 Spacer()
-                    .foregroundStyle(.black)
                 
                 Rectangle()
                     .frame(width: 12, height: 0)
@@ -143,6 +152,18 @@ public struct PrincipleReviewView: View {
         }
                .padding(.vertical, 10)
                .padding(.horizontal, 20)
+    }
+    
+    @ViewBuilder
+    private var principleDetailView: some View {
+        if store.state.principleDetailShown {
+            Text(store.state.selectedPrinciple.principle)
+                .font(FontModel.body3Medium)
+                .foregroundStyle(Color.hedgeUI.textAlternative)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 8)
+        }
     }
     
     private var principleEvaluationView: some View {
@@ -222,23 +243,36 @@ public struct PrincipleReviewView: View {
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textTitle)
                 .scrollContentBackground(.hidden)
+                .frame(height: max(textEditorHeight, 22), alignment: .topLeading)
             
             if store.state.text.isEmpty && !isFocused {
                 Text("이유 남기기")
                     .font(FontModel.body3Medium)
                     .foregroundStyle(Color.hedgeUI.textAssistive)
-                    .frame(minHeight: 54, alignment: .topLeading)
-                    .allowsHitTesting(false)
-                    .offset(x: 8, y: 8) // UITextView 기본 textContainerInset 값
+                    .padding(.horizontal, 8)
+            }
+            
+            GeometryReader { geo in
+                Text((store.state.text.isEmpty ? " " : store.state.text) + " ")
+                    .font(FontModel.body3Medium)
+                    .padding(.horizontal, 8)
+                    .frame(width: geo.size.width, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .opacity(0)
+                    .background(
+                        GeometryReader { inner in
+                            Color.clear.preference(key: TextEditorHeightKey.self, value: inner.size.height)
+                        }
+                    )
             }
         }
-        .onTapGesture {
-            isFocused = true
+        .onPreferenceChange(TextEditorHeightKey.self) { height in
+            textEditorHeight = height
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
         .padding(.bottom, 8)
-        .id("textEditorArea") // TextEditor 영역에 ID 부여
+        .id("textEditorArea")
     }
     
     private var resourceButtonView: some View {
@@ -256,6 +290,13 @@ public struct PrincipleReviewView: View {
             Spacer()
         }
         .padding(.horizontal, 20)
+    }
+}
+
+private struct TextEditorHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 import ComposableArchitecture
 
@@ -15,6 +16,39 @@ public struct PrincipleReviewFeature {
         case keep
         case normal
         case notKeep
+        
+        public var selectedImage: Image {
+            switch self {
+            case .keep:
+                return Image.hedgeUI.keep
+            case .normal:
+                return Image.hedgeUI.normal
+            case .notKeep:
+                return Image.hedgeUI.notKeep
+            }
+        }
+        
+        public var unselectedImage: Image {
+            switch self {
+            case .keep:
+                return Image.hedgeUI.keepDisabled
+            case .normal:
+                return Image.hedgeUI.normalDisabled
+            case .notKeep:
+                return Image.hedgeUI.notKeepDisabled
+            }
+        }
+        
+        public var title: String {
+            switch self {
+            case .keep:
+                return "지켰어요"
+            case .normal:
+                return "보통이에요"
+            case .notKeep:
+                return "안지켰어요"
+            }
+        }
     }
     
     public init() {
