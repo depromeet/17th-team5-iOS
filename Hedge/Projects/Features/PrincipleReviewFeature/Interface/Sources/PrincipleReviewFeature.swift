@@ -1,4 +1,6 @@
 import Foundation
+import Combine
+import PhotosUI
 import SwiftUI
 
 import ComposableArchitecture
@@ -86,6 +88,8 @@ public struct PrincipleReviewFeature {
         public var selectedEvaluation: Evaluation? = nil
         public var principleDetailShown: Bool = false
         public var text: String = ""
+        public var selectedPhotoItems: [PhotosPickerItem] = []
+        public var loadedImages: [Image] = []
         
         public var totalIndex: Int {
             principles.count
@@ -124,12 +128,13 @@ public struct PrincipleReviewFeature {
         case normalButtonTapped
         case notKeepButtonTapped
         case pricipleToggleButtonTapped
+        case linkButtonTapped
+        case loadPhotos
+        case deletePhoto(Int)
     }
-    public enum InnerAction {
-        
-    }
+    public enum InnerAction { }
     public enum AsyncAction {
-        
+        case loadImagesFromPhotos([PhotosPickerItem])
     }
     public enum ScopeAction { }
     public enum DelegateAction { }
@@ -179,7 +184,6 @@ extension PrincipleReviewFeature {
         switch action {
         case .onAppear:
             return .none
-            
         case .backButtonTapped:
             return .none
         case .keepButtonTapped:
@@ -193,6 +197,17 @@ extension PrincipleReviewFeature {
             return .none
         case .pricipleToggleButtonTapped:
             state.principleDetailShown.toggle()
+            return .none
+        case .linkButtonTapped:
+            return .none
+        case .loadPhotos:
+            return .send(.async(.loadImagesFromPhotos(state.selectedPhotoItems)))
+        case .deletePhoto(let index):
+            guard state.selectedPhotoItems.indices.contains(index),
+                  state.loadedImages.indices.contains(index) else { return .none }
+            
+            state.selectedPhotoItems.remove(at: index)
+            state.loadedImages.remove(at: index)
             return .none
         }
     }
@@ -210,7 +225,21 @@ extension PrincipleReviewFeature {
         _ state: inout State,
         _ action: AsyncAction
     ) -> Effect<Action> {
-        
+        switch action {
+        case .loadImagesFromPhotos(let photoItems):
+            return .run { send in
+                var images: [Image] = []
+                
+                for photoItem in photoItems {
+                    if let data = try? await photoItem.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        images.append(Image(uiImage: uiImage))
+                    }
+                }
+                
+                await send(.binding(.set(\.loadedImages, images)))
+            }
+        }
     }
     
     // MARK: - Scope Core

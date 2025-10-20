@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 import ComposableArchitecture
 
@@ -9,10 +10,10 @@ import Core
 @ViewAction(for: PrincipleReviewFeature.self)
 public struct PrincipleReviewView: View {
     @Bindable public var store: StoreOf<PrincipleReviewFeature>
+    
     @State private var isPresented: Bool = false
     @State private var focusWithAnimation: Bool = false
     @State private var focusWithoutAnimation: Bool = false
-    
     @FocusState private var isFocused: Bool
     
     public init(store: StoreOf<PrincipleReviewFeature>) {
@@ -27,7 +28,7 @@ public struct PrincipleReviewView: View {
             ZStack(alignment: .topLeading) {
                 if focusWithAnimation {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(store.state.selectedPrinciple.principle)
+                        Text(store.selectedPrinciple.principle)
                             .foregroundStyle(Color.hedgeUI.textTitle)
                             .font(FontModel.body2Semibold)
                         
@@ -145,7 +146,7 @@ public struct PrincipleReviewView: View {
                 .frame(width: 8, height: 0)
                 .foregroundStyle(.clear)
             
-            Text(store.state.stock.title)
+            Text(store.stock.title)
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .font(FontModel.label2Medium)
             
@@ -153,9 +154,10 @@ public struct PrincipleReviewView: View {
                 .frame(width: 2, height: 0)
                 .foregroundStyle(.clear)
             
-            Text("\(store.state.tradeHistory.tradingPrice)\(store.state.tradeHistory.concurrency)・\(store.state.tradeHistory.tradingQuantity)주 \(store.state.tradeType.rawValue)")
+            Text("\(store.tradeHistory.tradingPrice)\(store.tradeHistory.concurrency)・" +
+                 "\(store.tradeHistory.tradingQuantity)주 \(store.tradeType.rawValue)")
                 .foregroundStyle(
-                    store.state.tradeType == .buy ?
+                    store.tradeType == .buy ?
                     Color.hedgeUI.tradeBuy : Color.hedgeUI.tradeSell
                 )
                 .font(FontModel.label2Semibold)
@@ -175,7 +177,7 @@ public struct PrincipleReviewView: View {
                 .font(FontModel.body3Medium)
             
             HStack(spacing: 0) {
-                Text(store.state.selectedPrinciple.principle)
+                Text(store.selectedPrinciple.principle)
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .font(FontModel.h1Semibold)
                 
@@ -201,8 +203,8 @@ public struct PrincipleReviewView: View {
     
     @ViewBuilder
     private var principleDetailView: some View {
-        if store.state.principleDetailShown {
-            Text(store.state.selectedPrinciple.principle)
+        if store.principleDetailShown {
+            Text(store.selectedPrinciple.principle)
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -218,7 +220,7 @@ public struct PrincipleReviewView: View {
                 send(.keepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
                 
-                let style = PrincipleReviewFeature.Evaluation.style(store.state.selectedEvaluation, .keep)
+                let style = PrincipleReviewFeature.Evaluation.style(store.selectedEvaluation, .keep)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -241,7 +243,7 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.normalButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
-                let style = PrincipleReviewFeature.Evaluation.style(store.state.selectedEvaluation, .normal)
+                let style = PrincipleReviewFeature.Evaluation.style(store.selectedEvaluation, .normal)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -264,7 +266,7 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.notKeepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
-                let style = PrincipleReviewFeature.Evaluation.style(store.state.selectedEvaluation, .notKeep)
+                let style = PrincipleReviewFeature.Evaluation.style(store.selectedEvaluation, .notKeep)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -291,7 +293,7 @@ public struct PrincipleReviewView: View {
         
         ScrollView {
             ZStack(alignment: .topLeading) {
-                if store.state.text.isEmpty {
+                if store.text.isEmpty {
                     Text("이유 남기기")
                         .font(FontModel.body3Medium)
                         .foregroundStyle(Color.hedgeUI.textAssistive)
@@ -299,7 +301,7 @@ public struct PrincipleReviewView: View {
                         .padding(.top, 8)
                 }
                 
-                TextEditor(text: $store.state.text)
+                TextEditor(text: $store.text)
                     .focused($isFocused)
                     .tint(.black)
                     .font(FontModel.body3Medium)
@@ -310,6 +312,29 @@ public struct PrincipleReviewView: View {
             if !focusWithAnimation {
                 resourceButtonView
             }
+            
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(Array(store.loadedImages.enumerated()), id: \.offset) { index, image in
+                        ZStack(alignment: .topTrailing) {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 120)
+                                .clipped()
+                                .cornerRadius(18)
+                            
+                            Button {
+                                send(.deletePhoto(index))
+                            } label: {
+                                Image.hedgeUI.closeFillWhite
+                            }
+                            .padding(.top, 4)
+                            .padding(.trailing, 4)
+                        }
+                    }
+                }
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
@@ -319,15 +344,17 @@ public struct PrincipleReviewView: View {
     
     private var resourceButtonView: some View {
         HStack(spacing: 7) {
-            Image.hedgeUI.image
-                .renderingMode(.template)
-                .foregroundStyle(Color.hedgeUI.textAssistive)
-                .padding(4)
             
-            Image.hedgeUI.link
-                .renderingMode(.template)
-                .foregroundStyle(Color.hedgeUI.textAssistive)
-                .padding(4)
+            photoPickerView
+            
+            Button {
+                
+            } label: {
+                Image.hedgeUI.link
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .padding(4)
+            }
             
             Spacer()
         }
@@ -342,15 +369,17 @@ public struct PrincipleReviewView: View {
             HedgeSpacer(height: 7)
             
             HStack(alignment: .center, spacing: 4) {
-                Image.hedgeUI.image
-                    .renderingMode(.template)
-                    .foregroundStyle(Color.hedgeUI.textAssistive)
-                    .padding(5)
                 
-                Image.hedgeUI.link
-                    .renderingMode(.template)
-                    .foregroundStyle(Color.hedgeUI.textAssistive)
-                    .padding(5)
+                photoPickerView
+                
+                Button {
+                    
+                } label: {
+                    Image.hedgeUI.link
+                        .renderingMode(.template)
+                        .foregroundStyle(Color.hedgeUI.textAssistive)
+                        .padding(5)
+                }
                 
                 Spacer()
                 
@@ -364,6 +393,21 @@ public struct PrincipleReviewView: View {
             }
             .padding(.bottom, 8)
             .padding(.horizontal, 12)
+        }
+    }
+    
+    private var photoPickerView: some View {
+        PhotosPicker(
+            selection: $store.selectedPhotoItems,
+            matching: .images
+        ) {
+            Image.hedgeUI.image
+                .renderingMode(.template)
+                .foregroundStyle(Color.hedgeUI.textAssistive)
+                .padding(.horizontal, 4)
+        }
+        .onChange(of: store.selectedPhotoItems) { _, _ in
+            send(.loadPhotos)
         }
     }
 }
