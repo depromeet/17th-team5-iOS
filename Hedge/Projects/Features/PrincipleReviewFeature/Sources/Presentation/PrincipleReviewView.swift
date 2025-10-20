@@ -4,6 +4,7 @@ import PhotosUI
 import ComposableArchitecture
 
 import PrincipleReviewFeatureInterface
+import LinkDomainInterface
 import DesignKit
 import Core
 
@@ -163,11 +164,11 @@ public struct PrincipleReviewView: View {
             
             Text("\(store.tradeHistory.tradingPrice)\(store.tradeHistory.concurrency)・" +
                  "\(store.tradeHistory.tradingQuantity)주 \(store.tradeType.rawValue)")
-                .foregroundStyle(
-                    store.tradeType == .buy ?
-                    Color.hedgeUI.tradeBuy : Color.hedgeUI.tradeSell
-                )
-                .font(FontModel.label2Semibold)
+            .foregroundStyle(
+                store.tradeType == .buy ?
+                Color.hedgeUI.tradeBuy : Color.hedgeUI.tradeSell
+            )
+            .font(FontModel.label2Semibold)
             
             Spacer()
         }
@@ -320,39 +321,44 @@ public struct PrincipleReviewView: View {
                 resourceButtonView
             }
             
-             ScrollView(.horizontal) {
-                 HStack(alignment: .top, spacing: 12) {
-                     ForEach(store.photoItems) { photoItem in
-                         ZStack(alignment: .topTrailing) {
-                             if let image = photoItem.loadedImage {
-                                 image
-                                     .resizable()
-                                     .aspectRatio(contentMode: .fit)
-                                     .frame(width: 120)
-                                     .clipped()
-                                     .cornerRadius(18)
-                             } else {
-                                 // 로딩 중이거나 실패한 경우
-                                 Rectangle()
-                                     .fill(Color.hedgeUI.neutralBgSecondary)
-                                     .frame(width: 120, height: 120)
-                                     .cornerRadius(18)
-                                     .overlay {
-                                         ProgressView()
-                                     }
-                             }
-                             
-                             Button {
-                                 send(.deletePhoto(photoItem.id))
-                             } label: {
-                                 Image.hedgeUI.closeFillWhite
-                             }
-                             .padding(.top, 4)
-                             .padding(.trailing, 4)
-                         }
-                     }
-                 }
-             }
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(store.photoItems) { photoItem in
+                        ZStack(alignment: .topTrailing) {
+                            if let image = photoItem.loadedImage {
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 120)
+                                    .clipped()
+                                    .cornerRadius(18)
+                            } else {
+                                // 로딩 중이거나 실패한 경우
+                                Rectangle()
+                                    .fill(Color.hedgeUI.neutralBgSecondary)
+                                    .frame(width: 120, height: 120)
+                                    .cornerRadius(18)
+                                    .overlay {
+                                        ProgressView()
+                                    }
+                            }
+                            
+                            Button {
+                                send(.deletePhoto(photoItem.id))
+                            } label: {
+                                Image.hedgeUI.closeFillWhite
+                            }
+                            .padding(.top, 4)
+                            .padding(.trailing, 4)
+                        }
+                    }
+                }
+            }
+            
+            // 링크 메타데이터 표시
+            if let metadata = store.linkMetadata {
+                linkMetadataView(metadata)
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
@@ -391,7 +397,7 @@ public struct PrincipleReviewView: View {
                 photoPickerView
                 
                 Button {
-                    
+                    send(.linkButtonTapped)
                 } label: {
                     Image.hedgeUI.link
                         .renderingMode(.template)
@@ -428,17 +434,52 @@ public struct PrincipleReviewView: View {
             send(.loadPhotos)
         }
     }
-}
-
-#Preview {
-    PrincipleReviewView(store: .init(initialState: PrincipleReviewFeature.State(
-        tradeType: .sell,
-        stock: .init(symbol: "symbol", title: "삼성전자", market: "market"),
-        tradeHistory: .init(tradingPrice: "97,700",
-                            tradingQuantity: "10",
-                            tradingDate: "123123",
-                            concurrency: "원"),
-        principles: [.init(id: 0, principle: "원칙 1입니다."),
-                     .init(id: 1, principle: "원칙 2입니다.")]),
-                                     reducer: { PrincipleReviewFeature() } ))
+    
+    private func linkMetadataView(_ metadata: LinkMeta) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                // 이미지
+                if let imageURL = metadata.imageURL,
+                   let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Rectangle()
+                            .fill(Color.hedgeUI.neutralBgSecondary)
+                    }
+                    .frame(width: 80, height: 80)
+                    .clipped()
+                    .cornerRadius(8)
+                } else {
+                    Rectangle()
+                        .fill(Color.hedgeUI.neutralBgSecondary)
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(8)
+                }
+                
+                // 텍스트 정보
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(metadata.title)
+                        .font(FontModel.body3Semibold)
+                        .foregroundStyle(Color.hedgeUI.textTitle)
+                        .lineLimit(2)
+                    
+                    Text(metadata.newsSource)
+                        .font(FontModel.caption1Medium)
+                        .foregroundStyle(Color.hedgeUI.textAlternative)
+                }
+                
+                Spacer()
+            }
+        }
+        .padding(12)
+        .background(Color.hedgeUI.neutralBgDefault)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
+        )
+    }
 }

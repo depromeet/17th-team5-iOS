@@ -1,6 +1,11 @@
 import SwiftUI
 import PrincipleReviewFeature
 import PrincipleReviewFeatureInterface
+import LinkDomainInterface
+import LinkDomain
+import Shared
+import RemoteDataSource
+import Repository
 
 @main
 struct PrincipleReviewApp: App {
@@ -8,6 +13,9 @@ struct PrincipleReviewApp: App {
     
     var body: some Scene {
         WindowGroup {
+            
+            let linkUseCase = FetchLink(repository: DefaultLinkRepository(dataSource: DefaultLinkDataSource()))
+            
             PrincipleReviewView(store: .init(initialState: PrincipleReviewFeature.State(
                 tradeType: .sell,
                 stock: .init(symbol: "symbol", title: "삼성전자", market: "market"),
@@ -17,7 +25,7 @@ struct PrincipleReviewApp: App {
                                     concurrency: "원"),
                 principles: [.init(id: 0, principle: "원칙 1입니다."),
                              .init(id: 1, principle: "원칙 2입니다.")]),
-                                             reducer: { PrincipleReviewFeature() } ))
+                                             reducer: { PrincipleReviewFeature(fetchLinkUseCase: linkUseCase) } ))
         }
     }
 }

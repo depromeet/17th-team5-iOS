@@ -9,6 +9,7 @@ import Core
 import Shared
 import DesignKit
 
+import LinkDomainInterface
 import StockDomainInterface
 import PrinciplesDomainInterface
 
@@ -25,6 +26,11 @@ public struct PhotoItem: Identifiable, Equatable {
 
 @Reducer
 public struct PrincipleReviewFeature {
+    private let fetchLinkUseCase: FetchLinkUseCase
+    
+    public init(fetchLinkUseCase: FetchLinkUseCase) {
+        self.fetchLinkUseCase = fetchLinkUseCase
+    }
     
     public enum Evaluation {
         case keep
@@ -74,8 +80,6 @@ public struct PrincipleReviewFeature {
         }
     }
     
-    public init() { }
-    
     @ObservableState
     public struct State: Equatable {
         public var tradeType: TradeType
@@ -87,6 +91,7 @@ public struct PrincipleReviewFeature {
         public var text: String = ""
         public var linkModalShown: Bool = false
         public var addLink: String = ""
+        public var linkMetadata: LinkMeta?
         public var selectedPhotoItems: [PhotosPickerItem] = []
         public var loadedImages: [Image] = []
         public var photoItems: [PhotoItem] = []
@@ -150,6 +155,7 @@ public struct PrincipleReviewFeature {
     }
     public enum AsyncAction {
         case loadImagesFromPhotos([PhotosPickerItem])
+        case fetchLinkMetadata(String)
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -277,6 +283,17 @@ extension PrincipleReviewFeature {
                 await send(.binding(.set(\.loadedImages, images)))
                 await send(.binding(.set(\.photoItems, updatedPhotoItems)))
             }
+            
+        case .fetchLinkMetadata(let urlString):
+            return .run { send in
+                do {
+                    let metadata = try await fetchLinkUseCase.execute(urlString: urlString)
+                    await send(.binding(.set(\.linkMetadata, metadata)))
+                } catch {
+                    // 에러 처리는 필요에 따라 추가
+                    print("Failed to fetch link metadata: \(error)")
+                }
+            }
         }
     }
     
@@ -296,7 +313,23 @@ extension PrincipleReviewFeature {
         switch action {
         case .addLink(let link):
             state.addLink = link
-            return .send(.inner(.linkDismiss))
+            return .concatenate(
+                .send(.inner(.linkDismiss)),
+                .send(.async(.fetchLinkMetadata(link)))
+            )
         }
     }
 }
+
+// #Preview {
+//     PrincipleReviewView(store: .init(initialState: PrincipleReviewFeature.State(
+//         tradeType: .sell,
+//         stock: .init(symbol: "symbol", title: "삼성전자", market: "market"),
+//         tradeHistory: .init(tradingPrice: "97,700",
+//                             tradingQuantity: "10",
+//                             tradingDate: "123123",
+//                             concurrency: "원"),
+//         principles: [.init(id: 0, principle: "원칙 1입니다."),
+//                      .init(id: 1, principle: "원칙 2입니다.")]),
+//                                      reducer: { PrincipleReviewFeature(linkMetadataService: LinkMetadataService(provider: Provider.plain)) } ))
+// }

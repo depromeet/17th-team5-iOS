@@ -2,9 +2,11 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.configure(
-    moduleType: .micro(name: "PrincipleReviewFeature"),
+    moduleType: .module(name: "LinkDomain"),
     product: .staticFramework,
     dependencies: [
-        .Core.core,
-    ]
+        .Module.shared
+    ],
+    hasInterface: true,
+    hasTests: true
 )
