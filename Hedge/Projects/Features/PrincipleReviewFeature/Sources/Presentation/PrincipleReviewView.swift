@@ -217,19 +217,22 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.keepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
+                
+                let style = PrincipleReviewFeature.Evaluation.style(store.state.selectedEvaluation, .keep)
+                
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(lineWidth: store.state.selectedEvaluation == .keep ? 1.5 : 1)
-                    .foregroundStyle(store.state.selectedEvaluation == .keep ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary)
+                    .stroke(lineWidth: style.lineWidth)
+                    .foregroundStyle(style.foregroundColor)
                     .frame(height: 103)
                     .overlay {
                         VStack(alignment: .center, spacing: 4) {
-                            (store.state.selectedEvaluation == .keep ? Image.hedgeUI.keep : Image.hedgeUI.keepDisabled)
+                            style.image
                                 .resizable()
                                 .frame(width: 40, height: 40)
                             
-                            Text("지켰어요")
-                                .foregroundStyle(store.state.selectedEvaluation == .keep ? Color.hedgeUI.brandDarken : Color.hedgeUI.textAlternative)
-                                .font(store.state.selectedEvaluation == .keep ? FontModel.label1Semibold : FontModel.label1Medium)
+                            Text(style.title)
+                                .foregroundStyle(style.textColor)
+                                .font(style.font)
                         }
                     }
             }
@@ -238,19 +241,21 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.normalButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
+                let style = PrincipleReviewFeature.Evaluation.style(store.state.selectedEvaluation, .normal)
+                
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(lineWidth: store.state.selectedEvaluation == .normal ? 1.5 : 1)
-                    .foregroundStyle(store.state.selectedEvaluation == .normal ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary)
+                    .stroke(lineWidth: style.lineWidth)
+                    .foregroundStyle(style.foregroundColor)
                     .frame(height: 103)
                     .overlay {
                         VStack(alignment: .center, spacing: 4) {
-                            (store.state.selectedEvaluation == .normal ? Image.hedgeUI.normal : Image.hedgeUI.normalDisabled)
+                            style.image
                                 .resizable()
                                 .frame(width: 40, height: 40)
                             
-                            Text("보통이에요")
-                                .foregroundStyle(store.state.selectedEvaluation == .normal ? Color.hedgeUI.brandDarken : Color.hedgeUI.textAlternative)
-                                .font(store.state.selectedEvaluation == .normal ? FontModel.label1Semibold : FontModel.label1Medium)
+                            Text(style.title)
+                                .foregroundStyle(style.textColor)
+                                .font(style.font)
                         }
                     }
             }
@@ -259,19 +264,21 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.notKeepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
+                let style = PrincipleReviewFeature.Evaluation.style(store.state.selectedEvaluation, .notKeep)
+                
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(lineWidth: store.state.selectedEvaluation == .notKeep ? 1.5 : 1)
-                    .foregroundStyle(store.state.selectedEvaluation == .notKeep ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary)
+                    .stroke(lineWidth: style.lineWidth)
+                    .foregroundStyle(style.foregroundColor)
                     .frame(height: 103)
                     .overlay {
                         VStack(alignment: .center, spacing: 4) {
-                            (store.state.selectedEvaluation == .notKeep ? Image.hedgeUI.notKeep : Image.hedgeUI.notKeepDisabled)
+                            style.image
                                 .resizable()
                                 .frame(width: 40, height: 40)
                             
-                            Text("안지켰어요")
-                                .foregroundStyle(store.state.selectedEvaluation == .notKeep ? Color.hedgeUI.brandDarken : Color.hedgeUI.textAlternative)
-                                .font(store.state.selectedEvaluation == .notKeep ? FontModel.label1Semibold : FontModel.label1Medium)
+                            Text(style.title)
+                                .foregroundStyle(style.textColor)
+                                .font(style.font)
                         }
                     }
             }

@@ -5,6 +5,7 @@ import ComposableArchitecture
 
 import Core
 import Shared
+import DesignKit
 
 import StockDomainInterface
 import PrinciplesDomainInterface
@@ -48,6 +49,27 @@ public struct PrincipleReviewFeature {
             case .notKeep:
                 return "안지켰어요"
             }
+        }
+        
+        public struct Style {
+            public let title: String
+            public let lineWidth: CGFloat
+            public let foregroundColor: Color
+            public let image: Image
+            public let textColor: Color
+            public let font: FontModel
+        }
+        
+        public static func style(_ lhs: Evaluation?, _ rhs: Evaluation) -> Style {
+            let isSelected: Bool = lhs == rhs
+            let image: Image = isSelected ? rhs.selectedImage : rhs.unselectedImage
+            
+            return Style(title: rhs.title,
+                         lineWidth: isSelected ? 1.5 : 1,
+                         foregroundColor: isSelected ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary,
+                         image: image,
+                         textColor: isSelected ? Color.hedgeUI.brandDarken : Color.hedgeUI.textAlternative,
+                         font: isSelected ? FontModel.label1Semibold : FontModel.label1Medium)
         }
     }
     
