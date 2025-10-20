@@ -10,6 +10,8 @@ import Core
 public struct PrincipleReviewView: View {
     @Bindable public var store: StoreOf<PrincipleReviewFeature>
     @State private var isPresented: Bool = false
+    @State private var focusWithAnimation: Bool = false
+    @State private var focusWithoutAnimation: Bool = false
     
     @FocusState private var isFocused: Bool
     
@@ -20,82 +22,93 @@ public struct PrincipleReviewView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            if isFocused {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(store.state.selectedPrinciple.principle)
-                        .foregroundStyle(Color.hedgeUI.textTitle)
-                        .font(FontModel.body2Semibold)
-                    
-                    if let evaluation = store.selectedEvaluation {
-                        HStack(alignment: .center, spacing: 4) {
-                            evaluation.selectedImage
-                                .resizable()
-                                .frame(width: 18, height: 18)
-                            
-                            Text(evaluation.title)
-                                .foregroundStyle(Color.hedgeUI.brandDarken)
-                                .font(FontModel.body3Semibold)
-                        }
-                    } else {
-                        HStack(alignment: .center, spacing: 3) {
-                            Image.hedgeUI.keepDisabled
-                                .resizable()
-                                .frame(width: 18, height: 18)
-                            
-                            Image.hedgeUI.normalDisabled
-                                .resizable()
-                                .frame(width: 18, height: 18)
-                            
-                            Image.hedgeUI.notKeepDisabled
-                                .resizable()
-                                .frame(width: 18, height: 18)
-                            
-                            Spacer()
-                                .frame(width: 1)
-                                .foregroundStyle(.clear)
+            HedgeSpacer(height: 16)
+            
+            ZStack(alignment: .topLeading) {
+                if focusWithAnimation {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(store.state.selectedPrinciple.principle)
+                            .foregroundStyle(Color.hedgeUI.textTitle)
+                            .font(FontModel.body2Semibold)
                         
-                            Text("선택 전")
-                                .foregroundStyle(Color.hedgeUI.textAssistive)
-                                .font(FontModel.body3Medium)
+                        if let evaluation = store.selectedEvaluation {
+                            HStack(alignment: .center, spacing: 4) {
+                                evaluation.selectedImage
+                                    .resizable()
+                                    .frame(width: 18, height: 18)
+                                
+                                Text(evaluation.title)
+                                    .foregroundStyle(Color.hedgeUI.brandDarken)
+                                    .font(FontModel.body3Semibold)
+                            }
+                        } else {
+                            HStack(alignment: .center, spacing: 3) {
+                                Image.hedgeUI.keepDisabled
+                                    .resizable()
+                                    .frame(width: 18, height: 18)
+                                
+                                Image.hedgeUI.normalDisabled
+                                    .resizable()
+                                    .frame(width: 18, height: 18)
+                                
+                                Image.hedgeUI.notKeepDisabled
+                                    .resizable()
+                                    .frame(width: 18, height: 18)
+                                
+                                Spacer()
+                                    .frame(width: 1)
+                                    .foregroundStyle(.clear)
+                                
+                                Text("선택 전")
+                                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                                    .font(FontModel.body3Medium)
+                            }
                         }
+                        
+                        HedgeSpacer(height: 12)
+                            .color(.clear)
+                        
+                        HedgeSpacer(height: 1)
+                            .color(Color.hedgeUI.neutralBgSecondary)
                     }
-                    
+                    .padding(.top, 12)
+                    .padding(.horizontal, 20)
+                } else {
+                    VStack(alignment: .leading, spacing: 0) {
+                        navigationBar
+                        
+                        stockSummaryView
+                        
+                        HedgeSpacer(height: 1)
+                            .color(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.horizontal, 20)
+                        
+                        HedgeSpacer(height: 16)
+                            .padding(.horizontal, 20)
+                        
+                        // 원칙 요약
+                        principleSummaryView
+                        
+                        // 원칙 상세
+                        principleDetailView
+                        
+                        HedgeSpacer(height: 24)
+                        
+                        principleEvaluationView
+                        
+                        HedgeSpacer(height: 8)
+                    }
+                    .opacity(focusWithoutAnimation ? 0 : 1)
                 }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 20)
-                
-                HedgeSpacer(height: 1)
-                    .color(Color.hedgeUI.neutralBgSecondary)
-                    .padding(.horizontal, 20)
-                
-            } else {
-                navigationBar
-                
-                stockSummaryView
-                
-                HedgeSpacer(height: 1)
-                    .color(Color.hedgeUI.neutralBgSecondary)
-                    .padding(.horizontal, 20)
-                
-                HedgeSpacer(height: 16)
-                    .padding(.horizontal, 20)
-                
-                // 원칙 요약
-                principleSummaryView
-                
-                // 원칙 상세
-                principleDetailView
-                
-                HedgeSpacer(height: 24)
-                
-                principleEvaluationView
-                
-                HedgeSpacer(height: 8)
             }
             
             textInputView
             
             Spacer()
+            
+            if focusWithAnimation {
+                keyboardResourceButtonView
+            }
         }
         .onAppear {
             send(.onAppear)
@@ -103,7 +116,13 @@ public struct PrincipleReviewView: View {
         .onTapGesture {
             isFocused = false
         }
-//        .animation(.easeInOut(duration: 0.3), value: isFocused)
+        .onChange(of: isFocused) { _, newValue in
+            focusWithoutAnimation = newValue
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
+                focusWithAnimation = newValue
+            }
+        }
     }
     
     private var navigationBar: some View {
@@ -158,7 +177,7 @@ public struct PrincipleReviewView: View {
             HStack(spacing: 0) {
                 Text(store.state.selectedPrinciple.principle)
                     .foregroundStyle(Color.hedgeUI.grey900)
-                    .font(isFocused ? FontModel.body2Semibold : FontModel.h1Semibold)
+                    .font(FontModel.h1Semibold)
                 
                 Spacer()
                 
@@ -281,7 +300,7 @@ public struct PrincipleReviewView: View {
                     .scrollContentBackground(.hidden)
             }
             
-            if !isFocused {
+            if !focusWithAnimation {
                 resourceButtonView
             }
         }
@@ -304,6 +323,40 @@ public struct PrincipleReviewView: View {
                 .padding(4)
             
             Spacer()
+        }
+    }
+    
+    private var keyboardResourceButtonView: some View {
+        
+        VStack(spacing: 0) {
+            HedgeSpacer(height: 1)
+                .color(Color.hedgeUI.neutralBgSecondary)
+            
+            HedgeSpacer(height: 7)
+            
+            HStack(alignment: .center, spacing: 4) {
+                Image.hedgeUI.image
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .padding(5)
+                
+                Image.hedgeUI.link
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .padding(5)
+                
+                Spacer()
+                
+                Button {
+                    isFocused = false
+                } label: {
+                    Text("남기기")
+                        .font(FontModel.body1Semibold)
+                        .foregroundStyle(Color.hedgeUI.brandDarken)
+                }
+            }
+            .padding(.bottom, 8)
+            .padding(.horizontal, 12)
         }
     }
 }
