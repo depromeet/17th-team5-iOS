@@ -52,6 +52,7 @@ public struct HedgeActionButton: View {
                 Text(title)
                     .font(size.font)
                     .foregroundStyle(isEnabled ? color.textColor : color.disableTextColor)
+                    .frame(maxWidth: .infinity)
             }
         }
         .padding(.horizontal, size.horizontalPadding)
