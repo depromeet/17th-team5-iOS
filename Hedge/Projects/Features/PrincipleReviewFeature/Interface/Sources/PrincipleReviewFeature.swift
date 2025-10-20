@@ -12,6 +12,17 @@ import DesignKit
 import StockDomainInterface
 import PrinciplesDomainInterface
 
+public struct PhotoItem: Identifiable, Equatable {
+    public let id = UUID()
+    public let photosPickerItem: PhotosPickerItem
+    public var loadedImage: Image?
+    
+    public init(photosPickerItem: PhotosPickerItem, loadedImage: Image? = nil) {
+        self.photosPickerItem = photosPickerItem
+        self.loadedImage = loadedImage
+    }
+}
+
 @Reducer
 public struct PrincipleReviewFeature {
     
@@ -90,6 +101,7 @@ public struct PrincipleReviewFeature {
         public var text: String = ""
         public var selectedPhotoItems: [PhotosPickerItem] = []
         public var loadedImages: [Image] = []
+        public var photoItems: [PhotoItem] = []
         
         public var totalIndex: Int {
             principles.count
@@ -130,7 +142,7 @@ public struct PrincipleReviewFeature {
         case pricipleToggleButtonTapped
         case linkButtonTapped
         case loadPhotos
-        case deletePhoto(Int)
+        case deletePhoto(UUID)
     }
     public enum InnerAction { }
     public enum AsyncAction {
@@ -201,13 +213,21 @@ extension PrincipleReviewFeature {
         case .linkButtonTapped:
             return .none
         case .loadPhotos:
+            // selectedPhotoItems를 photoItems로 동기화
+            state.photoItems = state.selectedPhotoItems.map { PhotoItem(photosPickerItem: $0) }
             return .send(.async(.loadImagesFromPhotos(state.selectedPhotoItems)))
-        case .deletePhoto(let index):
-            guard state.selectedPhotoItems.indices.contains(index),
-                  state.loadedImages.indices.contains(index) else { return .none }
-            
-            state.selectedPhotoItems.remove(at: index)
-            state.loadedImages.remove(at: index)
+        case .deletePhoto(let photoId):
+            // ID로 PhotoItem 찾아서 삭제
+            if let index = state.photoItems.firstIndex(where: { $0.id == photoId }) {
+                state.photoItems.remove(at: index)
+                // selectedPhotoItems와 loadedImages도 동기화
+                if index < state.selectedPhotoItems.count {
+                    state.selectedPhotoItems.remove(at: index)
+                }
+                if index < state.loadedImages.count {
+                    state.loadedImages.remove(at: index)
+                }
+            }
             return .none
         }
     }
@@ -229,15 +249,21 @@ extension PrincipleReviewFeature {
         case .loadImagesFromPhotos(let photoItems):
             return .run { send in
                 var images: [Image] = []
+                var updatedPhotoItems: [PhotoItem] = []
                 
                 for photoItem in photoItems {
                     if let data = try? await photoItem.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
-                        images.append(Image(uiImage: uiImage))
+                        let loadedImage = Image(uiImage: uiImage)
+                        images.append(loadedImage)
+                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: loadedImage))
+                    } else {
+                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: nil))
                     }
                 }
                 
                 await send(.binding(.set(\.loadedImages, images)))
+                await send(.binding(.set(\.photoItems, updatedPhotoItems)))
             }
         }
     }

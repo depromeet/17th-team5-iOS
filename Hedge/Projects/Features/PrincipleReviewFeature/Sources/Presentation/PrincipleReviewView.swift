@@ -313,28 +313,39 @@ public struct PrincipleReviewView: View {
                 resourceButtonView
             }
             
-            ScrollView(.horizontal) {
-                HStack(alignment: .top, spacing: 12) {
-                    ForEach(Array(store.loadedImages.enumerated()), id: \.offset) { index, image in
-                        ZStack(alignment: .topTrailing) {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 120)
-                                .clipped()
-                                .cornerRadius(18)
-                            
-                            Button {
-                                send(.deletePhoto(index))
-                            } label: {
-                                Image.hedgeUI.closeFillWhite
-                            }
-                            .padding(.top, 4)
-                            .padding(.trailing, 4)
-                        }
-                    }
-                }
-            }
+             ScrollView(.horizontal) {
+                 HStack(alignment: .top, spacing: 12) {
+                     ForEach(store.photoItems) { photoItem in
+                         ZStack(alignment: .topTrailing) {
+                             if let image = photoItem.loadedImage {
+                                 image
+                                     .resizable()
+                                     .aspectRatio(contentMode: .fit)
+                                     .frame(width: 120)
+                                     .clipped()
+                                     .cornerRadius(18)
+                             } else {
+                                 // 로딩 중이거나 실패한 경우
+                                 Rectangle()
+                                     .fill(Color.hedgeUI.neutralBgSecondary)
+                                     .frame(width: 120, height: 120)
+                                     .cornerRadius(18)
+                                     .overlay {
+                                         ProgressView()
+                                     }
+                             }
+                             
+                             Button {
+                                 send(.deletePhoto(photoItem.id))
+                             } label: {
+                                 Image.hedgeUI.closeFillWhite
+                             }
+                             .padding(.top, 4)
+                             .padding(.trailing, 4)
+                         }
+                     }
+                 }
+             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
