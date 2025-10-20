@@ -220,7 +220,7 @@ public struct PrincipleReviewView: View {
                 send(.keepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
                 
-                let style = PrincipleReviewFeature.Evaluation.style(store.selectedEvaluation, .keep)
+                let style = store.state.evalutionStyle(store.selectedEvaluation, .keep)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -243,7 +243,7 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.normalButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
-                let style = PrincipleReviewFeature.Evaluation.style(store.selectedEvaluation, .normal)
+                let style = store.state.evalutionStyle(store.selectedEvaluation, .normal)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -266,7 +266,7 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.notKeepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
-                let style = PrincipleReviewFeature.Evaluation.style(store.selectedEvaluation, .notKeep)
+                let style = store.state.evalutionStyle(store.selectedEvaluation, .notKeep)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)

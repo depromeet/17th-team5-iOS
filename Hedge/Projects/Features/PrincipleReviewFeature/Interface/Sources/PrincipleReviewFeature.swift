@@ -72,18 +72,6 @@ public struct PrincipleReviewFeature {
             public let textColor: Color
             public let font: FontModel
         }
-        
-        public static func style(_ lhs: Evaluation?, _ rhs: Evaluation) -> Style {
-            let isSelected: Bool = lhs == rhs
-            let image: Image = isSelected ? rhs.selectedImage : rhs.unselectedImage
-            
-            return Style(title: rhs.title,
-                         lineWidth: isSelected ? 1.5 : 1,
-                         foregroundColor: isSelected ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary,
-                         image: image,
-                         textColor: isSelected ? Color.hedgeUI.brandDarken : Color.hedgeUI.textAlternative,
-                         font: isSelected ? FontModel.label1Semibold : FontModel.label1Medium)
-        }
     }
     
     public init() {
@@ -121,6 +109,18 @@ public struct PrincipleReviewFeature {
             self.stock = stock
             self.tradeHistory = tradeHistory
             self.principles = principles
+        }
+        
+        public func evalutionStyle(_ lhs: Evaluation?, _ rhs: Evaluation) -> Evaluation.Style {
+            let isSelected: Bool = lhs == rhs
+            let image: Image = isSelected ? rhs.selectedImage : rhs.unselectedImage
+            
+            return Evaluation.Style(title: rhs.title,
+                         lineWidth: isSelected ? 1.5 : 1,
+                         foregroundColor: isSelected ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary,
+                         image: image,
+                         textColor: isSelected ? Color.hedgeUI.brandDarken : Color.hedgeUI.textAlternative,
+                         font: isSelected ? FontModel.label1Semibold : FontModel.label1Medium)
         }
     }
     
