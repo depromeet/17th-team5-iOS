@@ -10,7 +10,6 @@ import Core
 public struct PrincipleReviewView: View {
     @Bindable public var store: StoreOf<PrincipleReviewFeature>
     @State private var isPresented: Bool = false
-    @State private var textEditorHeight: CGFloat = 22
     
     @FocusState private var isFocused: Bool
     
@@ -92,13 +91,11 @@ public struct PrincipleReviewView: View {
                 principleEvaluationView
                 
                 HedgeSpacer(height: 8)
-                
-                Spacer()
             }
             
             textInputView
             
-            resourceButtonView
+            Spacer()
         }
         .onAppear {
             send(.onAppear)
@@ -106,6 +103,7 @@ public struct PrincipleReviewView: View {
         .onTapGesture {
             isFocused = false
         }
+//        .animation(.easeInOut(duration: 0.3), value: isFocused)
     }
     
     private var navigationBar: some View {
@@ -264,43 +262,33 @@ public struct PrincipleReviewView: View {
     }
     
     private var textInputView: some View {
-        ZStack(alignment: .topLeading) {
-            TextEditor(text: $store.state.text)
-                .focused($isFocused)
-                .tint(.black)
-                .font(FontModel.body3Medium)
-                .foregroundStyle(Color.hedgeUI.textTitle)
-                .scrollContentBackground(.hidden)
-                .frame(height: textEditorHeight, alignment: .topLeading)
-            
-            if store.state.text.isEmpty && !isFocused {
-                Text("이유 남기기")
+        
+        ScrollView {
+            ZStack(alignment: .topLeading) {
+                if store.state.text.isEmpty {
+                    Text("이유 남기기")
+                        .font(FontModel.body3Medium)
+                        .foregroundStyle(Color.hedgeUI.textAssistive)
+                        .padding(.horizontal, 4)
+                        .padding(.top, 8)
+                }
+                
+                TextEditor(text: $store.state.text)
+                    .focused($isFocused)
+                    .tint(.black)
                     .font(FontModel.body3Medium)
-                    .foregroundStyle(Color.hedgeUI.textAssistive)
-                    .padding(.horizontal, 8)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                    .scrollContentBackground(.hidden)
             }
             
-            GeometryReader { geo in
-                Text((store.state.text.isEmpty ? " " : store.state.text) + " ")
-                    .font(FontModel.body3Medium)
-                    .padding(.horizontal, 8)
-                    .frame(width: geo.size.width, alignment: .leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .opacity(0)
-                    .background(
-                        GeometryReader { inner in
-                            Color.clear.preference(key: TextEditorHeightKey.self, value: inner.size.height)
-                        }
-                    )
+            if !isFocused {
+                resourceButtonView
             }
-        }
-        .onPreferenceChange(TextEditorHeightKey.self) { height in
-            textEditorHeight = height
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
         .padding(.bottom, 8)
-        .id("textEditorArea")
+        .scrollIndicators(.hidden)
     }
     
     private var resourceButtonView: some View {
@@ -317,14 +305,6 @@ public struct PrincipleReviewView: View {
             
             Spacer()
         }
-        .padding(.horizontal, 20)
-    }
-}
-
-private struct TextEditorHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
     }
 }
 
