@@ -124,6 +124,13 @@ public struct PrincipleReviewView: View {
                 focusWithAnimation = newValue
             }
         }
+        .overlay {
+            if store.state.linkModalShown {
+                HedgeLinkModal(shown: $store.state.linkModalShown) { link in
+                    send(.addLinkButtonTapped(link))
+                }
+            }
+        }
     }
     
     private var navigationBar: some View {
@@ -359,7 +366,7 @@ public struct PrincipleReviewView: View {
             photoPickerView
             
             Button {
-                
+                send(.linkButtonTapped)
             } label: {
                 Image.hedgeUI.link
                     .renderingMode(.template)

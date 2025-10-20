@@ -74,9 +74,7 @@ public struct PrincipleReviewFeature {
         }
     }
     
-    public init() {
-        
-    }
+    public init() { }
     
     @ObservableState
     public struct State: Equatable {
@@ -87,6 +85,8 @@ public struct PrincipleReviewFeature {
         public var selectedEvaluation: Evaluation? = nil
         public var principleDetailShown: Bool = false
         public var text: String = ""
+        public var linkModalShown: Bool = false
+        public var addLink: String = ""
         public var selectedPhotoItems: [PhotosPickerItem] = []
         public var loadedImages: [Image] = []
         public var photoItems: [PhotoItem] = []
@@ -142,14 +142,19 @@ public struct PrincipleReviewFeature {
         case pricipleToggleButtonTapped
         case linkButtonTapped
         case loadPhotos
+        case addLinkButtonTapped(String)
         case deletePhoto(UUID)
     }
-    public enum InnerAction { }
+    public enum InnerAction {
+        case linkDismiss
+    }
     public enum AsyncAction {
         case loadImagesFromPhotos([PhotosPickerItem])
     }
     public enum ScopeAction { }
-    public enum DelegateAction { }
+    public enum DelegateAction {
+        case addLink(String)
+    }
     
     // MARK: - Debounce ID
     private enum CancelID { case searchDebounce }
@@ -211,6 +216,7 @@ extension PrincipleReviewFeature {
             state.principleDetailShown.toggle()
             return .none
         case .linkButtonTapped:
+            state.linkModalShown = true
             return .none
         case .loadPhotos:
             // selectedPhotoItems를 photoItems로 동기화
@@ -229,6 +235,8 @@ extension PrincipleReviewFeature {
                 }
             }
             return .none
+        case .addLinkButtonTapped(let link):
+            return .send(.delegate(.addLink(link)))
         }
     }
     
@@ -237,7 +245,11 @@ extension PrincipleReviewFeature {
         _ state: inout State,
         _ action: InnerAction
     ) -> Effect<Action> {
-        
+        switch action {
+        case .linkDismiss:
+            state.linkModalShown = false
+            return .none
+        }
     }
     
     // MARK: - Async Core
@@ -281,6 +293,10 @@ extension PrincipleReviewFeature {
         _ state: inout State,
         _ action: DelegateAction
     ) -> Effect<Action> {
-        
+        switch action {
+        case .addLink(let link):
+            state.addLink = link
+            return .send(.inner(.linkDismiss))
+        }
     }
 }
