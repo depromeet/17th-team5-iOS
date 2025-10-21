@@ -91,7 +91,7 @@ public struct PrincipleReviewFeature {
         public var text: String = ""
         public var linkModalShown: Bool = false
         public var addLink: String = ""
-        public var linkMetadata: LinkMetadata?
+        public var linkMetadataList: [LinkMetadata] = []
         public var selectedPhotoItems: [PhotosPickerItem] = []
         public var loadedImages: [Image] = []
         public var photoItems: [PhotoItem] = []
@@ -149,6 +149,7 @@ public struct PrincipleReviewFeature {
         case loadPhotos
         case addLinkButtonTapped(String)
         case deletePhoto(UUID)
+        case deleteLink(Int)
     }
     public enum InnerAction {
         case linkDismiss
@@ -243,6 +244,11 @@ extension PrincipleReviewFeature {
             return .none
         case .addLinkButtonTapped(let link):
             return .send(.delegate(.addLink(link)))
+        case .deleteLink(let index):
+            if index < state.linkMetadataList.count {
+                state.linkMetadataList.remove(at: index)
+            }
+            return .none
         }
     }
     
@@ -285,10 +291,10 @@ extension PrincipleReviewFeature {
             }
             
         case .fetchLinkMetadata(let urlString):
-            return .run { send in
+            return .run { [linkMetadataList = state.linkMetadataList] send in
                 do {
                     let metadata = try await fetchLinkUseCase.execute(urlString: urlString)
-                    await send(.binding(.set(\.linkMetadata, metadata)))
+                    await send(.binding(.set(\.linkMetadataList, linkMetadataList + [metadata])))
                 } catch {
                     // 에러 처리는 필요에 따라 추가
                     print("Failed to fetch link metadata: \(error)")
@@ -320,16 +326,3 @@ extension PrincipleReviewFeature {
         }
     }
 }
-
-// #Preview {
-//     PrincipleReviewView(store: .init(initialState: PrincipleReviewFeature.State(
-//         tradeType: .sell,
-//         stock: .init(symbol: "symbol", title: "삼성전자", market: "market"),
-//         tradeHistory: .init(tradingPrice: "97,700",
-//                             tradingQuantity: "10",
-//                             tradingDate: "123123",
-//                             concurrency: "원"),
-//         principles: [.init(id: 0, principle: "원칙 1입니다."),
-//                      .init(id: 1, principle: "원칙 2입니다.")]),
-//                                      reducer: { PrincipleReviewFeature(linkMetadataService: LinkMetadataService(provider: Provider.plain)) } ))
-// }

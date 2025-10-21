@@ -356,8 +356,8 @@ public struct PrincipleReviewView: View {
             }
             
             // 링크 메타데이터 표시
-            if let metadata = store.linkMetadata {
-                linkMetadataView(metadata)
+            ForEach(Array(store.linkMetadataList.enumerated()), id: \.offset) { index, metadata in
+                linkMetadataView(metadata, index: index)
             }
         }
         .padding(.horizontal, 20)
@@ -435,10 +435,11 @@ public struct PrincipleReviewView: View {
         }
     }
     
-    private func linkMetadataView(_ metadata: LinkMetadata) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 12) {
-                // 이미지
+    private func linkMetadataView(_ metadata: LinkMetadata, index: Int) -> some View {
+        
+        ZStack(alignment: .topTrailing) {
+            // 이미지
+            HStack(alignment: .center, spacing: 16) {
                 if let imageURL = metadata.imageURL,
                    let url = URL(string: imageURL) {
                     AsyncImage(url: url) { image in
@@ -449,21 +450,21 @@ public struct PrincipleReviewView: View {
                         Rectangle()
                             .fill(Color.hedgeUI.neutralBgSecondary)
                     }
-                    .frame(width: 80, height: 80)
+                    .frame(width: 98, height: 98)
                     .clipped()
                     .cornerRadius(8)
                 } else {
                     Rectangle()
                         .fill(Color.hedgeUI.neutralBgSecondary)
-                        .frame(width: 80, height: 80)
+                        .frame(width: 98, height: 98)
                         .cornerRadius(8)
                 }
                 
                 // 텍스트 정보
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(metadata.title)
-                        .font(FontModel.body3Semibold)
-                        .foregroundStyle(Color.hedgeUI.textTitle)
+                        .font(FontModel.label2Semibold)
+                        .foregroundStyle(Color.hedgeUI.textPrimary)
                         .lineLimit(2)
                     
                     Text(metadata.newsSource)
@@ -473,13 +474,23 @@ public struct PrincipleReviewView: View {
                 
                 Spacer()
             }
+            
+            // 삭제 버튼
+            Button {
+                send(.deleteLink(index))
+            } label: {
+                Image.hedgeUI.closeFill
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .padding(3)
+            }
+            .padding(.top, 5)
+            .padding(.trailing, 4)
         }
-        .padding(12)
-        .background(Color.hedgeUI.neutralBgDefault)
-        .cornerRadius(12)
+        .cornerRadius(16)
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1.2)
         )
     }
 }
