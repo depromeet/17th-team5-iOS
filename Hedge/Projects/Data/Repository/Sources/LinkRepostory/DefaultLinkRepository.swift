@@ -19,7 +19,7 @@ public struct DefaultLinkRepository: LinkRepository {
         self.dataSource = dataSource
     }
     
-    public func fetch(urlString: String) async throws -> LinkMeta {
+    public func fetch(urlString: String) async throws -> LinkMetadata {
         return try await dataSource.fetch(urlString: urlString).toDomain()
     }
 }

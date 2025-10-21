@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol FetchLinkUseCase {
-    func execute(urlString: String) async throws -> LinkMeta
+    func execute(urlString: String) async throws -> LinkMetadata
 }

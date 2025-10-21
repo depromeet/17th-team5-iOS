@@ -2,11 +2,11 @@ import Foundation
 
 import LinkDomainInterface
 
-public struct LinkMetaDTO: Codable, Equatable {
+public struct LinkMetadataDTO: Codable, Equatable {
     public let title: String
     public let imageURL: String?
     public let newsSource: String
-    
+
     public init(title: String, imageURL: String?, newsSource: String) {
         self.title = title
         self.imageURL = imageURL
@@ -14,9 +14,9 @@ public struct LinkMetaDTO: Codable, Equatable {
     }
 }
 
-extension LinkMetaDTO {
-    public func toDomain() -> LinkMeta {
-        return LinkMeta(title: title,
+extension LinkMetadataDTO {
+    public func toDomain() -> LinkMetadata {
+        return LinkMetadata(title: title,
                         imageURL: imageURL,
                         newsSource: newsSource)
     }

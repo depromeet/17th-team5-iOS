@@ -91,7 +91,7 @@ public struct PrincipleReviewFeature {
         public var text: String = ""
         public var linkModalShown: Bool = false
         public var addLink: String = ""
-        public var linkMetadata: LinkMeta?
+        public var linkMetadata: LinkMetadata?
         public var selectedPhotoItems: [PhotosPickerItem] = []
         public var loadedImages: [Image] = []
         public var photoItems: [PhotoItem] = []

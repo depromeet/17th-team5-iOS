@@ -4,8 +4,6 @@ import PrincipleReviewFeatureInterface
 import LinkDomainInterface
 import LinkDomain
 import Shared
-import RemoteDataSource
-import Repository
 
 @main
 struct PrincipleReviewApp: App {
@@ -14,7 +12,7 @@ struct PrincipleReviewApp: App {
     var body: some Scene {
         WindowGroup {
             
-            let linkUseCase = FetchLink(repository: DefaultLinkRepository(dataSource: DefaultLinkDataSource()))
+            let linkUseCase = MockFetchLink()
             
             PrincipleReviewView(store: .init(initialState: PrincipleReviewFeature.State(
                 tradeType: .sell,

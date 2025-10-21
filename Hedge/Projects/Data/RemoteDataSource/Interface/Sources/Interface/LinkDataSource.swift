@@ -10,5 +10,5 @@ import Foundation
 
 public protocol LinkDataSource {
     /// 주식 검색
-    func fetch(urlString: String) async throws -> LinkMetaDTO
+    func fetch(urlString: String) async throws -> LinkMetadataDTO
 }

@@ -1,5 +1,5 @@
 //
-//  LinkMeta.swift
+//  LinkMetadata.swift
 //  LinkDomainInterface
 //
 //  Created by 이중엽 on 10/21/25.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct LinkMeta: Equatable, Hashable {
+public struct LinkMetadata: Equatable, Hashable {
     public let id: UUID = UUID()
     public let title: String
     public let imageURL: String?

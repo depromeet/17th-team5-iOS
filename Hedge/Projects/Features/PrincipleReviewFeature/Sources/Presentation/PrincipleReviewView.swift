@@ -435,7 +435,7 @@ public struct PrincipleReviewView: View {
         }
     }
     
-    private func linkMetadataView(_ metadata: LinkMeta) -> some View {
+    private func linkMetadataView(_ metadata: LinkMetadata) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 12) {
                 // 이미지

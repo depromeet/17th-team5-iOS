@@ -9,5 +9,5 @@
 import Foundation
 
 public protocol LinkRepository {
-    func fetch(urlString: String) async throws -> LinkMeta
+    func fetch(urlString: String) async throws -> LinkMetadata
 }
