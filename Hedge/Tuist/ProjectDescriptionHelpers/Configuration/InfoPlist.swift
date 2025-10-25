@@ -18,6 +18,12 @@ public struct InfoPlist {
         "NSAppTransportSecurity": [
             "NSAllowsArbitraryLoads": true
         ],
+        "CFBundleURLTypes": [
+            [
+                "CFBundleURLName": "AppleSignIn",
+                "CFBundleURLSchemes": ["com.og.hedge"]
+            ]
+        ],
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
             "UISceneConfigurations": [

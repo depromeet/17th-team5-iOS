@@ -16,10 +16,10 @@ public struct AppConfiguration {
     let projectName: String = "Hedge"
     let organizationName = "HedgeCompany"
     let shortVersion: String = "1.0.0"
-    let bundleIdentifier: String = "com.depromeet.hedge"
+    let bundleIdentifier: String = "com.og.hedge"
     let displayName: String = "햇제"
     let destination: Set<Destination> = [.iPhone, .iPad]
-    var entitlements: Entitlements? = nil
+    var entitlements: Entitlements? = "Hedge.entitlements"
     let deploymentTarget: DeploymentTargets = .iOS("17.0")
     
     public var configurationName: ConfigurationName {
@@ -28,10 +28,6 @@ public struct AppConfiguration {
     
     var infoPlist: [String : Plist.Value] {
         InfoPlist.appInfoPlist(self)
-    }
-    
-    public var autoCodeSigning: SettingsDictionary {
-        return SettingsDictionary().automaticCodeSigning(devTeam: "DD8KP9C4KQ")
     }
     
     let commonSettings = Settings.settings(
