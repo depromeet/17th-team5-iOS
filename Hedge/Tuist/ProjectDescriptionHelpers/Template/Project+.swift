@@ -139,8 +139,8 @@ extension Project {
         )
         
         // Test 타겟
-        let testTarget = createFrameworkTarget(
-            name: "\(name)Test",
+        let testTarget = createTestTarget(
+            name: name,
             configuration: configuration,
             product: product,
             dependencies: [
@@ -209,6 +209,26 @@ extension Project {
             deploymentTargets: configuration.deploymentTarget,
             infoPlist: .default,
             sources: ["Sources/**"],
+            resources: hasResources ? [.glob(pattern: "Resources/**", excluding: [])] : [],
+            dependencies: dependencies
+        )
+    }
+    
+    private static func createTestTarget(
+        name: String,
+        configuration: AppConfiguration,
+        hasResources: Bool = false,
+        product: Product,
+        dependencies: [TargetDependency]
+    ) -> Target {
+        return Target.target(
+            name: "\(name)Test",
+            destinations: configuration.destination,
+            product: product,
+            bundleId: "\(configuration.bundleIdentifier).\(name.lowercased())",
+            deploymentTargets: configuration.deploymentTarget,
+            infoPlist: .default,
+            sources: ["Test/Sources/**"],
             resources: hasResources ? [.glob(pattern: "Resources/**", excluding: [])] : [],
             dependencies: dependencies
         )
