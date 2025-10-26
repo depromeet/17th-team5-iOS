@@ -11,13 +11,15 @@ import Foundation
 import Alamofire
 
 public final class HedgeInterceptor: RequestInterceptor {
+    private let accessToken = UserDefaults.standard.string(forKey: "accessToken")
+    
     public func adapt(
         _ urlRequest: URLRequest,
         for session: Session,
         completion: @escaping (Result<URLRequest, any Error>) -> Void
     ) {
         var urlRequest = urlRequest
-        if let accessToken = UserDefaults.standard.string(forKey: "accessToken") {
+        if let accessToken {
             urlRequest.headers["Authorization"] = "Bearer " + accessToken
         }
         completion(.success(urlRequest))
