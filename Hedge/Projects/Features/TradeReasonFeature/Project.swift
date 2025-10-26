@@ -6,5 +6,7 @@ let project = Project.configure(
     product: .staticFramework,
     dependencies: [
         .Core.core
+    ], interfaceDependencies: [
+        .Feature.Principles.interface
     ]
 )

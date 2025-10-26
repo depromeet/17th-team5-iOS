@@ -31,7 +31,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
     private let principles: [Principle]
     private let selectedPrinciples: Set<Int>
     private let principleBuilder: PrinciplesViewBuilderProtocol
-    private let tradeReasonBuilder: TradeReasonViewBuilderProtocol
+    private let tradeReasonBuilder: TradeReasonViewBuilder
     private let generateRetrospectUseCase = DIContainer.resolve(GenerateRetrospectUseCase.self)
     private let analysisUseCase = DIContainer.resolve(AnalysisUseCase.self)
     
@@ -43,7 +43,7 @@ public final class DefaultTradeReasonCoordinator: TradeReasonCoordinator {
         principles: [Principle],
         selectedPrinciples: Set<Int>,
         principleBuilder: PrinciplesViewBuilderProtocol,
-        tradeReasonBuilder: TradeReasonViewBuilderProtocol
+        tradeReasonBuilder: TradeReasonViewBuilder
     ) {
         
         self.navigationController = navigationController

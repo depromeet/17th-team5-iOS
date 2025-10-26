@@ -34,6 +34,7 @@ extension Project {
                 name: name,
                 organizationName: configuration.organizationName,
                 dependencies: dependencies,
+                interfaceDependencies: interfaceDependencies,
                 settings: configuration.commonSettings
             )
             

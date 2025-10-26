@@ -111,6 +111,7 @@ extension Project {
         name: String,
         organizationName: String,
         dependencies: [TargetDependency],
+        interfaceDependencies: [TargetDependency],
         settings: Settings
     ) -> Project {
         
@@ -123,13 +124,13 @@ extension Project {
         )
         
         // Framework 타겟
+        var interfaceDependencies = interfaceDependencies
+        interfaceDependencies.append(.target(name: "\(name)Interface"))
         let frameworkTarget = createFrameworkTarget(
             name: name,
             configuration: configuration,
             product: product,
-            dependencies: [
-                .target(name: "\(name)Interface")
-            ]
+            dependencies: interfaceDependencies
         )
         
         // Demo 타겟
