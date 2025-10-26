@@ -13,7 +13,7 @@ public struct SocialLoginResponseDTO: Decodable {
     public let nickname: String?
     public let email: String?
     public let profileImageUrl: String?
-    public let isNewUser: Bool
+//    public let isNewUser: Bool
     public let accessToken: String
     public let refreshToken: String
 }

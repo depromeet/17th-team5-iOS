@@ -25,14 +25,13 @@ public final class DefaultAuthRepository: AuthRepository {
     public func social(
         provider: AuthDomainInterface.SocialProvider,
         authCode: String,
-        redirectUri: String?,
         email: String?,
         nickname: String?
     ) async throws {
         let request = SocialLoginRequestDTO(
             provider: provider.rawValue,
             authCode: authCode,
-            redirectUri: redirectUri,
+            redirectUri: "",
             nickname: nickname,
             email: email
         )

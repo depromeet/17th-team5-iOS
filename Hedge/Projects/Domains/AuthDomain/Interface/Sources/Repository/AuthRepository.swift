@@ -12,7 +12,6 @@ public protocol AuthRepository {
     func social(
         provider: SocialProvider,
         authCode: String,
-        redirectUri: String?,
         email: String?,
         nickname: String?
     ) async throws

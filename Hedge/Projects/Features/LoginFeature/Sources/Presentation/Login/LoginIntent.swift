@@ -34,23 +34,23 @@ public struct LoginIntent: LoginIntentProtocol {
             return
         }
         
-        Task {
+        Task { @MainActor in
             do {
+                let nickname = [credential.fullName?.givenName, credential.fullName?.familyName]
+                            .compactMap { $0 }
+                            .joined(separator: " ")
+                
                 try await authRepository.social(
                     provider: .apple,
                     authCode: authorizationCodeString,
-                    redirectUri: "com.og.hedge",
                     email: credential.email,
-                    nickname: credential.fullName?.nickname
+                    nickname: nickname
                 )
                 coordinator?.finish()
             } catch {
                 Log.error("login failure server: \(error)")
             }
         }
-        
-        Log.debug(authorizationCodeString)
-        
     }
     
     public func appleLoginFailure(_ error: any Error) {
