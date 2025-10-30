@@ -1,4 +1,6 @@
 import SwiftUI
+import ComposableArchitecture
+import TradeHistoryFeatureInterface
 import TradeHistoryFeature
 import DesignKit
 
@@ -8,7 +10,7 @@ struct TradeHistoryApp: App {
     
     var body: some Scene {
         WindowGroup {
-            TradeHistoryInputView(image: HedgeUI.search, stockTitle: "종목명", description: "얼마에 매도하셨나요?")
+            
         }
     }
 }

@@ -14,7 +14,6 @@ let project = Project.configure(
     dependencies: [
         .Feature.Home.feature,
         .Feature.StockSearch.feature,
-        .Feature.TradeReason.feature,
         .Feature.TradeHistory.feature,
         .Feature.TradeFeedback.feature,
         .Feature.Principles.feature,
