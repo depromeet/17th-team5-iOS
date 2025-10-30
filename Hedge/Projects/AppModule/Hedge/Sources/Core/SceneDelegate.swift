@@ -10,6 +10,11 @@ import Foundation
 import UIKit
 
 import Core
+import PrincipleReviewFeatureInterface
+import PrincipleReviewFeature
+import LinkDomainInterface
+import Shared
+import SwiftUI
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?

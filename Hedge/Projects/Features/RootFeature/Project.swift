@@ -18,5 +18,6 @@ let project = Project.configure(
         .Feature.TradeHistory.feature,
         .Feature.TradeFeedback.feature,
         .Feature.Principles.feature,
+        .Feature.PrincipleReview.feature,
     ]
 )

@@ -38,7 +38,7 @@ extension HedgeUI where Base == Image {
     public static var closeThin: Image { asset(#function) }
     public static var closeThick: Image { asset(#function) }
     public static var search: Image { asset(#function) }
-    public static var closeFill: Image { asset(#function) }
+    public static var closeFillWhite: Image { asset(#function) }
     public static var trash: Image { asset(#function) }
     public static var edit: Image { asset(#function) }
     public static var arrowDown: Image { asset(#function) }
@@ -54,6 +54,8 @@ extension HedgeUI where Base == Image {
     public static var principle: Image { asset(#function) }
     public static var check: Image { asset(#function) }
     public static var uncheck: Image { asset(#function) }
+    public static var image: Image { asset(#function) }
+    public static var link: Image { asset(#function) }
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }
@@ -65,6 +67,7 @@ extension HedgeUI where Base == Image {
     public static var error: Image { asset(#function) }
     
     // MARK: Size 32
+    public static var closeFill: Image { asset(#function) }
     public static var toastWarn: Image { asset(#function) }
     public static var toastCheck: Image { asset(#function) }
     public static var slider: Image { asset(#function) }
@@ -80,6 +83,14 @@ extension HedgeUI where Base == Image {
     public static var impulseOff: Image { asset(#function) }
     public static var neutral: Image { asset(#function) }
     public static var neutralOff: Image { asset(#function) }
+    
+    // MARK: Size 40
+    public static var keep: Image { asset(#function) }
+    public static var keepDisabled: Image { asset(#function) }
+    public static var normal: Image { asset(#function) }
+    public static var normalDisabled: Image { asset(#function) }
+    public static var notKeep: Image { asset(#function) }
+    public static var notKeepDisabled: Image { asset(#function) }
     
     // MARK: Size 48
     public static var anxiousOn: Image { asset(#function) }

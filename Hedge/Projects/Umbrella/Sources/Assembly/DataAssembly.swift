@@ -18,6 +18,7 @@ import PrinciplesDomainInterface
 import RetrospectDomainInterface
 import FeedbackDomainInterface
 import AnalysisDomainInterface
+import LinkDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -53,6 +54,12 @@ public struct DataAssembly: Assembly {
         container.register(AnalysisRepository.self) { _ in
             DefaultAnalysisRepository(
                 dataSource: DefaultAnalysisDataSource()
+            )
+        }
+        
+        container.register(LinkRepository.self) { _ in
+            DefaultLinkRepository(
+                dataSource: DefaultLinkDataSource()
             )
         }
     }
