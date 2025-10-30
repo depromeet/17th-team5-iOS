@@ -45,7 +45,6 @@ public struct PrincipleReviewView: View {
             isFocused = false
         }
         .onChange(of: isFocused) { _, newValue in
-            print(newValue)
             focusWithoutAnimation = newValue
             
             withAnimation(.easeInOut(duration: 0.3)) {
