@@ -80,30 +80,59 @@ public struct PrincipleReviewFeature {
         }
     }
     
+    // 각 페이지별 독립적인 상태
+    public struct PageState: Equatable {
+        public var selectedEvaluation: Evaluation? = nil
+        public var principleDetailShown: Bool = false
+        public var text: String = ""
+        public var linkMetadataList: [LinkMetadata] = []
+        public var selectedPhotoItems: [PhotosPickerItem] = []
+        public var loadedImages: [Image] = []
+        public var photoItems: [PhotoItem] = []
+        
+        public init() {}
+    }
+    
     @ObservableState
     public struct State: Equatable {
         public var tradeType: TradeType
         public var stock: StockSearch
         public var tradeHistory: TradeHistory
         public var principles: [Principle]
-        public var selectedEvaluation: Evaluation? = nil
-        public var principleDetailShown: Bool = false
-        public var text: String = ""
+        public var pageStates: [PageState] = []
         public var linkModalShown: Bool = false
         public var addLink: String = ""
-        public var linkMetadataList: [LinkMetadata] = []
-        public var selectedPhotoItems: [PhotosPickerItem] = []
-        public var loadedImages: [Image] = []
-        public var photoItems: [PhotoItem] = []
+        public var currentPageIndex: Int = 0
         
         public var totalIndex: Int {
             principles.count
         }
         
-        private var selectedIndex: Int = 0
+        public var endAngle: Double {
+            let totalCount = Double(pageStates.count)
+            var selectedCount = Double(pageStates.compactMap { $0.selectedEvaluation }.count)
+            
+            if selectedCount == 0 { selectedCount = 0.01 }
+            
+            return selectedCount / totalCount
+        }
         
         public var selectedPrinciple: Principle {
-            principles[selectedIndex]
+            principles[currentPageIndex]
+        }
+        
+        public var currentPageState: PageState {
+            get {
+                if currentPageIndex < pageStates.count {
+                    return pageStates[currentPageIndex]
+                }
+                return PageState()
+            }
+            set {
+                if currentPageIndex < pageStates.count {
+                    pageStates[currentPageIndex] = newValue
+                }
+            }
         }
         
         public init(tradeType: TradeType,
@@ -114,6 +143,7 @@ public struct PrincipleReviewFeature {
             self.stock = stock
             self.tradeHistory = tradeHistory
             self.principles = principles
+            self.pageStates = Array(repeating: PageState(), count: principles.count)
         }
         
         public func evalutionStyle(_ lhs: Evaluation?, _ rhs: Evaluation) -> Evaluation.Style {
@@ -150,6 +180,7 @@ public struct PrincipleReviewFeature {
         case addLinkButtonTapped(String)
         case deletePhoto(UUID)
         case deleteLink(Int)
+        case pageChanged(Int)
     }
     public enum InnerAction {
         case linkDismiss
@@ -211,43 +242,46 @@ extension PrincipleReviewFeature {
         case .backButtonTapped:
             return .none
         case .keepButtonTapped:
-            state.selectedEvaluation = state.selectedEvaluation == .keep ? nil : .keep
+            state.currentPageState.selectedEvaluation = state.currentPageState.selectedEvaluation == .keep ? nil : .keep
             return .none
         case .normalButtonTapped:
-            state.selectedEvaluation = state.selectedEvaluation == .normal ? nil : .normal
+            state.currentPageState.selectedEvaluation = state.currentPageState.selectedEvaluation == .normal ? nil : .normal
             return .none
         case .notKeepButtonTapped:
-            state.selectedEvaluation = state.selectedEvaluation == .notKeep ? nil : .notKeep
+            state.currentPageState.selectedEvaluation = state.currentPageState.selectedEvaluation == .notKeep ? nil : .notKeep
             return .none
         case .pricipleToggleButtonTapped:
-            state.principleDetailShown.toggle()
+            state.currentPageState.principleDetailShown.toggle()
             return .none
         case .linkButtonTapped:
             state.linkModalShown = true
             return .none
         case .loadPhotos:
             // selectedPhotoItems를 photoItems로 동기화
-            state.photoItems = state.selectedPhotoItems.map { PhotoItem(photosPickerItem: $0) }
-            return .send(.async(.loadImagesFromPhotos(state.selectedPhotoItems)))
+            state.currentPageState.photoItems = state.currentPageState.selectedPhotoItems.map { PhotoItem(photosPickerItem: $0) }
+            return .send(.async(.loadImagesFromPhotos(state.currentPageState.selectedPhotoItems)))
         case .deletePhoto(let photoId):
             // ID로 PhotoItem 찾아서 삭제
-            if let index = state.photoItems.firstIndex(where: { $0.id == photoId }) {
-                state.photoItems.remove(at: index)
+            if let index = state.currentPageState.photoItems.firstIndex(where: { $0.id == photoId }) {
+                state.currentPageState.photoItems.remove(at: index)
                 // selectedPhotoItems와 loadedImages도 동기화
-                if index < state.selectedPhotoItems.count {
-                    state.selectedPhotoItems.remove(at: index)
+                if index < state.currentPageState.selectedPhotoItems.count {
+                    state.currentPageState.selectedPhotoItems.remove(at: index)
                 }
-                if index < state.loadedImages.count {
-                    state.loadedImages.remove(at: index)
+                if index < state.currentPageState.loadedImages.count {
+                    state.currentPageState.loadedImages.remove(at: index)
                 }
             }
             return .none
         case .addLinkButtonTapped(let link):
             return .send(.delegate(.addLink(link)))
         case .deleteLink(let index):
-            if index < state.linkMetadataList.count {
-                state.linkMetadataList.remove(at: index)
+            if index < state.currentPageState.linkMetadataList.count {
+                state.currentPageState.linkMetadataList.remove(at: index)
             }
+            return .none
+        case .pageChanged(let newIndex):
+            state.currentPageIndex = newIndex
             return .none
         }
     }
@@ -286,15 +320,15 @@ extension PrincipleReviewFeature {
                     }
                 }
                 
-                await send(.binding(.set(\.loadedImages, images)))
-                await send(.binding(.set(\.photoItems, updatedPhotoItems)))
+                await send(.binding(.set(\.currentPageState.loadedImages, images)))
+                await send(.binding(.set(\.currentPageState.photoItems, updatedPhotoItems)))
             }
             
         case .fetchLinkMetadata(let urlString):
-            return .run { [linkMetadataList = state.linkMetadataList] send in
+            return .run { [linkMetadataList = state.currentPageState.linkMetadataList] send in
                 do {
                     let metadata = try await fetchLinkUseCase.execute(urlString: urlString)
-                    await send(.binding(.set(\.linkMetadataList, linkMetadataList + [metadata])))
+                    await send(.binding(.set(\.currentPageState.linkMetadataList, linkMetadataList + [metadata])))
                 } catch {
                     // 에러 처리는 필요에 따라 추가
                     print("Failed to fetch link metadata: \(error)")

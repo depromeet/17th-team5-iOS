@@ -16,12 +16,53 @@ public struct PrincipleReviewView: View {
     @State private var focusWithAnimation: Bool = false
     @State private var focusWithoutAnimation: Bool = false
     @FocusState private var isFocused: Bool
+    @State private var currentPageIndex: Int = 0
     
     public init(store: StoreOf<PrincipleReviewFeature>) {
         self.store = store
     }
     
     public var body: some View {
+        TabView(selection: $currentPageIndex) {
+            ForEach(0..<store.principles.count, id: \.self) { index in
+                singleReviewView(for: index)
+                    .tag(index)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .onChange(of: currentPageIndex) { _, newValue in
+            send(.pageChanged(newValue))
+        }
+        .overlay(alignment: .bottom) {
+            VStack(spacing: 0) {
+                pageFloatingView
+            }
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+        .onTapGesture {
+            isFocused = false
+        }
+        .onChange(of: isFocused) { _, newValue in
+            print(newValue)
+            focusWithoutAnimation = newValue
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
+                focusWithAnimation = newValue
+            }
+        }
+        .overlay {
+            if store.state.linkModalShown {
+                HedgeLinkModal(shown: $store.state.linkModalShown) { link in
+                    send(.addLinkButtonTapped(link))
+                }
+            }
+        }
+    }
+    
+    // MARK: - Single Review View
+    private func singleReviewView(for index: Int) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             
             HedgeSpacer(height: 16)
@@ -29,11 +70,11 @@ public struct PrincipleReviewView: View {
             ZStack(alignment: .topLeading) {
                 if focusWithAnimation {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(store.selectedPrinciple.principle)
+                        Text(store.principles[index].principle)
                             .foregroundStyle(Color.hedgeUI.textTitle)
                             .font(FontModel.body2Semibold)
                         
-                        if let evaluation = store.selectedEvaluation {
+                        if let evaluation = store.currentPageState.selectedEvaluation {
                             HStack(alignment: .center, spacing: 4) {
                                 evaluation.selectedImage
                                     .resizable()
@@ -88,11 +129,11 @@ public struct PrincipleReviewView: View {
                         HedgeSpacer(height: 16)
                             .padding(.horizontal, 20)
                         
-                        // 원칙 요약
-                        principleSummaryView
+                        // 원칙 요약 (현재 페이지의 원칙)
+                        principleSummaryView(for: index)
                         
                         // 원칙 상세
-                        principleDetailView
+                        principleDetailView(for: index)
                         
                         HedgeSpacer(height: 24)
                         
@@ -110,26 +151,6 @@ public struct PrincipleReviewView: View {
             
             if focusWithAnimation {
                 keyboardResourceButtonView
-            }
-        }
-        .onAppear {
-            send(.onAppear)
-        }
-        .onTapGesture {
-            isFocused = false
-        }
-        .onChange(of: isFocused) { _, newValue in
-            focusWithoutAnimation = newValue
-            
-            withAnimation(.easeInOut(duration: 0.3)) {
-                focusWithAnimation = newValue
-            }
-        }
-        .overlay {
-            if store.state.linkModalShown {
-                HedgeLinkModal(shown: $store.state.linkModalShown) { link in
-                    send(.addLinkButtonTapped(link))
-                }
             }
         }
     }
@@ -176,7 +197,7 @@ public struct PrincipleReviewView: View {
         .padding(.bottom, 16)
     }
     
-    private var principleSummaryView: some View {
+    private func principleSummaryView(for index: Int) -> some View {
         VStack(alignment: .leading,
                spacing: 4) {
             
@@ -185,7 +206,7 @@ public struct PrincipleReviewView: View {
                 .font(FontModel.body3Medium)
             
             HStack(spacing: 0) {
-                Text(store.selectedPrinciple.principle)
+                Text(store.principles[index].principle)
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .font(FontModel.h1Semibold)
                 
@@ -210,9 +231,9 @@ public struct PrincipleReviewView: View {
     }
     
     @ViewBuilder
-    private var principleDetailView: some View {
-        if store.principleDetailShown {
-            Text(store.selectedPrinciple.principle)
+    private func principleDetailView(for index: Int) -> some View {
+        if store.currentPageState.principleDetailShown {
+            Text(store.principles[index].principle)
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -228,7 +249,7 @@ public struct PrincipleReviewView: View {
                 send(.keepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
                 
-                let style = store.state.evalutionStyle(store.selectedEvaluation, .keep)
+                let style = store.state.evalutionStyle(store.currentPageState.selectedEvaluation, .keep)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -251,7 +272,7 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.normalButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
-                let style = store.state.evalutionStyle(store.selectedEvaluation, .normal)
+                let style = store.state.evalutionStyle(store.currentPageState.selectedEvaluation, .normal)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -274,7 +295,7 @@ public struct PrincipleReviewView: View {
             Button {
                 send(.notKeepButtonTapped, animation: .easeInOut(duration: 0.3))
             } label: {
-                let style = store.state.evalutionStyle(store.selectedEvaluation, .notKeep)
+                let style = store.state.evalutionStyle(store.currentPageState.selectedEvaluation, .notKeep)
                 
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(lineWidth: style.lineWidth)
@@ -301,7 +322,7 @@ public struct PrincipleReviewView: View {
         
         ScrollView {
             ZStack(alignment: .topLeading) {
-                if store.text.isEmpty {
+                if store.currentPageState.text.isEmpty {
                     Text("이유 남기기")
                         .font(FontModel.body3Medium)
                         .foregroundStyle(Color.hedgeUI.textAssistive)
@@ -309,7 +330,7 @@ public struct PrincipleReviewView: View {
                         .padding(.top, 8)
                 }
                 
-                TextEditor(text: $store.text)
+                TextEditor(text: $store.currentPageState.text)
                     .focused($isFocused)
                     .tint(.black)
                     .font(FontModel.body3Medium)
@@ -323,7 +344,7 @@ public struct PrincipleReviewView: View {
             
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 12) {
-                    ForEach(store.photoItems) { photoItem in
+                    ForEach(store.currentPageState.photoItems) { photoItem in
                         ZStack(alignment: .topTrailing) {
                             if let image = photoItem.loadedImage {
                                 image
@@ -356,7 +377,7 @@ public struct PrincipleReviewView: View {
             }
             
             // 링크 메타데이터 표시
-            ForEach(Array(store.linkMetadataList.enumerated()), id: \.offset) { index, metadata in
+            ForEach(Array(store.currentPageState.linkMetadataList.enumerated()), id: \.offset) { index, metadata in
                 linkMetadataView(metadata, index: index)
             }
         }
@@ -422,7 +443,7 @@ public struct PrincipleReviewView: View {
     
     private var photoPickerView: some View {
         PhotosPicker(
-            selection: $store.selectedPhotoItems,
+            selection: $store.currentPageState.selectedPhotoItems,
             matching: .images
         ) {
             Image.hedgeUI.image
@@ -430,7 +451,7 @@ public struct PrincipleReviewView: View {
                 .foregroundStyle(Color.hedgeUI.textAssistive)
                 .padding(.horizontal, 4)
         }
-        .onChange(of: store.selectedPhotoItems) { _, _ in
+        .onChange(of: store.currentPageState.selectedPhotoItems) { _, _ in
             send(.loadPhotos)
         }
     }
@@ -492,5 +513,67 @@ public struct PrincipleReviewView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1.2)
         )
+    }
+    
+    private var pageFloatingView: some View {
+        VStack(spacing: 0) {
+            // 그라데이션 배경
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.white.opacity(0),
+                    Color.white.opacity(0.2),
+                    Color.white.opacity(0.98)
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 32)
+            
+            // 메인 카드 컨테이너
+            HStack(spacing: 12) {
+                // 왼쪽 아이콘 영역
+                ZStack {
+                    // 🔥 이모지가 있는 원형 배경
+                    Circle()
+                        .fill(Color.hedgeUI.neutralBgSecondary)
+                        .frame(width: 24, height: 24)
+                        .overlay {
+                            Text("🔥")
+                                .font(FontModel.caption1Semibold)
+                        }
+                    
+                    // 초록색 원형 인디케이터
+                    Circle()
+                        .trim(from: 0.0, to: store.endAngle)
+                        .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                        .frame(width: 24, height: 24)
+                        .rotationEffect(.degrees(-90))
+                }
+                
+                // 페이지 인디케이터 영역
+                HStack(spacing: 8) {
+                    // 페이지 인디케이터들
+                    ForEach(0..<store.principles.count, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
+                            .frame(width: 6, height: 6)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 29)
+                    .fill(Color.white)
+                    .shadow(
+                        color: Color.black.opacity(0.1),
+                        radius: 30,
+                        x: 0,
+                        y: 6
+                    )
+            )
+            .padding(.horizontal, 0)
+            .padding(.bottom, 32)
+        }
     }
 }
