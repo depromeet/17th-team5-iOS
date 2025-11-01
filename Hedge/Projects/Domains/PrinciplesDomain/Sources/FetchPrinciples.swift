@@ -9,6 +9,7 @@
 import Foundation
 
 import PrinciplesDomainInterface
+import Core
 
 public struct FetchPrinciples: FetchPrinciplesUseCase {
     private let repository: PrinciplesRepository
@@ -17,8 +18,11 @@ public struct FetchPrinciples: FetchPrinciplesUseCase {
         self.repository = repository
     }
     
-    public func execute() async throws -> [Principle] {
+    public func execute(_ tradeType: TradeType) async throws -> [PrincipleGroup] {
         return try await repository.fetch()
+            .filter { group in
+                group.principleType == tradeType.toRequest
+            }
     }
 }
 
@@ -27,11 +31,11 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
     
     public func execute() async throws -> [Principle] {
         return [
-            Principle(id: 0, principle: "첫번째 레슨"),
-            Principle(id: 1, principle: "두번째 레슨"),
-            Principle(id: 2, principle: "세번째 레슨"),
-            Principle(id: 3, principle: "네번째 레슨"),
-            Principle(id: 4, principle: "다섯번째 레슨")
+            // Principle(id: 0, principle: "첫번째 레슨"),
+            // Principle(id: 1, principle: "두번째 레슨"),
+            // Principle(id: 2, principle: "세번째 레슨"),
+            // Principle(id: 3, principle: "네번째 레슨"),
+            // Principle(id: 4, principle: "다섯번째 레슨")
         ]
     }
 }
