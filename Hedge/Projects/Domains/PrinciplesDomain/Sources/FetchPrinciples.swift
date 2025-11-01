@@ -18,10 +18,14 @@ public struct FetchPrinciples: FetchPrinciplesUseCase {
     }
     
     public func execute(_ tradeType: String) async throws -> [PrincipleGroup] {
-        return try await repository.fetch()
+        var principleGroup = try await repository.fetch()
             .filter { group in
                 group.principleType == tradeType
             }
+        
+        principleGroup.append(PrincipleGroup.systemItemForSell)
+        
+        return principleGroup
     }
 }
 
@@ -34,6 +38,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                 id: 1,
                 groupName: "초보자를 위한 매도 원칙",
                 principleType: tradeType,
+                groupType: .system,
                 displayOrder: 1,
                 principles: [
                     Principle(
@@ -42,6 +47,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "초보자를 위한 매도 원칙1",
                         principleType: tradeType,
                         principle: "안전마진을 확보하라",
+                        description: "",
                         displayOrder: 1
                     ),
                     Principle(
@@ -50,6 +56,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "초보자를 위한 매도 원칙2",
                         principleType: tradeType,
                         principle: "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
+                        description: "",
                         displayOrder: 2
                     ),
                     Principle(
@@ -58,6 +65,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "초보자를 위한 매도 원칙3",
                         principleType: tradeType,
                         principle: "정책 민감도가 높은 주식은 정책 잘 살펴보고 매매",
+                        description: "",
                         displayOrder: 3
                     )
                 ]
@@ -65,7 +73,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
             PrincipleGroup(
                 id: 2,
                 groupName: "초보자를 위한 매수 원칙",
-                principleType: tradeType,
+                principleType: tradeType, groupType: .custom,
                 displayOrder: 2,
                 principles: [
                     Principle(
@@ -74,6 +82,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "초보자를 위한 매수 원칙1",
                         principleType: tradeType,
                         principle: "손실 구간에서 감정적 판단하지 말고 체계적으로 판단하라",
+                        description: "",
                         displayOrder: 1
                     ),
                     Principle(
@@ -82,6 +91,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "초보자를 위한 매수 원칙2",
                         principleType: tradeType,
                         principle: "분산투자를 통한 리스크 관리",
+                        description: "",
                         displayOrder: 2
                     )
                 ]
@@ -89,7 +99,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
             PrincipleGroup(
                 id: 3,
                 groupName: "이건 좀 지키자 제발",
-                principleType: "CUSTOM",
+                principleType: "CUSTOM", groupType: .custom,
                 displayOrder: 1,
                 principles: [
                     Principle(
@@ -98,6 +108,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "이건 좀 지키자 제발1",
                         principleType: "CUSTOM",
                         principle: "안전마진을 확보하라",
+                        description: "",
                         displayOrder: 1
                     ),
                     Principle(
@@ -106,6 +117,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "이건 좀 지키자 제발2",
                         principleType: "CUSTOM",
                         principle: "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
+                        description: "",
                         displayOrder: 2
                     ),
                     Principle(
@@ -114,6 +126,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                         groupName: "이건 좀 지키자 제발3",
                         principleType: "CUSTOM",
                         principle: "정책 민감도가 높은 주식은 정책 잘 살펴보고 매매",
+                        description: "",
                         displayOrder: 3
                     )
                 ]

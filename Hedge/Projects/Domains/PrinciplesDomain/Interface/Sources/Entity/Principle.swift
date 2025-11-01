@@ -14,6 +14,7 @@ public struct Principle: Equatable, Hashable {
     public let groupName: String
     public let principleType: String
     public let principle: String
+    public let description: String
     public let displayOrder: Int
     
     public init(
@@ -22,6 +23,7 @@ public struct Principle: Equatable, Hashable {
         groupName: String,
         principleType: String,
         principle: String,
+        description: String,
         displayOrder: Int
     ) {
         self.id = id
@@ -29,6 +31,7 @@ public struct Principle: Equatable, Hashable {
         self.groupName = groupName
         self.principleType = principleType
         self.principle = principle
+        self.description = description
         self.displayOrder = displayOrder
     }
 }

@@ -38,7 +38,8 @@ public struct PrinciplesFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public var principleGroups: [PrincipleGroup] = []
+        public var systemPrincipleGroups: [PrincipleGroup] = []
+        public var customPrincipleGroups: [PrincipleGroup] = []
         public var selectedGroupId: Int?
         
         public func isSelected(_ groupId: Int) -> Bool {
@@ -140,7 +141,8 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrincipleGroupsSuccess(let principleGroups):
-            state.principleGroups = principleGroups
+            state.systemPrincipleGroups = principleGroups.filter { $0.groupType == .system }
+            state.customPrincipleGroups = principleGroups.filter { $0.groupType == .custom }
             return .none
             
         case .failure(let error):

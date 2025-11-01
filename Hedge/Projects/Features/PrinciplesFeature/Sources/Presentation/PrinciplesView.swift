@@ -29,7 +29,7 @@ public struct PrinciplesView: View {
             
             ScrollView {
                 VStack(spacing: 0) {
-                    defaultGroupSection
+                    systemGroupSection
                     customGroupSection
                 }
                 .padding(.bottom, 32)
@@ -66,7 +66,7 @@ public struct PrinciplesView: View {
     }
     
     // MARK: - Default Group Section
-    private var defaultGroupSection: some View {
+    private var systemGroupSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("기본")
                 .font(.label2Medium)
@@ -76,7 +76,7 @@ public struct PrinciplesView: View {
             
             // Principle Items
             VStack(spacing: 0) {
-                ForEach(store.state.principleGroups, id: \.id) { group in
+                ForEach(store.state.systemPrincipleGroups, id: \.id) { group in
                     principleGroupItem(group: group)
                 }
             }
@@ -94,7 +94,7 @@ public struct PrinciplesView: View {
             
             // Custom Principle Items
             VStack(spacing: 0) {
-                ForEach(store.state.principleGroups, id: \.id) { group in
+                ForEach(store.state.customPrincipleGroups, id: \.id) { group in
                     principleGroupItem(group: group)
                 }
             }

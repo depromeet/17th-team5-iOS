@@ -30,6 +30,7 @@ public struct PrincipleResponseDTO: Decodable {
     public let groupName: String
     public let principleType: String
     public let principle: String
+    public let description: String
     public let displayOrder: Int
 }
 
@@ -39,6 +40,7 @@ extension PrincipleGroupResponseDTO {
             id: self.id,
             groupName: self.groupName,
             principleType: self.principleType,
+            groupType: .custom,
             displayOrder: self.displayOrder,
             principles: self.principles.map { $0.toDomain() }
         )
@@ -53,6 +55,7 @@ extension PrincipleResponseDTO {
             groupName: self.groupName,
             principleType: self.principleType,
             principle: self.principle,
+            description: self.description
             displayOrder: self.displayOrder
         )
     }
