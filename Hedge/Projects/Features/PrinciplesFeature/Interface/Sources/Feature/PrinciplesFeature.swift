@@ -11,27 +11,25 @@ import ComposableArchitecture
 
 import Core
 
+import StockDomainInterface
 import PrinciplesDomainInterface
 
 @Reducer
 public struct PrinciplesFeature {
-    private let coordinator: PrinciplesCoordinator
+    // private let coordinator: PrinciplesCoordinator
     private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
-    
-    let tradeType: TradeType
-    let stock: StockSearch
-    let tradeHistory: TradeHistory
-    
-    let principleGroups: [PrincipleGroup] = []
+    private let tradeType: TradeType
+    private let stock: StockSearch
+    private let tradeHistory: TradeHistory
     
     public init(
-        coordinator: PrinciplesCoordinator,
+        // coordinator: PrinciplesCoordinator,
         fetchPrinciplesUseCase: FetchPrinciplesUseCase,
         tradeType: TradeType,
         stock: StockSearch,
         tradeHistory: TradeHistory
     ) {
-        self.coordinator = coordinator
+        // self.coordinator = coordinator
         self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
         self.tradeType = tradeType
         self.stock = stock
@@ -40,6 +38,13 @@ public struct PrinciplesFeature {
     
     @ObservableState
     public struct State: Equatable {
+        public var principleGroups: [PrincipleGroup] = []
+        public var selectedGroupId: Int?
+        
+        public func isSelected(_ groupId: Int) -> Bool {
+            selectedGroupId == groupId
+        }
+        
         public init() {}
     }
     
@@ -54,6 +59,8 @@ public struct PrinciplesFeature {
     public enum View {
         case onAppear
         case closeButtonTapped
+        case groupTapped(Int)
+        case confirmButtonTapped
     }
     
     public enum InnerAction {
@@ -68,7 +75,7 @@ public struct PrinciplesFeature {
     public enum ScopeAction { }
     
     public enum DelegateAction {
-        
+        // case pushToTradeReason(PrincipleGroup)
     }
     
     public var body: some Reducer<State, Action> {
@@ -107,9 +114,21 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .none
+            return .send(.async(.fetchPrincipleGroups))
+            
         case .closeButtonTapped:
-            coordinator.popToPrev()
+            
+            return .none
+            
+        case .groupTapped(let groupId):
+            if state.isSelected(groupId) {
+                state.selectedGroupId = nil
+            } else {
+                state.selectedGroupId = groupId
+            }
+            return .none
+            
+        case .confirmButtonTapped:
             return .none
         }
     }
@@ -121,9 +140,12 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrincipleGroupsSuccess(let principleGroups):
-            self.principleGroups = principleGroups
+            state.principleGroups = principleGroups
+            return .none
+            
         case .failure(let error):
-            print("error")
+            print("Failed to fetch principle groups: \(error)")
+            return .none
         }
     }
     
@@ -134,9 +156,9 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrincipleGroups:
-            return .run { send in
+            return .run { [tradeType] send in
                 do {
-                    let response = try await fetchPrinciplesUseCase.execute(tradeType)
+                    let response = try await fetchPrinciplesUseCase.execute(tradeType.toRequest)
                     await send(.inner(.fetchPrincipleGroupsSuccess(response)))
                 } catch {
                     await send(.inner(.failure(error)))
@@ -150,7 +172,7 @@ extension PrinciplesFeature {
         _ state: inout State,
         _ action: ScopeAction
     ) -> Effect<Action> {
-        
+        return .none
     }
     
     // MARK: - Delegate Core
@@ -158,9 +180,7 @@ extension PrinciplesFeature {
         _ state: inout State,
         _ action: DelegateAction
     ) -> Effect<Action> {
-        switch action {
-            
-        }
+        return .none
     }
 }
 
