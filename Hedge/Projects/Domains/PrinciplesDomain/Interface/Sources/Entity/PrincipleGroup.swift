@@ -9,11 +9,11 @@
 import Foundation
 
 public struct PrincipleGroup: Equatable, Hashable {
-    let id: Int
-    let groupName: String
-    let principleType: String
-    let displayOrder: Int
-    let principles: [Principle]
+    public let id: Int
+    public let groupName: String
+    public let principleType: String
+    public let displayOrder: Int
+    public let principles: [Principle]
     
     public init(
         id: Int,

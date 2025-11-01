@@ -19,6 +19,6 @@ public struct DefaultPrinciplesRepository: PrinciplesRepository {
     }
     
     public func fetch() async throws -> [PrincipleGroup] {
-        return try await dataSource.fetch().data.flatMap { $0.toDomain() }
+        return try await dataSource.fetch().data.map { $0.toDomain() }
     }
 }
