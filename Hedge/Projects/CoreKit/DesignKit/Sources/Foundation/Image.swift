@@ -65,6 +65,7 @@ extension HedgeUI where Base == Image {
 
     // MARK: Size 30
     public static var error: Image { asset(#function) }
+    public static var networkError: Image { asset(#function) }
     
     // MARK: Size 32
     public static var closeFill: Image { asset(#function) }
