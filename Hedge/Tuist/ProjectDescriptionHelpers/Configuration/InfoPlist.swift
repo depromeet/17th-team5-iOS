@@ -16,12 +16,30 @@ public struct InfoPlist {
         "LSSupportsOpeningDocumentsInPlace": true,
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": [
-            "NSAllowsArbitraryLoads": true
+            "NSAllowsArbitraryLoads": true,
+            "NSExceptionDomains": [
+                "kakao.com": [
+                    "NSIncludesSubdomains": true,
+                    "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
+                    "NSTemporaryExceptionRequiresForwardSecrecy": false,
+                ],
+                "kakaocdn.net": [
+                    "NSIncludesSubdomains": true,
+                    "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
+                    "NSTemporaryExceptionRequiresForwardSecrecy": false,
+                ]
+            ]
         ],
         "CFBundleURLTypes": [
             [
                 "CFBundleURLName": "AppleSignIn",
                 "CFBundleURLSchemes": ["com.og.hedge"]
+            ],
+            [
+                "CFBundleTypeRole": "Editor",
+                "CFBundleURLSchemes": [
+                    "kakao$(KAKAO_NATIVE_APP_KEY)",
+                ]
             ]
         ],
         "UIApplicationSceneManifest": [
@@ -34,6 +52,9 @@ public struct InfoPlist {
                     ],
                 ]
             ]
+        ],
+        "LSApplicationQueriesSchemes" : [
+            "kakaokompassauth",
         ]
     ]
     
@@ -42,6 +63,7 @@ public struct InfoPlist {
         infoPlist["CFBundleShortVersionString"] = .string(appConfiguration.shortVersion)
         infoPlist["CFBundleIdentifier"] = .string(appConfiguration.bundleIdentifier)
         infoPlist["CFBundleDisplayName"] = .string(appConfiguration.displayName)
+        infoPlist["KakaoNativeAppKey"] = .string("$(KAKAO_NATIVE_APP_KEY)")
         return infoPlist
     }
 }

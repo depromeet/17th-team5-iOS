@@ -11,4 +11,6 @@ import AuthenticationServices
 public protocol LoginIntentProtocol {
     func appleLoginSuccess(_ response: ASAuthorization)
     func appleLoginFailure(_ error: Error)
+    
+    func kakaoLoginTapped()
 }

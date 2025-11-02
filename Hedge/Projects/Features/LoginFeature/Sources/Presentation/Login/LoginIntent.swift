@@ -12,6 +12,8 @@ import LoginFeatureInterface
 import Shared
 import AuthDomainInterface
 
+import KakaoSDKUser
+
 public struct LoginIntent: LoginIntentProtocol {
     private let authRepository: AuthRepository
     public weak var coordinator: LoginCoordinator?
@@ -55,5 +57,60 @@ public struct LoginIntent: LoginIntentProtocol {
     
     public func appleLoginFailure(_ error: any Error) {
         Log.error("apple login failure: \(error.localizedDescription)")
+    }
+    
+    public func kakaoLoginTapped() {
+        Task { @MainActor in
+            do {
+                guard let idToken = try await executeKakaoLogin() else {
+                    Log.error("kakao login failure")
+                    return
+                }
+                try await authRepository.social(
+                    provider: .kakao,
+                    authCode: idToken,
+                    email: nil,
+                    nickname: nil
+                )
+                coordinator?.finish()
+            } catch {
+                Log.error("kakao login failure: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    @MainActor
+    private func executeKakaoLogin() async throws -> String? {
+        if UserApi.isKakaoTalkLoginAvailable() {
+            return try await loginWithKakaoTalk()
+        } else {
+            return try await loginWithKakaoAccount()
+        }
+    }
+    
+    @MainActor
+    private func loginWithKakaoTalk() async throws -> String? {
+        try await withCheckedThrowingContinuation { continuation in
+            UserApi.shared.loginWithKakaoTalk { oauthToken, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: oauthToken?.idToken)
+                }
+            }
+        }
+    }
+    
+    @MainActor
+    private func loginWithKakaoAccount() async throws -> String? {
+        try await withCheckedThrowingContinuation { continuation in
+            UserApi.shared.loginWithKakaoAccount { oauthToken, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: oauthToken?.idToken)
+                }
+            }
+        }
     }
 }
