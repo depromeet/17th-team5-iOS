@@ -36,7 +36,15 @@ public struct PrinciplesView: View {
             }
             
             if store.state.selectedGroupId != nil {
-                bottomCTASection
+                VStack(spacing: 12) {
+                    if store.state.viewType == .management {
+                        Text("한 템플릿당 최대 5개를 추가할 수 있어요")
+                            .font(FontModel.body3Medium)
+                            .foregroundStyle(Color.hedgeUI.textAssistive)
+                    }
+                    
+                    bottomCTASection
+                }
             }
         }
         .background(Color.hedgeUI.backgroundWhite)
@@ -91,6 +99,11 @@ public struct PrinciplesView: View {
                 .foregroundStyle(Color.hedgeUI.textAlternative)
             .padding(.horizontal, 20)
             .padding(.vertical, 4)
+            
+            // #123
+            if store.state.viewType == .management {
+                addNewGroupButton
+            }
             
             // Custom Principle Items
             VStack(spacing: 0) {
@@ -215,15 +228,32 @@ public struct PrinciplesView: View {
         }
     }
     
+    // MARK: - Add New Group Button
+    private var addNewGroupButton: some View {
+        Button(action: {
+            // TODO: 새로운 원칙 그룹 추가 액션
+        }) {
+            HStack(spacing: 12) {
+                Image.hedgeUI.thumbnailAdd
+                
+                // Title
+                Text("새로운 원칙 그룹 추가")
+                    .font(.body3Medium)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.plain)
+    }
+    
     // MARK: - Bottom CTA Section
     private var bottomCTASection: some View {
-        HedgeBottomCTAButton("")
-            .bg(.whiteGradient)
-            .style(.oneButton(
-                title: "이 원칙으로 회고하기",
-                onTapped: {
-                    send(.confirmButtonTapped)
-                }
-            ))
+        HedgeActionButton(store.state.buttonTitle) {
+            send(.confirmButtonTapped)
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 10)
     }
 }

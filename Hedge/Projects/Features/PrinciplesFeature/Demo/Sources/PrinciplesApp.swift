@@ -21,7 +21,7 @@ struct PrinciplesApp: App {
             
             PrinciplesView(
                 store: Store(
-                    initialState: PrinciplesFeature.State()
+                    initialState: PrinciplesFeature.State(viewType: .management)
                 ) {
                     PrinciplesFeature(
                         fetchPrinciplesUseCase: fetchPrinciplesUseCase,

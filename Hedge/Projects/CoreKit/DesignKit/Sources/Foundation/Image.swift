@@ -73,6 +73,7 @@ extension HedgeUI where Base == Image {
     public static var toastWarn: Image { asset(#function) }
     public static var toastCheck: Image { asset(#function) }
     public static var slider: Image { asset(#function) }
+    public static var thumbnailAdd: Image { asset(#function) }
 
     // MARK: Size 35
     public static var anxious: Image { asset(#function) }

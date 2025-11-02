@@ -36,17 +36,36 @@ public struct PrinciplesFeature {
         self.tradeHistory = tradeHistory
     }
     
+    public enum PrincipleViewType {
+        case select
+        case management
+    }
+    
     @ObservableState
     public struct State: Equatable {
         public var systemPrincipleGroups: [PrincipleGroup] = []
         public var customPrincipleGroups: [PrincipleGroup] = []
         public var selectedGroupId: Int?
+        public var viewType: PrincipleViewType
+        public var warningText: String? = nil
+        public var buttonTitle: String = ""
         
         public func isSelected(_ groupId: Int) -> Bool {
             selectedGroupId == groupId
         }
         
-        public init() {}
+        public init(viewType: PrincipleViewType) {
+            self.viewType = viewType
+            
+            switch viewType {
+            case .select:
+                warningText = nil
+                buttonTitle = "이 원칙으로 회고하기"
+            case .management:
+                warningText = "한 템플릿당 최대 5개를 추가할 수 있어요"
+                buttonTitle = "선택"
+            }
+        }
     }
     
     public enum Action: FeatureAction, ViewAction {
