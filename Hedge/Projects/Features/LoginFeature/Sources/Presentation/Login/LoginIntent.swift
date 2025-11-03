@@ -44,7 +44,7 @@ public struct LoginIntent: LoginIntentProtocol {
                 
                 try await authRepository.social(
                     provider: .apple,
-                    authCode: authorizationCodeString,
+                    code: authorizationCodeString,
                     email: credential.email,
                     nickname: nickname
                 )
@@ -68,7 +68,7 @@ public struct LoginIntent: LoginIntentProtocol {
                 }
                 try await authRepository.social(
                     provider: .kakao,
-                    authCode: idToken,
+                    code: idToken,
                     email: nil,
                     nickname: nil
                 )

@@ -24,14 +24,15 @@ public final class DefaultAuthRepository: AuthRepository {
     
     public func social(
         provider: AuthDomainInterface.SocialProvider,
-        authCode: String,
+        code: String,
         email: String?,
         nickname: String?
     ) async throws {
         let request = SocialLoginRequestDTO(
             provider: provider.rawValue,
-            authCode: authCode,
-            redirectUri: "",
+            authCode: provider == .apple ? code : nil,
+            idToken: provider == .kakao ? code : nil,
+            redirectUri: nil,
             nickname: nickname,
             email: email
         )

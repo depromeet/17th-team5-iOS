@@ -11,7 +11,7 @@ import Foundation
 public protocol AuthRepository {
     func social(
         provider: SocialProvider,
-        authCode: String,
+        code: String,
         email: String?,
         nickname: String?
     ) async throws
