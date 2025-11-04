@@ -18,6 +18,7 @@ let project = Project.configure(
         .Domain.Feedback.implement,
         .Domain.Analysis.implement,
         .Domain.Auth.implement,
+        .Domain.Link.implement,
     ],
     hasTests: true
 )

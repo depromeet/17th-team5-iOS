@@ -37,9 +37,15 @@ public extension TargetDependency.Domain {
         public static let implement = domainDependency(target: name)
         public static let interface = domainInterfaceDependency(target: name)
     }
-
+    
     struct Auth {
         private static let name = "AuthDomain"
+        public static let implement = domainDependency(target: name)
+        public static let interface = domainInterfaceDependency(target: name)
+    }
+    
+    struct Link {
+        private static let name = "LinkDomain"
         public static let implement = domainDependency(target: name)
         public static let interface = domainInterfaceDependency(target: name)
     }

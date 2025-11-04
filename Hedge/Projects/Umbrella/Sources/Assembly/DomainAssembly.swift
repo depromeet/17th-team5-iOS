@@ -21,6 +21,8 @@ import PrinciplesDomainInterface
 import PrinciplesDomain
 import AnalysisDomainInterface
 import AnalysisDomain
+import LinkDomainInterface
+import LinkDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -64,6 +66,14 @@ public struct DomainAssembly: Assembly {
             }
             
             return Analysis(repository: repository)
+        }
+        
+        container.register(FetchLinkUseCase.self) { resolver in
+            guard let repository = resolver.resolve(LinkRepository.self) else {
+                fatalError("Could not resolve AnalysisRepository")
+            }
+            
+            return FetchLink(repository: repository)
         }
     }
 }

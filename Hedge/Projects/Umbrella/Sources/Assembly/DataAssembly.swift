@@ -23,6 +23,7 @@ import FeedbackDomainInterface
 import AnalysisDomainInterface
 import AuthDomain
 import AuthDomainInterface
+import LinkDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -74,6 +75,12 @@ public struct DataAssembly: Assembly {
             DefaultAuthRepository(
                 tokenDataSource: resolver.resolve(TokenDataSource.self)!,
                 authDataSource: resolver.resolve(AuthDataSource.self)!
+                )
+        }
+                
+        container.register(LinkRepository.self) { _ in
+            DefaultLinkRepository(
+                dataSource: DefaultLinkDataSource()
             )
         }
     }

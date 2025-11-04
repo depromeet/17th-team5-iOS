@@ -189,6 +189,7 @@ extension Project {
             product: .app,
             bundleId: "\(configuration.bundleIdentifier).\(name.lowercased())Demo",
             deploymentTargets: configuration.deploymentTarget,
+            infoPlist: .extendingDefault(with: configuration.infoPlist),
             sources: ["Demo/Sources/**"],
             resources: [.glob(pattern: "Demo/Resources/**", excluding: [])],
             dependencies: [.target(name: name)]

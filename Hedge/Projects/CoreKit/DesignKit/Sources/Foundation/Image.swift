@@ -21,6 +21,9 @@ extension HedgeUI where Base == Image {
     public static var neutralSimple: Image { asset(#function) }
     public static var principleSimple: Image { asset(#function) }
     
+    // MARK: Size 18
+    public static var feedbackWarn: Image { asset(#function) }
+
     // MARK: Size 19
     public static var generate: Image { asset(#function) }
     
@@ -35,7 +38,7 @@ extension HedgeUI where Base == Image {
     public static var closeThin: Image { asset(#function) }
     public static var closeThick: Image { asset(#function) }
     public static var search: Image { asset(#function) }
-    public static var closeFill: Image { asset(#function) }
+    public static var closeFillWhite: Image { asset(#function) }
     public static var trash: Image { asset(#function) }
     public static var edit: Image { asset(#function) }
     public static var arrowDown: Image { asset(#function) }
@@ -51,14 +54,20 @@ extension HedgeUI where Base == Image {
     public static var principle: Image { asset(#function) }
     public static var check: Image { asset(#function) }
     public static var uncheck: Image { asset(#function) }
+    public static var image: Image { asset(#function) }
+    public static var link: Image { asset(#function) }
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }
-  
+    public static var circle: Image { asset(#function) }
+    public static var cross: Image { asset(#function) }
+    public static var triangle: Image { asset(#function) }
+
     // MARK: Size 30
     public static var error: Image { asset(#function) }
     
     // MARK: Size 32
+    public static var closeFill: Image { asset(#function) }
     public static var toastWarn: Image { asset(#function) }
     public static var toastCheck: Image { asset(#function) }
     public static var slider: Image { asset(#function) }
@@ -75,6 +84,14 @@ extension HedgeUI where Base == Image {
     public static var neutral: Image { asset(#function) }
     public static var neutralOff: Image { asset(#function) }
     
+    // MARK: Size 40
+    public static var keep: Image { asset(#function) }
+    public static var keepDisabled: Image { asset(#function) }
+    public static var normal: Image { asset(#function) }
+    public static var normalDisabled: Image { asset(#function) }
+    public static var notKeep: Image { asset(#function) }
+    public static var notKeepDisabled: Image { asset(#function) }
+    
     // MARK: Size 48
     public static var anxiousOn: Image { asset(#function) }
     public static var confidenceOn: Image { asset(#function) }
@@ -85,6 +102,12 @@ extension HedgeUI where Base == Image {
     public static var logo: Image { asset(#function) }
     public static var kakaoLogo: Image { asset(#function) }
     
+    // MARK: Size xlarge
+    public static var emerald: Image { asset(#function) }
+    public static var gold: Image { asset(#function) }
+    public static var silver: Image { asset(#function) }
+    public static var bronze: Image { asset(#function) }
+
     // TODO: 임시 차트 이미지 추후 삭제
     public static var tmpChart: Image { asset(#function) }
     public static var buyDemo: Image { asset(#function) }
