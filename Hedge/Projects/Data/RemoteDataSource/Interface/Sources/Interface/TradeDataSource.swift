@@ -10,7 +10,7 @@ import Foundation
 
 /// Data source for fetching retrospections (trade records) from the API
 /// NOTE: RetrospectDataSource handles creating retrospections (POST)
-/// This protocol handles fetching retrospections (GET list, GET single, badges)
+/// This protocol handles fetching retrospections (GET list, badges)
 public protocol RetrospectionListDataSource {
     /// Fetch all retrospections (trade records) for the home screen
     /// Real API: GET /api/v1/retrospections
@@ -21,13 +21,5 @@ public protocol RetrospectionListDataSource {
     /// Badges are calculated from retrospection data instead (see HomeFeature).
     /// This method returns zeros for backwards compatibility.
     func fetchBadgeCounts() async throws -> BadgeCountsResponseDTO
-    
-    /// Fetch a single retrospection detail by ID
-    /// Real API: GET /api/v1/retrospections/{id}
-    func fetchRetrospection(id: Int) async throws -> RetrospectionDetailResponseDTO
-    
-    /// Delete a retrospection by ID
-    /// Real API: DELETE /api/v1/retrospections/{retrospectionId}
-    func deleteRetrospection(id: Int) async throws -> DeleteRetrospectionResponseDTO
 }
 

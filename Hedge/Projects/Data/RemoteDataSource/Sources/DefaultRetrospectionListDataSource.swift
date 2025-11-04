@@ -44,26 +44,11 @@ public struct DefaultRetrospectionListDataSource: RetrospectionListDataSource {
             )
         )
     }
-    
-    // MARK: - Real Implementation: Fetch Retrospection Detail
-    /// This is a real API: GET /api/v1/retrospections/{id}
-    public func fetchRetrospection(id: Int) async throws -> RetrospectionDetailResponseDTO {
-        return try await provider.request(RetrospectionListTarget.fetchRetrospection(id: id))
-    }
-    
-    // MARK: - Real Implementation: Delete Retrospection
-    /// Real API: DELETE /api/v1/retrospections/{retrospectionId}
-    public func deleteRetrospection(id: Int) async throws -> DeleteRetrospectionResponseDTO {
-        return try await provider.request(RetrospectionListTarget.deleteRetrospection(id: id))
-    }
-    
 }
 
 // MARK: - RetrospectionListTarget (for real API endpoints)
 enum RetrospectionListTarget {
     case fetchRetrospections
-    case fetchRetrospection(id: Int)
-    case deleteRetrospection(id: Int)
     // Note: fetchBadgeCounts removed - API doesn't exist, badges calculated from retrospection data
 }
 
@@ -78,10 +63,8 @@ extension RetrospectionListTarget: TargetType {
     
     var method: Alamofire.HTTPMethod {
         switch self {
-        case .fetchRetrospections, .fetchRetrospection:
+        case .fetchRetrospections:
             return .get
-        case .deleteRetrospection:
-            return .delete
         }
     }
     
@@ -89,10 +72,6 @@ extension RetrospectionListTarget: TargetType {
         switch self {
         case .fetchRetrospections:
             return "/retrospections"
-        case .fetchRetrospection(let id):
-            return "/retrospections/\(id)"
-        case .deleteRetrospection(let id):
-            return "/retrospections/\(id)"
         }
     }
     
