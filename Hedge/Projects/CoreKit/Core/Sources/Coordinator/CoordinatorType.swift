@@ -11,6 +11,7 @@ import Foundation
 public enum CoordinatorType {
     case app
     case root
+    case login
     case home
     case principles
     case stockSearch

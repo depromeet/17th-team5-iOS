@@ -17,7 +17,7 @@ public struct DefaultStockSearchDataSource: StockDataSource {
     private let provider: Provider
     
     public init() {
-        self.provider = Provider.plain
+        self.provider = Provider.authorized
     }
     
     public func search(_ request: StockSearchRequestDTO) async throws -> StockSearchResponseDTO {

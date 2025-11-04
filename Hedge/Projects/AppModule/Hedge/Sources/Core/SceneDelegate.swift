@@ -16,6 +16,8 @@ import LinkDomainInterface
 import Shared
 import SwiftUI
 
+import KakaoSDKAuth
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     var appCoordinator: AppCoordinator?
@@ -43,5 +45,15 @@ extension SceneDelegate {
             navigationController: navigationController
         )
         appCoordinator?.start()
+    }
+    
+    func scene(
+        _ scene: UIScene,
+        openURLContexts URLContexts: Set<UIOpenURLContext>
+    ) {
+        if let url = URLContexts.first?.url,
+           AuthApi.isKakaoTalkLoginUrl(url) {
+            _ = AuthController.handleOpenUrl(url: url)
+        }
     }
 }

@@ -12,4 +12,5 @@ public extension TargetDependency.Library {
     static let swinject = TargetDependency.external(name: "Swinject")
     static let tca = TargetDependency.external(name: "ComposableArchitecture")
     static let kingfisher = TargetDependency.external(name: "Kingfisher")
+    static let kakaoSDKUser = TargetDependency.external(name: "KakaoSDKUser")
 }

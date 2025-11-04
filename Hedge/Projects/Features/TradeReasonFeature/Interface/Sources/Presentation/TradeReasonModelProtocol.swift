@@ -10,7 +10,6 @@ import SwiftUI
 
 import Core
 import DesignKit
-import PrinciplesFeatureInterface
 import StockDomainInterface
 import PrinciplesDomainInterface
 
@@ -29,7 +28,6 @@ public protocol TradeReasonModelProtocol {
     var text: String { get }
     var contents: String? { get }
     var emotion: TradeEmotion? { get }
-    var principleBuilder: PrinciplesViewBuilderProtocol { get }
     
     var principlesBinding: Binding<[Principle]> { get }
     var textBinding: Binding<String> { get }

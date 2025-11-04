@@ -99,6 +99,9 @@ extension HedgeUI where Base == Image {
     public static var impulseOn: Image { asset(#function) }
     public static var neutralOn: Image { asset(#function) }
     
+    public static var logo: Image { asset(#function) }
+    public static var kakaoLogo: Image { asset(#function) }
+    
     // MARK: Size xlarge
     public static var emerald: Image { asset(#function) }
     public static var gold: Image { asset(#function) }

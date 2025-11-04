@@ -17,7 +17,7 @@ public struct DefaultRetrospectDataSource: RetrospectDataSource {
     private let provider: Provider
     
     public init() {
-        self.provider = Provider.plain
+        self.provider = Provider.authorized
     }
     
     public func generate(_ request: GenerateRetrospectRequestDTO) async throws -> GenerateRetrospectResponseDTO {

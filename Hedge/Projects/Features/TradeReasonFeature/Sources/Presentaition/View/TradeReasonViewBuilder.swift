@@ -16,7 +16,7 @@ import AnalysisDomainInterface
 import RetrospectDomainInterface
 import PrinciplesFeatureInterface
 
-public struct TradeReasonViewBuilder: TradeReasonViewBuilderProtocol {
+public struct TradeReasonViewBuilder {
     public init() {}
     
     public func build(

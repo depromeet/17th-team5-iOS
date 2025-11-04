@@ -10,7 +10,8 @@ import ProjectDescriptionHelpers
             "Alamofire": .framework,
             "Swinject": .framework,
             "ComposableArchitecture": .framework,
-            "Kingfisher": .framework
+            "Kingfisher": .framework,
+            "KakaoOpenSDK": .framework,
         ],
         baseSettings: Settings.settings(configurations: XCConfig.library)
     )
@@ -24,5 +25,6 @@ let package = Package(
         .package(url: "https://github.com/Swinject/Swinject.git", exact: "2.10.0"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.22.2"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", exact: "8.5.0"),
+        .package(url: "https://github.com/kakao/kakao-ios-sdk", exact: "2.23.0")
     ]
 )
