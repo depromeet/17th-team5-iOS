@@ -17,21 +17,120 @@ public struct FetchPrinciples: FetchPrinciplesUseCase {
         self.repository = repository
     }
     
-    public func execute() async throws -> [Principle] {
-        return try await repository.fetch()
+    public func execute(_ tradeType: String) async throws -> [PrincipleGroup] {
+        var principleGroup = try await repository.fetch()
+            .filter { group in
+                group.principleType == tradeType
+            }
+        
+        principleGroup.append(PrincipleGroup.systemItemForSell)
+        
+        return principleGroup
     }
 }
 
 public struct MockFetchPrinciples: FetchPrinciplesUseCase {
     public init() {}
     
-    public func execute() async throws -> [Principle] {
+    public func execute(_ tradeType: String) async throws -> [PrincipleGroup] {
         return [
-            Principle(id: 0, principle: "첫번째 레슨"),
-            Principle(id: 1, principle: "두번째 레슨"),
-            Principle(id: 2, principle: "세번째 레슨"),
-            Principle(id: 3, principle: "네번째 레슨"),
-            Principle(id: 4, principle: "다섯번째 레슨")
+            PrincipleGroup(
+                id: 1,
+                groupName: "초보자를 위한 매도 원칙",
+                principleType: tradeType,
+                groupType: .system,
+                displayOrder: 1,
+                principles: [
+                    Principle(
+                        id: 1,
+                        groupId: 1,
+                        groupName: "초보자를 위한 매도 원칙1",
+                        principleType: tradeType,
+                        principle: "안전마진을 확보하라",
+                        description: "",
+                        displayOrder: 1
+                    ),
+                    Principle(
+                        id: 2,
+                        groupId: 1,
+                        groupName: "초보자를 위한 매도 원칙2",
+                        principleType: tradeType,
+                        principle: "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
+                        description: "",
+                        displayOrder: 2
+                    ),
+                    Principle(
+                        id: 3,
+                        groupId: 1,
+                        groupName: "초보자를 위한 매도 원칙3",
+                        principleType: tradeType,
+                        principle: "정책 민감도가 높은 주식은 정책 잘 살펴보고 매매",
+                        description: "",
+                        displayOrder: 3
+                    )
+                ]
+            ),
+            PrincipleGroup(
+                id: 2,
+                groupName: "초보자를 위한 매수 원칙",
+                principleType: tradeType, groupType: .custom,
+                displayOrder: 2,
+                principles: [
+                    Principle(
+                        id: 4,
+                        groupId: 2,
+                        groupName: "초보자를 위한 매수 원칙1",
+                        principleType: tradeType,
+                        principle: "손실 구간에서 감정적 판단하지 말고 체계적으로 판단하라",
+                        description: "",
+                        displayOrder: 1
+                    ),
+                    Principle(
+                        id: 5,
+                        groupId: 2,
+                        groupName: "초보자를 위한 매수 원칙2",
+                        principleType: tradeType,
+                        principle: "분산투자를 통한 리스크 관리",
+                        description: "",
+                        displayOrder: 2
+                    )
+                ]
+            ),
+            PrincipleGroup(
+                id: 3,
+                groupName: "이건 좀 지키자 제발",
+                principleType: "CUSTOM", groupType: .custom,
+                displayOrder: 1,
+                principles: [
+                    Principle(
+                        id: 6,
+                        groupId: 3,
+                        groupName: "이건 좀 지키자 제발1",
+                        principleType: "CUSTOM",
+                        principle: "안전마진을 확보하라",
+                        description: "",
+                        displayOrder: 1
+                    ),
+                    Principle(
+                        id: 7,
+                        groupId: 3,
+                        groupName: "이건 좀 지키자 제발2",
+                        principleType: "CUSTOM",
+                        principle: "기업의 본질 가치보다 낮게 거래되는 주식을 찾아 장기 보유하기",
+                        description: "",
+                        displayOrder: 2
+                    ),
+                    Principle(
+                        id: 8,
+                        groupId: 3,
+                        groupName: "이건 좀 지키자 제발3",
+                        principleType: "CUSTOM",
+                        principle: "정책 민감도가 높은 주식은 정책 잘 살펴보고 매매",
+                        description: "",
+                        displayOrder: 3
+                    )
+                ]
+            )
         ]
     }
 }

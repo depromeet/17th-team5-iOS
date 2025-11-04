@@ -1,24 +1,42 @@
 import SwiftUI
+import ComposableArchitecture
 
 import Core
+import DesignKit
 import PrinciplesFeatureInterface
-import PrinciplesDomain
 import PrinciplesFeature
+import PrinciplesDomainInterface
+import PrinciplesDomain
+import StockDomain
 import StockDomainInterface
+// import StockSearchFeatureInterface
 
 @main
 struct PrinciplesApp: App {
-    let builder: PrinciplesViewBuilderProtocol = PrinciplesViewBuilder()
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     var body: some Scene {
         WindowGroup {
-            AnyView(builder.build(
-                coordinator: nil,
-                tradeType: .buy,
-                stock: StockSearch(symbol: "", title: "하이욤", market: "마켓"),
-                tradeHistory: TradeHistory(tradingPrice: "10100", tradingQuantity: "10", tradingDate: "100010101", concurrency: "120010101"),
-                fetchPrinciplesUseCase: MockFetchPrinciples()
-            ))
+            let fetchPrinciplesUseCase = MockFetchPrinciples()
+            
+            PrinciplesView(
+                store: Store(
+                    initialState: PrinciplesFeature.State(viewType: .management)
+                ) {
+                    PrinciplesFeature(
+                        fetchPrinciplesUseCase: fetchPrinciplesUseCase,
+                        tradeType: TradeType.buy,
+                        stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
+                        tradeHistory: TradeHistory(
+                            tradingPrice: "97,700",
+                            tradingQuantity: "10",
+                            tradingDate: "2025-01-01",
+                            yield: nil,
+                            concurrency: "KRW"
+                        )
+                    )
+                }
+            )
         }
     }
 }

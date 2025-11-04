@@ -32,7 +32,7 @@ enum PrinciplesFetchTarget {
 
 extension PrinciplesFetchTarget: TargetType {
     var baseURL: String {
-        return Configuration.baseURL + "/api/v1/investment-principles"
+        return Configuration.baseURL + "/api/v1/principle-groups"
     }
     
     var header: Alamofire.HTTPHeaders {

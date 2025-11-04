@@ -9,5 +9,5 @@
 import Foundation
 
 public protocol PrinciplesRepository {
-    func fetch() async throws -> [Principle]
+    func fetch() async throws -> [PrincipleGroup]
 }
