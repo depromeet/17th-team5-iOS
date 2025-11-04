@@ -29,9 +29,23 @@ public struct Provider: ProviderProtocol {
     /// Token이 없을 때 요청하는 Provider
     public static let plain: Provider = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 15
-        configuration.timeoutIntervalForResource = 15
+        configuration.timeoutIntervalForRequest = 5
+        configuration.timeoutIntervalForResource = 5
+        
         let session = Session(configuration: configuration)
+        return Provider(session: session)
+    }()
+    
+    /// 인증 세션
+    public static let authorized: Provider = {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.timeoutIntervalForRequest = 5
+        configuration.timeoutIntervalForResource = 5
+        
+        let session = Session(
+            configuration: configuration,
+            interceptor: HedgeInterceptor()
+        )
         return Provider(session: session)
     }()
     
@@ -42,10 +56,7 @@ public struct Provider: ProviderProtocol {
                 .serializingDecodable(T.self)
                 .response
             
-            print(response.request?.url)
-            
             if let error = response.error {
-                print(error)
                 throw makeHedgeError(error, data: response.data)
             }
             

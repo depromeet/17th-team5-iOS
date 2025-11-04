@@ -18,7 +18,7 @@ public struct DefaultsPrinciplesDataSource: PrinciplesDataSource {
     private let provider: Provider
     
     public init() {
-        self.provider = Provider.plain
+        self.provider = Provider.authorized
     }
     
     public func fetch() async throws -> RemoteDataSourceInterface.PrinciplesResponseDTO {

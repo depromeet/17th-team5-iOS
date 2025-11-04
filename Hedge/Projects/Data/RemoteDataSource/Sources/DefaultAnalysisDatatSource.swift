@@ -17,7 +17,7 @@ public struct DefaultAnalysisDataSource: AnalysisDataSource {
     private let provider: Provider
     
     public init() {
-        self.provider = Provider.plain
+        self.provider = Provider.authorized
     }
     
     public func fetch(_ request: AnalysisRequestDTO) async throws -> AnalysisResponseDTO {

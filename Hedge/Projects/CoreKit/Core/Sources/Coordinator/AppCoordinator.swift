@@ -8,4 +8,7 @@
 
 import Foundation
 
-public protocol AppCoordinator: Coordinator {}
+public protocol AppCoordinator: Coordinator {
+    func loginFlow()
+    func mainFlow()
+}

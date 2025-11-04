@@ -15,6 +15,8 @@ import DesignKit
 import Shared
 import Umbrella
 
+import KakaoSDKCommon
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(
@@ -23,6 +25,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         registerDependencies()
         
+        if let kakaoNativeAppKey = Bundle.main.object(forInfoDictionaryKey: "KakaoNativeAppKey") as? String {
+            print(kakaoNativeAppKey)
+            KakaoSDK.initSDK(appKey: kakaoNativeAppKey)
+        }
         return true
     }
 }

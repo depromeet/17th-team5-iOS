@@ -15,7 +15,7 @@ public struct DefaultFeedbackDataSource: FeedbackDataSource {
     private let provider: Provider
     
     public init() {
-        self.provider = Provider.plain
+        self.provider = Provider.authorized
     }
     
     public func fetch(id: Int) async throws -> FeedbackResponseDTO {
