@@ -9,7 +9,10 @@
 import ComposableArchitecture
 
 import Core
+import Shared
 import HomeFeatureInterface
+import HomeFeature
+import TradeDomainInterface
 
 @Reducer
 public struct TabBarFeature {
@@ -47,8 +50,14 @@ public struct TabBarFeature {
     public var body: some Reducer<State, Action> {
         Reduce(reducerCore)
             .ifLet(\.homeState, action: \.delegate.homeAction) {
-                HomeFeature()
+                makeHomeFeature()
             }
+    }
+    
+    private func makeHomeFeature() -> HomeFeature {
+        // UseCases resolved via DIContainer.resolve in HomeFeature
+        // Only persistenceService needs to be injected
+        return HomeFeature(persistenceService: HomePersistenceService())
     }
 }
 
@@ -126,6 +135,11 @@ extension TabBarFeature {
         switch action {
         case .homeAction(.delegate(.pushToStockSearch(let tradeType))):
             coordinator.pushToStockSearch(with: tradeType)
+            return .none
+        case .homeAction(.delegate(.pushToTradeFeedback(let tradeData))):
+            // Debug: Log navigation to TradeFeedback
+            Log.debug("📱 TabBarFeature: Navigating to TradeFeedback for trade ID: \(tradeData.id)")
+            coordinator.pushToFeedback(tradeData: tradeData)
             return .none
         default:
             return .none

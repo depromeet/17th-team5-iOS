@@ -16,6 +16,8 @@ import LocalDataSourceInterface
 import LocalDataSource
 import Persistence
 import Repository
+import LocalDataSourceInterface
+import LocalDataSource
 import StockDomainInterface
 import PrinciplesDomainInterface
 import RetrospectDomainInterface
@@ -24,6 +26,7 @@ import AnalysisDomainInterface
 import AuthDomain
 import AuthDomainInterface
 import LinkDomainInterface
+import TradeDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -81,6 +84,28 @@ public struct DataAssembly: Assembly {
         container.register(LinkRepository.self) { _ in
             DefaultLinkRepository(
                 dataSource: DefaultLinkDataSource()
+            )
+        }
+        
+        // TradeLocalDataSource
+        container.register(TradeLocalDataSource.self) { _ in
+            DefaultTradeLocalDataSource()
+        }
+        
+        // RetrospectionListDataSource
+        container.register(RetrospectionListDataSource.self) { _ in
+            DefaultRetrospectionListDataSource()
+        }
+        
+        // TradeRepository
+        container.register(TradeRepository.self) { resolver in
+            guard let remoteDataSource = resolver.resolve(RetrospectionListDataSource.self),
+                  let localDataSource = resolver.resolve(TradeLocalDataSource.self) else {
+                fatalError("Could not resolve RetrospectionListDataSource or TradeLocalDataSource")
+            }
+            return DefaultTradeRepository(
+                remoteDataSource: remoteDataSource,
+                localDataSource: localDataSource
             )
         }
     }

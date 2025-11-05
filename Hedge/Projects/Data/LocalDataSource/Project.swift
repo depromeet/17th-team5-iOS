@@ -12,7 +12,10 @@ let project = Project.configure(
     moduleType: .module(name: "LocalDataSource"),
     product: .staticFramework,
     dependencies: [
-        .Module.persistence
+        // Note: Persistence module exists but is empty/placeholder
+        // LocalDataSource uses UserDefaults directly (matches existing pattern)
+        .Core.core,
+        .Domain.Trade.interface
     ],
     hasInterface: true
 )

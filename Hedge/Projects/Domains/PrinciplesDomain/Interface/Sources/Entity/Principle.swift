@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Principle: Equatable, Hashable {
+public struct Principle: Equatable, Hashable, Codable {
     public let id: Int
     public let groupId: Int
     public let groupName: String
@@ -33,5 +33,17 @@ public struct Principle: Equatable, Hashable {
         self.principle = principle
         self.description = description
         self.displayOrder = displayOrder
+    }
+    
+    // Convenience initializer for backward compatibility
+    // Used when converting from API responses that only have id and principle
+    public init(id: Int, principle: String) {
+        self.id = id
+        self.principle = principle
+        self.groupId = 0
+        self.groupName = ""
+        self.principleType = ""
+        self.description = ""
+        self.displayOrder = 0
     }
 }

@@ -27,7 +27,7 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     
     public func start() {
         let viewController = UIHostingController(
-            rootView: TradeFeedbackView(
+            rootView: TradeFeedbackResultView(
                 store: .init(
                     initialState: TradeFeedbackFeature.State(tradeData: tradeData),
                     reducer: {
@@ -45,5 +45,13 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     
     public func popToPrev() {
         finish()
+    }
+    
+    public func popToHome(selectingStock stockSymbol: String) {
+        if let rootCoordinator = parentCoordinator {
+            rootCoordinator.popToHome(selectingStock: stockSymbol)
+        } else {
+            finish()
+        }
     }
 }

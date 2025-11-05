@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - TradeType
-public enum TradeType: String, CaseIterable, Equatable {
+public enum TradeType: String, CaseIterable, Equatable, Codable {
     case buy = "매수"
     case sell = "매도"
     

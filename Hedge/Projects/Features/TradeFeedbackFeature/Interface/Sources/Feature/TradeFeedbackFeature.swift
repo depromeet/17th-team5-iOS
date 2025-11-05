@@ -52,6 +52,7 @@ public struct TradeFeedbackFeature {
         case onAppear
         case backButtonTapped
         case nextTapped
+        case completeButtonTapped
     }
     public enum InnerAction {
         case fetchFeedbackSuccess(FeedbackData)
@@ -112,6 +113,11 @@ extension TradeFeedbackFeature {
             return .none
             
         case .nextTapped:
+            return .none
+            
+        case .completeButtonTapped:
+            // Navigate back to home and select the stock symbol
+            coordinator.popToHome(selectingStock: state.tradeData.stockSymbol)
             return .none
         }
     }
