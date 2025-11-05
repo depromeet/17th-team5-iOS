@@ -76,7 +76,7 @@ public struct HomeView: View {
                                  .fill(
                                      RadialGradient(
                                         colors: [
-                                            Color.hedgeUI.shadowBlue.opacity(0.16 / 0.7), Color.clear],
+                                            Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
                                          center: .center,
                                          startRadius: 0,
                                          endRadius: 137.5
