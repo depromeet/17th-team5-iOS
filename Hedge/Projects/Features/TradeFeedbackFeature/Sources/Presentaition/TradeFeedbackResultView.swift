@@ -404,29 +404,29 @@ struct TradeFeedbackResultView: View {
     }
 }
 
-// MARK: - Preview & Mocks
-#Preview {
-    let tradeData = TradeData(
-        id: 1, tradeType: .sell,
-        stockSymbol: "005930", stockTitle: "삼성전자", stockMarket: "KOSPI",
-        tradingPrice: "160,000", tradingQuantity: "8", tradingDate: "2025년 1월 9일",
-        yield: "+5%", emotion: .conviction,
-        tradePrinciple: [Principle(id: 1, principle: "매매전략1")],
-        retrospection: "삼성전자 매도 회고입니다."
-    )
-    
-    return TradeFeedbackResultView(
-        store: .init(
-            initialState: TradeFeedbackFeature.State(tradeData: tradeData),
-            reducer: {
-                TradeFeedbackFeature(
-                    coordinator: MockCoordinator(),
-                    fetchFeedbackUseCase: MockFetchFeedbackUseCase()
-                )
-            }
-        )
-    )
-}
+// // MARK: - Preview & Mocks
+// #Preview {
+//     let tradeData = TradeData(
+//         id: 1, tradeType: .sell,
+//         stockSymbol: "005930", stockTitle: "삼성전자", stockMarket: "KOSPI",
+//         tradingPrice: "160,000", tradingQuantity: "8", tradingDate: "2025년 1월 9일",
+//         yield: "+5%", emotion: .conviction,
+//         tradePrinciple: [Principle(id: 1, principle: "매매전략1")],
+//         retrospection: "삼성전자 매도 회고입니다."
+//     )
+//     
+//     TradeFeedbackResultView(
+//         store: .init(
+//             initialState: TradeFeedbackFeature.State(tradeData: tradeData),
+//             reducer: {
+//                 TradeFeedbackFeature(
+//                     coordinator: MockCoordinator(),
+//                     fetchFeedbackUseCase: MockFetchFeedbackUseCase()
+//                 )
+//             }
+//         )
+//     )
+// }
 
 class MockCoordinator: TradeFeedbackCoordinator {
     var navigationController: UINavigationController = UINavigationController()
