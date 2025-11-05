@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - GenerateRetrospectRequest
-public struct GenerateRetrospectRequestDTO: Encodable {
+public struct GenerateRetrospectRequestDTO: Encodable, Sendable {
     public let symbol: String
     public let market: String
     public let orderType: String
@@ -50,7 +50,7 @@ public struct GenerateRetrospectRequestDTO: Encodable {
 }
 
 // MARK: - PrincipleCheck
-public struct PrincipleCheckRequestDTO: Encodable, Equatable {
+public struct PrincipleCheckRequestDTO: Encodable, Equatable, Sendable {
     public let principleId: Int
     public let isFollowed: Bool
     
