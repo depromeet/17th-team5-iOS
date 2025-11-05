@@ -10,13 +10,7 @@ import Foundation
 
 import PrinciplesDomainInterface
 
-/// Trade data model representing a single trade retrospective
-/// Conforms to Identifiable for SwiftUI list usage
-/// uuid is excluded from Codable encoding/decoding to avoid persistence issues
-/// Equatable compares by `id` only (not uuid) to ensure stability across app launches
 public struct TradeData: Identifiable, Equatable, Codable {
-    // UUID for internal identity only, excluded from Codable and Equatable
-    // After decoding, a new uuid is generated, so we use `id` for equality
     private let uuid = UUID()
     
     public var id: Int
@@ -28,7 +22,6 @@ public struct TradeData: Identifiable, Equatable, Codable {
     public var tradingQuantity: String
     public var tradingDate: String
     public var yield: String?
-    public var emotion: TradeEmotion?
     public var tradePrinciple: [Principle]
     public var retrospection: String
     
@@ -36,7 +29,7 @@ public struct TradeData: Identifiable, Equatable, Codable {
     private enum CodingKeys: String, CodingKey {
         case id, tradeType, stockSymbol, stockTitle, stockMarket,
              tradingPrice, tradingQuantity, tradingDate, yield,
-             emotion, tradePrinciple, retrospection
+             tradePrinciple, retrospection
     }
     
     public init(
@@ -49,7 +42,6 @@ public struct TradeData: Identifiable, Equatable, Codable {
         tradingQuantity: String,
         tradingDate: String,
         yield: String? = nil,
-        emotion: TradeEmotion? = nil,
         tradePrinciple: [Principle],
         retrospection: String
     ) {
@@ -62,13 +54,10 @@ public struct TradeData: Identifiable, Equatable, Codable {
         self.tradingQuantity = tradingQuantity
         self.tradingDate = tradingDate
         self.yield = yield
-        self.emotion = emotion
         self.tradePrinciple = tradePrinciple
         self.retrospection = retrospection
     }
     
-    // Custom Equatable implementation: compare by `id` only (not uuid)
-    // This ensures equality is stable across app launches even though uuid changes after decoding
     public static func == (lhs: TradeData, rhs: TradeData) -> Bool {
         lhs.id == rhs.id
     }

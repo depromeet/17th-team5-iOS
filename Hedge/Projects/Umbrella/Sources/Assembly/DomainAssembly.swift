@@ -38,14 +38,6 @@ public struct DomainAssembly: Assembly {
             return FetchStockSearch(repository: repository)
         }
         
-        container.register(GenerateRetrospectUseCase.self) { resolver in
-            guard let repository = resolver.resolve(RetrospectRepository.self) else {
-                fatalError("Could not resolve StockRepository")
-            }
-            
-            return GenerateRetrospect(retrospectRepository: repository)
-        }
-        
         container.register(FetchFeedbackUseCase.self) { resolver in
             guard let repository = resolver.resolve(FeedbackRepository.self) else {
                 fatalError("Could not resolve StockRepository")
@@ -76,22 +68,6 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchLink(repository: repository)
-        }
-        
-        container.register(FetchTradeRecordsUseCase.self) { resolver in
-            guard let repository = resolver.resolve(TradeRepository.self) else {
-                fatalError("Could not resolve TradeRepository")
-            }
-            
-            return FetchTradeRecords(tradeRepository: repository)
-        }
-        
-        container.register(FetchBadgeCountsUseCase.self) { resolver in
-            guard let repository = resolver.resolve(TradeRepository.self) else {
-                fatalError("Could not resolve TradeRepository")
-            }
-            
-            return FetchBadgeCounts(tradeRepository: repository)
         }
     }
 }

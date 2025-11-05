@@ -45,18 +45,6 @@ public struct DataAssembly: Assembly {
                 dataSource: DefaultsPrinciplesDataSource()
             )
         }
-              
-        container.register(RetrospectRepository.self) { _ in
-            DefaultRetrospectRepository(
-                dataSource: DefaultRetrospectDataSource()
-            )
-        }
-        
-        container.register(FeedbackRepository.self) { _ in
-            DefaultFeedbackRepository(
-                dataSource: DefaultFeedbackDataSource()
-            )
-        }
         
         // AnalysisRepository
         container.register(AnalysisRepository.self) { _ in
@@ -84,28 +72,6 @@ public struct DataAssembly: Assembly {
         container.register(LinkRepository.self) { _ in
             DefaultLinkRepository(
                 dataSource: DefaultLinkDataSource()
-            )
-        }
-        
-        // TradeLocalDataSource
-        container.register(TradeLocalDataSource.self) { _ in
-            DefaultTradeLocalDataSource()
-        }
-        
-        // RetrospectionListDataSource
-        container.register(RetrospectionListDataSource.self) { _ in
-            DefaultRetrospectionListDataSource()
-        }
-        
-        // TradeRepository
-        container.register(TradeRepository.self) { resolver in
-            guard let remoteDataSource = resolver.resolve(RetrospectionListDataSource.self),
-                  let localDataSource = resolver.resolve(TradeLocalDataSource.self) else {
-                fatalError("Could not resolve RetrospectionListDataSource or TradeLocalDataSource")
-            }
-            return DefaultTradeRepository(
-                remoteDataSource: remoteDataSource,
-                localDataSource: localDataSource
             )
         }
     }

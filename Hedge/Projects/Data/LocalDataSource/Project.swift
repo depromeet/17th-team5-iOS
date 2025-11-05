@@ -13,7 +13,6 @@ let project = Project.configure(
     product: .staticFramework,
     dependencies: [
         .Core.core,
-        .Domain.Trade.interface,
         .Module.persistence
     ],
     hasInterface: true
