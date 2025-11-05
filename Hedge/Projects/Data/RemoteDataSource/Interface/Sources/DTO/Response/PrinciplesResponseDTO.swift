@@ -55,7 +55,7 @@ extension PrincipleResponseDTO {
             groupName: self.groupName,
             principleType: self.principleType,
             principle: self.principle,
-            description: self.description
+            description: self.description,
             displayOrder: self.displayOrder
         )
     }

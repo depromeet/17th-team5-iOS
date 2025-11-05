@@ -27,6 +27,7 @@ import TradeFeedbackFeatureInterface
 import PrinciplesDomainInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
+    
     public var navigationController: UINavigationController
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public var type: Core.CoordinatorType = .root
@@ -88,47 +89,23 @@ extension DefaultRootCoordinator {
         childCoordinators.append(tradeHistoryCoordinator)
     }
     
-    public func pushToTradeReason(
-        tradeType: TradeType,
-        stock: StockSearch,
-        tradeHistory: TradeHistory,
-        tradePrinciple: [Principle],
-        selectedPrinciples: Set<Int>
-    ) {
-        let tradeReasonCoordinator = DefaultTradeReasonCoordinator(
-            navigationController: navigationController,
-            tradeType: tradeType,
-            stock: stock,
-            tradeHistory: tradeHistory,
-            principles: tradePrinciple,
-            selectedPrinciples: selectedPrinciples,
-            principleBuilder: PrinciplesViewBuilder(),
-            tradeReasonBuilder: TradeReasonViewBuilder()
-        )
-        tradeReasonCoordinator.parentCoordinator = self
-        tradeReasonCoordinator.finishDelegate = self
-        tradeReasonCoordinator.start()
-        
-        childCoordinators.append(tradeReasonCoordinator)
-    }
-    
     public func pushToPrinciples(
         tradeType: TradeType,
         stock: StockSearch,
         tradeHistory: TradeHistory
     ) {
-        let principlesCoordinator = DefaultPrinciplesCoordinator(
-            navigationController: navigationController,
-            tradeType: tradeType,
-            stock: stock,
-            tradeHistory: tradeHistory,
-            viewBuilder: PrinciplesViewBuilder()
-        )
-        principlesCoordinator.parentCoordinator = self
-        principlesCoordinator.finishDelegate = self
-        principlesCoordinator.start()
-        
-        childCoordinators.append(principlesCoordinator)
+        // let principlesCoordinator = DefaultPrinciplesCoordinator(
+        //     navigationController: navigationController,
+        //     tradeType: tradeType,
+        //     stock: stock,
+        //     tradeHistory: tradeHistory,
+        //     viewBuilder: PrinciplesViewBuilder()
+        // )
+        // principlesCoordinator.parentCoordinator = self
+        // principlesCoordinator.finishDelegate = self
+        // principlesCoordinator.start()
+        // 
+        // childCoordinators.append(principlesCoordinator)
     }
     
     public func showEmotionSelection(
