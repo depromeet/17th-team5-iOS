@@ -10,6 +10,8 @@ public struct HomeFeature {
     
     @ObservableState
     public struct State: Equatable {
+        public var selectedType: TabType = .home
+        
         public init() { }
     }
     
@@ -23,6 +25,8 @@ public struct HomeFeature {
     
     public enum View {
         case retrospectTapped(TradeType)
+        case homeTabTapped
+        case principleTabTapped
     }
     public enum InnerAction { }
     public enum AsyncAction { }
@@ -68,6 +72,12 @@ extension HomeFeature {
         switch action {
         case .retrospectTapped(let type):
             return .send(.delegate(.pushToStockSearch(type)))
+        case .homeTabTapped:
+            state.selectedType = .home
+            return .none
+        case .principleTabTapped:
+            state.selectedType = .principle
+            return .none
         }
     }
     

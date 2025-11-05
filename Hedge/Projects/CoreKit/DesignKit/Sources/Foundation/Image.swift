@@ -49,6 +49,7 @@ extension HedgeUI where Base == Image {
     public static var uncheckFill: Image { asset(#function) }
     public static var image: Image { asset(#function) }
     public static var link: Image { asset(#function) }
+    public static var setting: Image { asset(#function) }
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }

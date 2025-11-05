@@ -57,6 +57,9 @@ extension HedgeUI where Base == Color {
     // MARK: Neutral
     public static var neutralBgDefault: Color { backgroundWhite }
     public static var neutralBgSecondary: Color { backgroundSecondary }
+    
+    public static var shadowBlue: Color { asset(#function) }
+    public static var shadowGreen: Color { asset(#function) }
 }
 
 extension HedgeUI where Base == Color {
