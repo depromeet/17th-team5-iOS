@@ -68,8 +68,7 @@ extension HedgeInterceptor {
         Self.sharedIsRefreshing = true
         Self.sharedRefreshLock.unlock()
         
-        refreshAccessToken { [weak self] response in
-            guard let self = self else { return }
+        refreshAccessToken { response in
             Self.sharedRefreshLock.lock()
             Self.sharedIsRefreshing = false
             

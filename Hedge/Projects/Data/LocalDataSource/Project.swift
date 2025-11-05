@@ -12,6 +12,8 @@ let project = Project.configure(
     moduleType: .module(name: "LocalDataSource"),
     product: .staticFramework,
     dependencies: [
+        .Core.core,
+        .Domain.Trade.interface,
         .Module.persistence
     ],
     hasInterface: true

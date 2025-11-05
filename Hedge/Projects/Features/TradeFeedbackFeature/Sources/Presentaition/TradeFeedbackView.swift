@@ -17,7 +17,7 @@ struct TradeFeedbackView: View {
     
     @Bindable public var store: StoreOf<TradeFeedbackFeature>
     
-    @State private var selectedTab: Int = 1
+    @State private var selectedTab: Int = 0 // Default to "나의 회고" tab first
     @State private var isImageHidden: Bool = false
     @State private var isPrincipleExpanded: Bool = false
     @State private var feedback: Feedback? = nil

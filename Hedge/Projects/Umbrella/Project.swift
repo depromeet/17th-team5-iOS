@@ -13,7 +13,8 @@ let project = Project.configure(
     product: .framework,
     dependencies: [
         .Feature.Root.feature,
-        .Module.data
+        .Module.data,
+        .Domain.Trade.implement // DomainAssembly imports TradeDomain implementation
     ],
     hasTests: false
 )

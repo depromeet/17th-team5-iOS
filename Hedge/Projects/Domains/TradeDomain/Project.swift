@@ -1,11 +1,15 @@
+
 import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.configure(
-    moduleType: .micro(name: "HomeFeature"),
+    moduleType: .module(name: "TradeDomain"),
     product: .staticFramework,
     dependencies: [
-        .Core.core,
-        .Domain.Trade.interface // Required for FetchTradeRecordsUseCase
-    ]
+        .Module.shared,
+        .Core.core
+    ],
+    hasInterface: true,
+    hasTests: true
 )
+

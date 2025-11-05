@@ -143,7 +143,7 @@ extension TradeHistoryFeature {
         _ state: inout State,
         _ action: AsyncAction
     ) -> Effect<Action> {
-        
+        return .none
     }
     
     // MARK: - Scope Core

@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import CoreText
 
 public struct HedgeFont {
     public enum Pretendard: String, CaseIterable {

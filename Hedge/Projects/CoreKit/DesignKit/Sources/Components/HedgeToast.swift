@@ -97,7 +97,7 @@ private struct HedgeToastModifier: ViewModifier {
                 .onAppear { scheduleAutoDismissIfNeeded() }
             }
         }
-        .onChange(of: isPresented) { newValue in
+        .onChange(of: isPresented) { oldValue, newValue in
             guard newValue else { return }
             // dedup: ignore same toast within debounce window
             let key = "\(type)|\(message)"

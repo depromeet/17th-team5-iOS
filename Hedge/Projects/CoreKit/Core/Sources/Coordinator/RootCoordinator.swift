@@ -17,4 +17,5 @@ public protocol RootCoordinator: Coordinator {
     func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory)
     func showEmotionSelection(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory)
     func pushToFeedback(tradeData: TradeData)
+    func popToHome(selectingStock stockSymbol: String)
 }

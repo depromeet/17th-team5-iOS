@@ -23,6 +23,8 @@ import AnalysisDomainInterface
 import AnalysisDomain
 import LinkDomainInterface
 import LinkDomain
+import TradeDomainInterface
+import TradeDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -74,6 +76,22 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchLink(repository: repository)
+        }
+        
+        container.register(FetchTradeRecordsUseCase.self) { resolver in
+            guard let repository = resolver.resolve(TradeRepository.self) else {
+                fatalError("Could not resolve TradeRepository")
+            }
+            
+            return FetchTradeRecords(tradeRepository: repository)
+        }
+        
+        container.register(FetchBadgeCountsUseCase.self) { resolver in
+            guard let repository = resolver.resolve(TradeRepository.self) else {
+                fatalError("Could not resolve TradeRepository")
+            }
+            
+            return FetchBadgeCounts(tradeRepository: repository)
         }
     }
 }

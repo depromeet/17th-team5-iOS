@@ -3,7 +3,7 @@
 //  DesignKit
 //
 //  Created by Junyoung on 9/13/25.
-//  Copyright © 2025 SampleCompany. All rights reserved.
+//  Copyright © 2025 depromeet. All rights reserved.
 //
 
 import Foundation
@@ -68,9 +68,51 @@ extension HedgeUI where Base == Color {
 extension HedgeUI where Base == UIColor {
     private static func asset(_ name: String) -> UIColor {
         guard let color = UIColor(named: name, in: .module, compatibleWith: nil) else {
+            #if DEBUG
             assertionFailure("can't find color asset: \(name)")
+            return UIColor.magenta // Loud fallback in DEBUG for missing tokens
+            #else
             return UIColor.clear
+            #endif
         }
         return color
+    }
+}
+
+// MARK: - Hex Color Support
+extension Color {
+    /// Initialize a Color from a hex string
+    /// Supports #RGB, #RRGGBB, and #RRGGBBAA formats
+    /// Returns nil if parsing fails (use with ?? operator for fallback)
+    public init?(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        guard Scanner(string: hex).scanHexInt64(&int) else {
+            return nil
+        }
+        
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // #RGB
+            (a, r, g, b) = (255, (int>>8)*17, (int>>4&0xF)*17, (int&0xF)*17)
+        case 6: // #RRGGBB
+            (a, r, g, b) = (255, int>>16, int>>8&0xFF, int&0xFF)
+        case 8: // #RRGGBBAA
+            (a, r, g, b) = (int>>24, int>>16&0xFF, int>>8&0xFF, int&0xFF)
+        default:
+            return nil
+        }
+        
+        self.init(.sRGB, red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, opacity: Double(a)/255)
+    }
+    
+    /// Initialize a Color from a hex string with a safe fallback
+    /// If parsing fails, returns the fallback color (defaults to black)
+    public init(hex: String, fallback: Color = .black) {
+        if let color = Color(hex: hex) {
+            self = color
+        } else {
+            self = fallback
+        }
     }
 }

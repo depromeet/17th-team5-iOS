@@ -8,7 +8,7 @@
 
 import Foundation
 
-import Alamofire
+@preconcurrency import Alamofire
 
 import Networker
 import RemoteDataSourceInterface
@@ -25,7 +25,7 @@ public struct DefaultRetrospectDataSource: RetrospectDataSource {
     }
 }
 
-enum RetrospectTarget {
+enum RetrospectTarget: Sendable {
     case generate(_ request: GenerateRetrospectRequestDTO)
 }
 

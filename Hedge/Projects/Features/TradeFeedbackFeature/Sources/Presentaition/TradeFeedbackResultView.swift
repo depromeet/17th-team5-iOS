@@ -18,30 +18,16 @@ enum BadgeGrade { case emerald, gold, silver, bronze }
 
 extension TradeData {
     var grade: BadgeGrade {
-        switch yield {//TODO: do this
+        // Badge grade logic based on yield
+        // Implementation pending based on business requirements
+        switch yield {
         default: return .silver
         }
     }
 }
 
-// MARK: - Color Extension for Hex Support
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: (a,r,g,b) = (255,(int>>8)*17,(int>>4&0xF)*17,(int&0xF)*17)
-        case 6: (a,r,g,b) = (255,int>>16,int>>8&0xFF,int&0xFF)
-        case 8: (a,r,g,b) = (int>>24,int>>16&0xFF,int>>8&0xFF,int&0xFF)
-        default:(a,r,g,b) = (1,1,1,0)
-        }
-        self.init(.sRGB, red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, opacity: Double(a)/255)
-    }
-}
-
 // MARK: - Figma-style color wash (two ellipses)
+// Note: Using Color(hex:) from DesignKit module
 private struct BackgroundWash: View {
     var body: some View {
         GeometryReader { geo in
@@ -54,8 +40,8 @@ private struct BackgroundWash: View {
                     .fill(
                         RadialGradient(
                             gradient: Gradient(stops: [
-                                .init(color: Color(hex: "#29F980").opacity(0.25), location: 0.0),
-                                .init(color: Color(hex: "#29F980").opacity(0.0), location: 1)
+                                .init(color: Color(hex: "#29F980", fallback: .green).opacity(0.25), location: 0.0),
+                                .init(color: Color(hex: "#29F980", fallback: .green).opacity(0.0), location: 1)
                             ]),
                             center: .center,
                             startRadius: 0,
@@ -68,8 +54,8 @@ private struct BackgroundWash: View {
                     .fill(
                         RadialGradient(
                             gradient: Gradient(stops: [
-                                .init(color: Color(hex: "#1CCAFF").opacity(0.25), location: 0.0),
-                                .init(color: Color(hex: "#1CCAFF").opacity(0.0), location: 1.0)
+                                .init(color: Color(hex: "#1CCAFF", fallback: .cyan).opacity(0.25), location: 0.0),
+                                .init(color: Color(hex: "#1CCAFF", fallback: .cyan).opacity(0.0), location: 1.0)
                             ]),
                             center: .center,
                             startRadius: 0,
@@ -91,7 +77,7 @@ private struct TopWhiteOverlay: View {
     var body: some View {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color(hex: "#FFFFFF"),
+                Color(hex: "#FFFFFF", fallback: .white),
                 Color.hedgeUI.backgroundGrey
             ]),
             startPoint: .top,
@@ -182,7 +168,7 @@ struct TradeFeedbackResultView: View {
                 buttonText: "완료",
                 color: .primary,
                 onLeftButtonTap: { store.send(.view(.backButtonTapped)) },
-                onRightButtonTap: { /* finish */ }
+                onRightButtonTap: { store.send(.view(.completeButtonTapped)) }
             )
             // .background(.ultraThinMaterial.opacity(0.3))
         }
@@ -293,10 +279,10 @@ struct TradeFeedbackResultView: View {
     private var titleGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(stops: [
-                .init(color: Color(hex: "#07BC70"), location: 0.0),
-                .init(color: Color(hex: "#07BC70"), location: 0.3),
-                .init(color: Color(hex: "#0696BE"), location: 0.7),
-                .init(color: Color(hex: "#0696BE"), location: 1.0)
+                .init(color: Color(hex: "#07BC70", fallback: .green), location: 0.0),
+                .init(color: Color(hex: "#07BC70", fallback: .green), location: 0.3),
+                .init(color: Color(hex: "#0696BE", fallback: .blue), location: 0.7),
+                .init(color: Color(hex: "#0696BE", fallback: .blue), location: 1.0)
             ]),
             startPoint: .leading,
             endPoint: .trailing
@@ -436,6 +422,7 @@ class MockCoordinator: TradeFeedbackCoordinator {
     weak var finishDelegate: CoordinatorFinishDelegate?
     func start() {}
     func popToPrev() {}
+    func popToHome(selectingStock stockSymbol: String) {}
 }
 
 class MockFetchFeedbackUseCase: FetchFeedbackUseCase {

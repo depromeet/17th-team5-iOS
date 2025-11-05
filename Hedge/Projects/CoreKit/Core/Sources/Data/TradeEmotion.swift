@@ -11,7 +11,7 @@ import SwiftUI
 import DesignKit
 
 // MARK: - Emotion
-public enum TradeEmotion: Int, CaseIterable, Equatable {
+public enum TradeEmotion: Int, CaseIterable, Equatable, Codable {
     
     case anxious
     case impulse
