@@ -71,6 +71,8 @@ extension HomeFeature {
         _ action: View
     ) -> Effect<Action> {
         switch action {
+        case .onAppear:
+            return .none
         case .retrospectTapped(let type):
             return .send(.delegate(.pushToStockSearch(type)))
         case .homeTabTapped:

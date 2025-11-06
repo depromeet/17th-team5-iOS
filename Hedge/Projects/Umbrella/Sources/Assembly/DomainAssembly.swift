@@ -21,6 +21,8 @@ import AnalysisDomainInterface
 import AnalysisDomain
 import LinkDomainInterface
 import LinkDomain
+import RetrospectionDomainInterface
+import RetrospectionDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -64,6 +66,14 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchLink(repository: repository)
+        }
+        
+        container.register(RetrospectionUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return FetchRetrospection(repository: repository)
         }
     }
 }

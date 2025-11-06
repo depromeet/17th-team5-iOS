@@ -25,6 +25,7 @@ import AnalysisDomainInterface
 import AuthDomain
 import AuthDomainInterface
 import LinkDomainInterface
+import RetrospectionDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -70,6 +71,13 @@ public struct DataAssembly: Assembly {
         container.register(LinkRepository.self) { _ in
             DefaultLinkRepository(
                 dataSource: DefaultLinkDataSource()
+            )
+        }
+        
+        // RetrospectionRepository
+        container.register(RetrospectionRepository.self) { _ in
+            DefaultRetrospectionRepository(
+                dataSource: DefaultRetrospectionDataSource()
             )
         }
     }

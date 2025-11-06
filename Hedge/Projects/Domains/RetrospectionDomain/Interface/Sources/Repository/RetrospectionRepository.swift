@@ -8,4 +8,5 @@
 
 public protocol RetrospectionRepository {
     func fetch() async throws -> [Retrospection]
+    func fetchCompanies() async throws -> [RetrospectionCompany]
 }
