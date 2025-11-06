@@ -12,6 +12,7 @@ import Core
 import Shared
 import HomeFeatureInterface
 import HomeFeature
+import RetrospectionDomainInterface
 
 @Reducer
 public struct TabBarFeature {
@@ -49,7 +50,9 @@ public struct TabBarFeature {
     public var body: some Reducer<State, Action> {
         Reduce(reducerCore)
             .ifLet(\.homeState, action: \.delegate.homeAction) {
-                HomeFeature()
+                HomeFeature(
+                    fetchRetrospectionUseCase: DIContainer.resolve(RetrospectionUseCase.self)
+                )
             }
     }
 }

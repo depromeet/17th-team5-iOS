@@ -2,6 +2,7 @@ import SwiftUI
 
 import DesignKit
 import HomeFeatureInterface
+import RetrospectionDomainInterface
 
 import ComposableArchitecture
 
@@ -84,44 +85,44 @@ extension HomeView {
     private var badgeArea: some View {
         ZStack {
             // 배경 레이어
-             RoundedRectangle(cornerRadius: 22)
-                 .fill(Color.hedgeUI.backgroundWhite)
-                 .overlay {
-                     Capsule()
-                         .fill(
-                             RadialGradient(
+            RoundedRectangle(cornerRadius: 22)
+                .fill(Color.hedgeUI.backgroundWhite)
+                .overlay {
+                    Capsule()
+                        .fill(
+                            RadialGradient(
                                 colors: [Color.hedgeUI.shadowGreen.opacity(0.16 / 0.7),
                                          Color.clear],
-                                 center: .center,
-                                 startRadius: 0,
+                                center: .center,
+                                startRadius: 0,
                                 endRadius: 137.5
-                             )
-                         )
-                         .frame(width: 355, height: 274)
-                         .opacity(0.7)
-                         .blur(radius: 84.6)
-                         .offset(x: -124, y: -117)
-                     
-                     Capsule()
-                         .fill(
-                             RadialGradient(
+                            )
+                        )
+                        .frame(width: 355, height: 274)
+                        .opacity(0.7)
+                        .blur(radius: 84.6)
+                        .offset(x: -124, y: -117)
+                    
+                    Capsule()
+                        .fill(
+                            RadialGradient(
                                 colors: [
                                     Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
-                                 center: .center,
-                                 startRadius: 0,
-                                 endRadius: 137.5
-                             )
-                         )
-                         .frame(width: 355, height: 274)
-                         .opacity(0.7)
-                         .blur(radius: 84.6)
-                         .offset(x: 90, y: -117)
-                 }
-                 .clipShape(RoundedRectangle(cornerRadius: 22)) // overlay 내부의 Circle만 clip
-             
-             // Stroke는 별도 레이어
-             RoundedRectangle(cornerRadius: 22)
-                 .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 137.5
+                            )
+                        )
+                        .frame(width: 355, height: 274)
+                        .opacity(0.7)
+                        .blur(radius: 84.6)
+                        .offset(x: 90, y: -117)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 22)) // overlay 내부의 Circle만 clip
+            
+            // Stroke는 별도 레이어
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
             
             // 내부 콘텐츠
             VStack(spacing: 0) {
@@ -183,85 +184,142 @@ extension HomeView {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
             
-            HStack(spacing: 2) {
-                // 주식 종목
-                ScrollView {
-                    VStack(alignment: .center, spacing: 12) {
-                        ForEach(sampleStockSymbols, id: \.self) { symbol in
-                            HStack(spacing: 8) {
-                                Image.hedgeUI.stockThumbnailDemo
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
+            if store.state.groupedRetrospections.isEmpty {
+                // 데이터가 없을 때
+                Text("회고 기록이 없습니다")
+                    .font(FontModel.body3Regular)
+                    .foregroundStyle(Color.hedgeUI.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 40)
+            } else {
+                HStack(spacing: 2) {
+                    // 주식 종목 리스트 (왼쪽)
+                    ScrollView {
+                        VStack(alignment: .center, spacing: 12) {
+                            ForEach(store.state.companySymbols, id: \.self) { symbol in
+                                let isSelected = store.state.selectedCompanySymbol == symbol
                                 
-                                Text(symbol)
-                                    .font(FontModel.body3Medium)
-                                    .foregroundStyle(Color.hedgeUI.textSecondary)
-                                    .lineLimit(2)
-                                    .truncationMode(.tail)
+                                HStack(spacing: 8) {
+                                    Image.hedgeUI.stockThumbnailDemo
+                                        .resizable()
+                                        .frame(width: 24, height: 24)
+                                    
+                                    Text(symbol)
+                                        .font(FontModel.body3Medium)
+                                        .foregroundStyle(
+                                            isSelected ? Color.hedgeUI.brandPrimary : Color.hedgeUI.textSecondary
+                                        )
+                                        .lineLimit(2)
+                                        .truncationMode(.tail)
+                                }
+                                .frame(width: 98, alignment: .leading)
+                                .padding(10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(isSelected ? Color.hedgeUI.neutralBgSecondary : .clear)
+                                )
+                                .onTapGesture {
+                                    send(.companyTapped(symbol))
+                                }
                             }
-                            .frame(width: 98, alignment: .leading)
-                            .padding(10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.hedgeUI.neutralBgSecondary)
-                            )
                         }
+                        .padding(.horizontal, 12)
                     }
-                    .padding(.horizontal, 12)
-                }
-                
-                // 종목에 해당하는 회고 리스트 (날짜별 섹션)
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(groupedRetrospects.keys.sorted(by: >), id: \.self) { date in
-                            VStack(alignment: .leading, spacing: 8) {
-                                // 날짜 헤더
-                                Text(formatDate(date))
-                                    .font(FontModel.body2Semibold)
-                                    .foregroundStyle(Color.hedgeUI.textTitle)
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 8)
-                                
-                                // 해당 날짜의 회고 항목들
-                                ForEach(groupedRetrospects[date] ?? []) { item in
-                                    retrospectItemView(item)
+                    .scrollIndicators(.hidden)
+                    
+                    // 회고 리스트 (오른쪽) - 월별 -> 일별 -> 개별 항목
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(store.state.groupedRetrospections) { companyGroup in
+                                ForEach(Array(companyGroup.monthlyGroups.enumerated()), id: \.element.id) { monthIndex, monthlyGroup in
+                                    
+                                    // 월별 헤더 ("이번달 회고", "지난달 회고" 등)
+                                    Text(monthlyGroup.monthTitle)
+                                        .font(FontModel.body1Semibold)
+                                        .foregroundStyle(Color.hedgeUI.textTitle)
+                                        .padding(.trailing, 15)
+                                        .padding(.bottom, 12)
+                                    
+                                    // 월별 섹션 구분선
+                                    Rectangle()
+                                        .fill(Color.hedgeUI.neutralBgSecondary)
+                                        .frame(height: 1)
+                                        .padding(.bottom, 16)
+                                    
+                                    // 일별 그룹
+                                    ForEach(monthlyGroup.dailyGroups) { dailyGroup in
+                                        // 일별 헤더 ("9월 15일")
+                                        Text(dailyGroup.dateString)
+                                            .font(FontModel.label1Regular)
+                                            .foregroundStyle(Color.hedgeUI.textPrimary)
+                                            .padding(.bottom, 8)
+                                        
+                                        // 개별 회고 항목
+                                        VStack(alignment: .leading, spacing: 20) {
+                                            ForEach(dailyGroup.retrospections, id: \.id) { retrospection in
+                                                retrospectItemView(retrospection: retrospection)
+                                            }
+                                        }
+                                        
+                                        HedgeSpacer(height: 28)
+                                    }
+                                    
+                                    HedgeSpacer(height: 16)
                                 }
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .scrollIndicators(.hidden)
+                    .padding(.top, 10)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
     
-    // 날짜별로 그룹화된 회고 데이터
-    private var groupedRetrospects: [String: [RetrospectItem]] {
-        Dictionary(grouping: sampleRetrospects) { $0.date }
-    }
-    
     // 회고 항목 뷰
     @ViewBuilder
-    private func retrospectItemView(_ item: RetrospectItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(item.stockSymbol)
-                .font(FontModel.label2Semibold)
-                .foregroundStyle(Color.hedgeUI.textPrimary)
+    private func retrospectItemView(retrospection: Retrospection) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // 금액 • 주수
+            Text("\(formatPrice(retrospection.price))원 • \(retrospection.volume)주")
+                .font(FontModel.h2Semibold)
+                .foregroundStyle(Color.hedgeUI.textTitle)
             
-            Text(item.content)
-                .font(FontModel.body3Regular)
-                .foregroundStyle(Color.hedgeUI.textSecondary)
-                .lineLimit(2)
-            
-            Text("매수")
-                .font(FontModel.caption2Semibold)
-                .foregroundStyle(
-                    Color.hedgeUI.tradeBuy
-                )
+            // 매수/매도 + 날짜
+            HStack(spacing: 5) {
+                Text(retrospection.orderType == "BUY" ? "매수" : "매도")
+                    .font(FontModel.label2Medium)
+                    .foregroundStyle(
+                        retrospection.orderType == "BUY"
+                        ? Color.hedgeUI.tradeBuy
+                        : Color.hedgeUI.tradeSell
+                    )
+                
+                Text(formatOrderDate(retrospection.orderCreatedAt))
+                    .font(FontModel.label2Regular)
+                    .foregroundStyle(Color.hedgeUI.textAlternative)
+            }
+            .padding(.top, 2)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .background(Color.hedgeUI.backgroundWhite)
+    }
+    
+    // 가격 포맷팅 (천 단위 구분자)
+    private func formatPrice(_ price: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = ","
+        return formatter.string(from: NSNumber(value: price)) ?? "\(price)"
+    }
+    
+    // 주문 날짜 포맷팅 (YYYY.MM.DD)
+    private func formatOrderDate(_ dateString: String) -> String {
+        // orderCreatedAt은 "2025-11-06" 형식
+        let components = dateString.split(separator: "-")
+        if components.count == 3 {
+            return "\(components[0]).\(components[1]).\(components[2])"
+        }
+        return dateString
     }
     
     private var startArea: some View {
@@ -365,33 +423,9 @@ extension HomeView {
     }
 }
 
-extension HomeView {
-    // 더미 데이터 - 실제 데이터로 교체 필요
-    private var sampleStockSymbols: [String] {
-        ["삼성전자", "종목명이최대두줄이상일때", "NAVER"]
-    }
-    
-    // 더미 회고 데이터 - 실제 데이터로 교체 필요
-    private var sampleRetrospects: [RetrospectItem] {
-        [
-            RetrospectItem(id: 1, stockSymbol: "삼성전자", date: "2025-01-15", content: "매수 회고 내용 1"),
-            RetrospectItem(id: 2, stockSymbol: "삼성전자", date: "2025-01-15", content: "매수 회고 내용 2"),
-            RetrospectItem(id: 3, stockSymbol: "종목명이최대10자이상", date: "2025-01-14", content: "매도 회고 내용 1"),
-            RetrospectItem(id: 4, stockSymbol: "NAVER", date: "2025-01-13", content: "매수 회고 내용 3")
-        ]
-    }
-    
-    // 회고 항목 모델
-    private struct RetrospectItem: Identifiable {
-        let id: Int
-        let stockSymbol: String
-        let date: String
-        let content: String
-    }
-}
 
-#Preview {
-    HomeView(store: .init(initialState: HomeFeature.State(),
-                          reducer: { HomeFeature() } )
-    )
-}
+// #Preview {
+//     HomeView(store: .init(initialState: HomeFeature.State(),
+//                           reducer: { HomeFeature() } )
+//     )
+// }
