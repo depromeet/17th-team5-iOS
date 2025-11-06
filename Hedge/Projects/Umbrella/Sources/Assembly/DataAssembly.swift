@@ -26,7 +26,6 @@ import AnalysisDomainInterface
 import AuthDomain
 import AuthDomainInterface
 import LinkDomainInterface
-import TradeDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}

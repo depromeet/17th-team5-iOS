@@ -23,8 +23,6 @@ import AnalysisDomainInterface
 import AnalysisDomain
 import LinkDomainInterface
 import LinkDomain
-import TradeDomainInterface
-import TradeDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}

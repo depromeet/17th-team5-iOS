@@ -12,7 +12,6 @@ import Core
 import Shared
 import HomeFeatureInterface
 import HomeFeature
-import TradeDomainInterface
 
 @Reducer
 public struct TabBarFeature {
