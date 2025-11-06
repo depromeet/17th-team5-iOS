@@ -185,7 +185,6 @@ extension HomeView {
                 .padding(.vertical, 10)
             
             if store.state.groupedRetrospections.isEmpty {
-                // 데이터가 없을 때
                 Text("회고 기록이 없습니다")
                     .font(FontModel.body3Regular)
                     .foregroundStyle(Color.hedgeUI.textSecondary)
@@ -226,58 +225,84 @@ extension HomeView {
                         .padding(.horizontal, 12)
                     }
                     .scrollIndicators(.hidden)
+                    .overlay {
+                        VStack {
+                            LinearGradient(
+                                gradient: Gradient(stops: [
+                                    .init(color: Color.white.opacity(1.0), location: 0.0),
+                                    .init(color: Color.white.opacity(0.0), location: 0.85),
+                                ]
+                                ),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(height: 70)
+                            .allowsHitTesting(false)
+                            
+                            Spacer()
+                        }
+                    }
                     
                     // 회고 리스트 (오른쪽) - 월별 -> 일별 -> 개별 항목
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 0) {
-                            ForEach(store.state.groupedRetrospections) { companyGroup in
-                                ForEach(Array(companyGroup.monthlyGroups.enumerated()), id: \.element.id) { monthIndex, monthlyGroup in
-                                    
-                                    // 월별 헤더 ("이번달 회고", "지난달 회고" 등)
-                                    Text(monthlyGroup.monthTitle)
-                                        .font(FontModel.body1Semibold)
-                                        .foregroundStyle(Color.hedgeUI.textTitle)
-                                        .padding(.trailing, 15)
-                                        .padding(.bottom, 12)
-                                    
-                                    // 월별 섹션 구분선
-                                    Rectangle()
-                                        .fill(Color.hedgeUI.neutralBgSecondary)
-                                        .frame(height: 1)
-                                        .padding(.bottom, 16)
-                                    
-                                    // 일별 그룹
-                                    ForEach(monthlyGroup.dailyGroups) { dailyGroup in
-                                        // 일별 헤더 ("9월 15일")
-                                        Text(dailyGroup.dateString)
-                                            .font(FontModel.label1Regular)
-                                            .foregroundStyle(Color.hedgeUI.textPrimary)
-                                            .padding(.bottom, 8)
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                // 최상단 앵커 뷰
+                                Color.clear
+                                    .frame(height: 0)
+                                    .id("scrollTop")
+                                
+                                ForEach(store.state.groupedRetrospections) { companyGroup in
+                                    ForEach(Array(companyGroup.monthlyGroups.enumerated()), id: \.element.id) { monthIndex, monthlyGroup in
                                         
-                                        // 개별 회고 항목
-                                        VStack(alignment: .leading, spacing: 20) {
-                                            ForEach(dailyGroup.retrospections, id: \.id) { retrospection in
-                                                retrospectItemView(retrospection: retrospection)
+                                        // 월별 헤더 ("이번달 회고", "지난달 회고" 등)
+                                        Text(monthlyGroup.monthTitle)
+                                            .font(FontModel.body1Semibold)
+                                            .foregroundStyle(Color.hedgeUI.textTitle)
+                                            .padding(.trailing, 15)
+                                            .padding(.bottom, 12)
+                                        
+                                        // 월별 섹션 구분선
+                                        Rectangle()
+                                            .fill(Color.hedgeUI.neutralBgSecondary)
+                                            .frame(height: 1)
+                                            .padding(.bottom, 16)
+                                        
+                                        // 일별 그룹
+                                        ForEach(monthlyGroup.dailyGroups) { dailyGroup in
+                                            Text(dailyGroup.dateString)
+                                                .font(FontModel.label1Regular)
+                                                .foregroundStyle(Color.hedgeUI.textPrimary)
+                                                .padding(.bottom, 8)
+                                            
+                                            // 개별 회고 항목
+                                            LazyVStack(alignment: .leading, spacing: 20) {
+                                                ForEach(dailyGroup.retrospections, id: \.id) { retrospection in
+                                                    retrospectItemView(retrospection: retrospection)
+                                                }
                                             }
+                                            HedgeSpacer(height: 28)
                                         }
-                                        
-                                        HedgeSpacer(height: 28)
+                                        HedgeSpacer(height: 16)
                                     }
-                                    
-                                    HedgeSpacer(height: 16)
                                 }
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .scrollIndicators(.hidden)
+                        .padding(.top, 10)
+                        .onChange(of: store.state.selectedCompanySymbol) { oldValue, newValue in
+                            // selectedCompanySymbol이 변경되면 최상단으로 스크롤
+                            withAnimation {
+                                proxy.scrollTo("scrollTop", anchor: .top)
+                            }
+                        }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .scrollIndicators(.hidden)
-                    .padding(.top, 10)
                 }
             }
         }
     }
     
-    // 회고 항목 뷰
     @ViewBuilder
     private func retrospectItemView(retrospection: Retrospection) -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -304,7 +329,6 @@ extension HomeView {
         }
     }
     
-    // 가격 포맷팅 (천 단위 구분자)
     private func formatPrice(_ price: Int) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -312,7 +336,6 @@ extension HomeView {
         return formatter.string(from: NSNumber(value: price)) ?? "\(price)"
     }
     
-    // 주문 날짜 포맷팅 (YYYY.MM.DD)
     private func formatOrderDate(_ dateString: String) -> String {
         // orderCreatedAt은 "2025-11-06" 형식
         let components = dateString.split(separator: "-")
@@ -396,6 +419,15 @@ extension HomeView {
     }
 }
 
+// MARK: - ScrollOffsetPreferenceKey
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 extension HomeView {
     func badge(image: Image, count: Int) -> some View {
         VStack(alignment: .center, spacing: 6) {
@@ -409,20 +441,7 @@ extension HomeView {
                 .padding(.vertical, 1)
         }
     }
-    
-    // 날짜 포맷팅
-    private func formatDate(_ dateString: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        
-        if let date = formatter.date(from: dateString) {
-            formatter.dateFormat = "yyyy년 MM월 dd일"
-            return formatter.string(from: date)
-        }
-        return dateString
-    }
 }
-
 
 // #Preview {
 //     HomeView(store: .init(initialState: HomeFeature.State(),
