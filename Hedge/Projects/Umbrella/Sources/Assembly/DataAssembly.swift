@@ -20,7 +20,6 @@ import LocalDataSourceInterface
 import LocalDataSource
 import StockDomainInterface
 import PrinciplesDomainInterface
-import RetrospectDomainInterface
 import FeedbackDomainInterface
 import AnalysisDomainInterface
 import AuthDomain

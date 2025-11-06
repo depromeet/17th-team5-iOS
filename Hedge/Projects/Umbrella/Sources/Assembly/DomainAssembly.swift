@@ -12,8 +12,6 @@ import Swinject
 
 import StockDomainInterface
 import StockDomain
-import RetrospectDomainInterface
-import RetrospectDomain
 import FeedbackDomainInterface
 import FeedbackDomain
 

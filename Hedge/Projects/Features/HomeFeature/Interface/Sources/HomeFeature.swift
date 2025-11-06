@@ -24,6 +24,7 @@ public struct HomeFeature {
     }
     
     public enum View {
+        case onAppear
         case retrospectTapped(TradeType)
         case homeTabTapped
         case principleTabTapped

@@ -39,6 +39,9 @@ public struct HomeView: View {
             
             startArea
         }
+        .onAppear {
+            send(.onAppear)
+        }
     }
 }
 

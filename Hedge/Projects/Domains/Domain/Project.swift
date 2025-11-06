@@ -18,6 +18,7 @@ let project = Project.configure(
         .Domain.Analysis.implement,
         .Domain.Auth.implement,
         .Domain.Link.implement,
+        .Domain.Retrospection.implement,
     ],
     hasTests: true
 )
