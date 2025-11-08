@@ -24,11 +24,6 @@ public struct HomeView: View {
             Color.hedgeUI.backgroundWhite
                 .ignoresSafeArea()
             
-            if isActive {
-                Color.hedgeUI.grey500
-                    .ignoresSafeArea()
-            }
-            
             VStack(spacing: 0) {
                 topNavigationBar
                 tabArea
@@ -368,87 +363,96 @@ extension HomeView {
     }
     
     private var startArea: some View {
-        VStack(spacing: 0) {
-            Spacer()
+        ZStack {
+            if isActive {
+                (Color.init(hex: "#242424") ?? Color.clear)
+                    .opacity(0.5)
+                    .ignoresSafeArea()
+            }
             
-            HStack {
+            VStack(spacing: 0) {
                 Spacer()
                 
-                VStack(spacing: 16) {
-                    HStack(spacing: 8) {
-                        Image.hedgeUI.buyDemo
-                        
-                        Text("매수 회고하기")
-                            .font(FontModel.body2Semibold)
-                            .foregroundStyle(Color.hedgeUI.textPrimary)
-                    }
-                    .onTapGesture {
-                        send(.retrospectTapped(.buy))
-                    }
+                HStack {
+                    Spacer()
                     
-                    HStack(spacing: 8) {
-                        Image.hedgeUI.sellDemo
+                    VStack(spacing: 0) {
+                        Button {
+                            send(.retrospectTapped(.sell))
+                        } label: {
+                            Text("매수 회고하기".colorText(target: "매수", color: Color.hedgeUI.tradeBuy))
+                                .font(FontModel.body2Semibold)
+                        }
+                        .padding(.top, 16)
+                        .padding(.bottom, 12)
+                        .padding(.horizontal, 24)
                         
-                        Text("매수 회고하기")
-                            .font(FontModel.body2Semibold)
-                            .foregroundStyle(Color.hedgeUI.textPrimary)
+                        HedgeSpacer(height: 1)
+                            .color(Color.hedgeUI.neutralBgSecondary)
+                        
+                        Button {
+                            send(.retrospectTapped(.sell))
+                        } label: {
+                            Text("매도 회고하기".colorText(target: "매도", color: Color.hedgeUI.tradeSell))
+                                .font(FontModel.body2Semibold)
+                        }
+                        .padding(.top, 12)
+                        .padding(.bottom, 16)
+                        .padding(.horizontal, 24)
                     }
-                    .onTapGesture {
-                        send(.retrospectTapped(.sell))
-                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(.white)
+                    )
+                    .cornerRadius(18)
+                    .frame(width: 136)
+                    .opacity(isActive ? 1 : 0)
+                    
+                    
+                    Rectangle()
+                        .frame(width: 20, height: 0)
                 }
-                .padding(14)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.white)
-                )
-                .cornerRadius(12)
-                .opacity(isActive ? 1 : 0)
-                
                 
                 Rectangle()
-                    .frame(width: 20, height: 0)
-            }
-            
-            Rectangle()
-                .frame(height: 12)
-                .foregroundStyle(.clear)
-            
-            HStack {
-                Spacer()
+                    .foregroundStyle(.clear)
+                    .frame(height: 12)
                 
-                Group {
-                    if isActive {
-                        Image.hedgeUI.cancelDemo
-                            .transition(.scale.combined(with: .opacity))
-                    } else {
-                        Image.hedgeUI.plusDemo
-                            .transition(.scale.combined(with: .opacity))
+                HStack {
+                    Spacer()
+                    
+                    Group {
+                        if isActive {
+                            Image.hedgeUI.cancelDemo
+                                .transition(.scale.combined(with: .opacity))
+                        } else {
+                            Image.hedgeUI.plusDemo
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                    .rotationEffect(.degrees(rotationAngle))
+                    .animation(.easeInOut(duration: 0.3), value: isActive)
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            isActive.toggle()
+                            rotationAngle += 180
+                        }
                     }
                 }
-                .rotationEffect(.degrees(rotationAngle))
-                .animation(.easeInOut(duration: 0.3), value: isActive)
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        isActive.toggle()
-                        rotationAngle += 180
-                    }
-                }
+                .padding(.bottom, 58)
+                .padding(.trailing, 20)
             }
-            .padding(.bottom, 100)
-            .padding(.trailing, 20)
         }
     }
 }
 
-// MARK: - ScrollOffsetPreferenceKey
-private struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
+// // MARK: - ScrollOffsetPreferenceKey
+// private struct ScrollOffsetPreferenceKey: PreferenceKey {
+//     static var defaultValue: CGFloat = 0
+//     
+//     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+//         value = nextValue()
+//     }
+// }
 
 extension HomeView {
     func badge(image: Image, count: Int) -> some View {
@@ -522,13 +526,20 @@ extension HomeView {
             Text(description)
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textPrimary)
-                // .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
 
-// #Preview {
-//     HomeView(store: .init(initialState: HomeFeature.State(),
-//                           reducer: { HomeFeature() } )
-//     )
+// extension HomeView {
+//     private func makeAttributeText(colorTitle: String, color: Color) -> AttributedString {
+//         var attributed = AttributedString("\(colorTitle) 회고하기")
+//         if let range = attributed.range(of: colorTitle) {
+//             attributed[range].foregroundColor = UIColor(color)
+//         }
+//         if let range = attributed.range(of: " 회고하기") {
+//             attributed[range].foregroundColor = UIColor(Color.hedgeUI.textPrimary)
+//         }
+//         
+//         return attributed
+//     }
 // }
