@@ -16,11 +16,11 @@ public struct HomeFeature {
     public struct State: Equatable {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
-        public var selectedCompanySymbol: String?
+        public var selectedCompanyName: String?
         
         // Company symbols만 따로 모은 프로퍼티
-        public var companySymbols: [String] {
-            retrospectionCompanies.map { $0.symbol }
+        public var companyNames: [String] {
+            retrospectionCompanies.map { $0.companyName }
         }
         
         // 그룹화된 데이터 (Company -> Month -> Day)
@@ -85,8 +85,8 @@ extension HomeFeature {
         }
     }
     
-    private func updateGroupedRetrospections(for symbol: String, state: inout State) {
-        let selectedCompanies = state.retrospectionCompanies.filter { $0.symbol == symbol }
+    private func updateGroupedRetrospections(for companyName: String, state: inout State) {
+        let selectedCompanies = state.retrospectionCompanies.filter { $0.companyName == companyName }
         state.groupedRetrospections = state.groupRetrospections(companies: selectedCompanies)
     }
     
@@ -99,7 +99,7 @@ extension HomeFeature {
         case .onAppear:
             return .send(.async(.fetchRetrospections))
         case .companyTapped(let selectedSymbol):
-            state.selectedCompanySymbol = selectedSymbol
+            state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
             return .none
         case .retrospectTapped(let type):
@@ -121,9 +121,9 @@ extension HomeFeature {
         switch action {
         case .fetchRetrospectionsSuccess(let companies):
             state.retrospectionCompanies = companies
-            state.selectedCompanySymbol = companies.first?.symbol
+            state.selectedCompanyName = companies.first?.companyName
             
-            if let selectedSymbol = state.selectedCompanySymbol {
+            if let selectedSymbol = state.selectedCompanyName {
                 updateGroupedRetrospections(for: selectedSymbol, state: &state)
             }
             
@@ -332,7 +332,7 @@ extension HomeFeature.State {
             }
             
             return GroupedRetrospectionByCompany(
-                symbol: company.symbol,
+                symbol: company.companyName,
                 monthlyGroups: monthlyGroups
             )
         }

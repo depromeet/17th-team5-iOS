@@ -12,7 +12,6 @@ import Alamofire
 
 public final class HedgeInterceptor: RequestInterceptor {
     
-    private let accessToken = UserDefaults.standard.string(forKey: "accessToken")
     private let maxRetryCount: Int = 3
     
     // 모든 인스턴스가 공유하는 정적 변수
@@ -26,8 +25,11 @@ public final class HedgeInterceptor: RequestInterceptor {
         completion: @escaping (Result<URLRequest, any Error>) -> Void
     ) {
         var urlRequest = urlRequest
-        if let accessToken {
-            urlRequest.headers["Authorization"] = "Bearer " + accessToken
+        let token = UserDefaults.standard.string(forKey: "accessToken")
+        if let token {
+            urlRequest.headers["Authorization"] = "Bearer " + token
+        } else {
+            print("[HedgeInterceptor] accessToken is nil, Authorization header not added")
         }
         completion(.success(urlRequest))
     }

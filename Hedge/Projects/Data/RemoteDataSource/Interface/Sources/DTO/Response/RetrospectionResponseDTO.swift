@@ -17,7 +17,7 @@ public struct RetrospectionResponseDTO: Decodable {
 }
 
 public struct RetrospectionCompanyResponseDTO: Decodable {
-    public let symbol: String
+    public let companyName: String
     public let retrospections: [RetrospectionItemResponseDTO]
 }
 
@@ -33,7 +33,7 @@ public struct RetrospectionItemResponseDTO: Decodable {
 extension RetrospectionCompanyResponseDTO {
     public func toDomain() -> RetrospectionCompany {
         return RetrospectionCompany(
-            symbol: self.symbol,
+            companyName: self.companyName,
             retrospections: self.retrospections.map { $0.toDomain() }
         )
     }

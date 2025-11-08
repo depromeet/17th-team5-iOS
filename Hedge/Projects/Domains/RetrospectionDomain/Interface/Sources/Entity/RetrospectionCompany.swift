@@ -9,14 +9,14 @@ import Foundation
 
 public struct RetrospectionCompany: Equatable, Hashable {
     public let id: UUID = UUID()
-    public let symbol: String
+    public let companyName: String
     public let retrospections: [Retrospection]
     
     public init(
-        symbol: String,
+        companyName: String,
         retrospections: [Retrospection]
     ) {
-        self.symbol = symbol
+        self.companyName = companyName
         self.retrospections = retrospections
     }
 }

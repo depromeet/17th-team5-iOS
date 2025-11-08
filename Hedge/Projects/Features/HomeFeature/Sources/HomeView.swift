@@ -195,8 +195,8 @@ extension HomeView {
                     // 주식 종목 리스트 (왼쪽)
                     ScrollView {
                         VStack(alignment: .center, spacing: 12) {
-                            ForEach(store.state.companySymbols, id: \.self) { symbol in
-                                let isSelected = store.state.selectedCompanySymbol == symbol
+                            ForEach(store.state.companyNames, id: \.self) { symbol in
+                                let isSelected = store.state.selectedCompanyName == symbol
                                 
                                 HStack(spacing: 8) {
                                     Image.hedgeUI.stockThumbnailDemo
@@ -291,7 +291,7 @@ extension HomeView {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .scrollIndicators(.hidden)
                         .padding(.top, 10)
-                        .onChange(of: store.state.selectedCompanySymbol) { oldValue, newValue in
+                        .onChange(of: store.state.selectedCompanyName) { oldValue, newValue in
                             // selectedCompanySymbol이 변경되면 최상단으로 스크롤
                             withAnimation {
                                 proxy.scrollTo("scrollTop", anchor: .top)
