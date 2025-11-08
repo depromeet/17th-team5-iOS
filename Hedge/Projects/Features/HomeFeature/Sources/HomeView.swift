@@ -378,7 +378,7 @@ extension HomeView {
                     
                     VStack(spacing: 0) {
                         Button {
-                            send(.retrospectTapped(.sell))
+                            send(.retrospectTapped(.buy))
                         } label: {
                             Text("매수 회고하기".colorText(target: "매수", color: Color.hedgeUI.tradeBuy))
                                 .font(FontModel.body2Semibold)

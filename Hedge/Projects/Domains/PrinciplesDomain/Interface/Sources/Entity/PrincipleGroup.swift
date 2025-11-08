@@ -18,21 +18,24 @@ public struct PrincipleGroup: Equatable, Hashable {
     public let id: Int
     public let groupName: String
     public let principleType: String
+    public let thumbnail: String
     public let groupType: GroupType
-    public let displayOrder: Int
+    public let displayOrder: Int?
     public let principles: [Principle]
     
     public init(
         id: Int,
         groupName: String,
         principleType: String,
+        thumbnail: String,
         groupType: GroupType,
-        displayOrder: Int,
+        displayOrder: Int?,
         principles: [Principle]
     ) {
         self.id = id
         self.groupName = groupName
         self.principleType = principleType
+        self.thumbnail = thumbnail
         self.groupType = groupType
         self.displayOrder = displayOrder
         self.principles = principles
@@ -46,6 +49,7 @@ extension PrincipleGroup {
             id: 0,
             groupName: "초보자를 위한 매도 원칙",
             principleType: "SELL",
+            thumbnail: "🫶",
             groupType: .system,
             displayOrder: 1,
             principles: [

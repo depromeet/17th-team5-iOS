@@ -32,7 +32,8 @@ public struct Provider: ProviderProtocol {
         configuration.timeoutIntervalForRequest = 5
         configuration.timeoutIntervalForResource = 5
         
-        let session = Session(configuration: configuration)
+        let monitor = NetworkEventMonitor()
+        let session = Session(configuration: configuration, eventMonitors: [monitor])
         return Provider(session: session)
     }()
     
@@ -42,9 +43,11 @@ public struct Provider: ProviderProtocol {
         configuration.timeoutIntervalForRequest = 5
         configuration.timeoutIntervalForResource = 5
         
+        let monitor = NetworkEventMonitor()
         let session = Session(
             configuration: configuration,
-            interceptor: HedgeInterceptor()
+            interceptor: HedgeInterceptor(),
+            eventMonitors: [monitor]
         )
         return Provider(session: session)
     }()
@@ -85,6 +88,28 @@ public struct Provider: ProviderProtocol {
 }
 
 extension Provider {
+    private func logRequest(_ request: DataRequest, phase: String) {
+        let url = request.request?.url?.absoluteString ?? "unknown url"
+        let method = request.request?.httpMethod ?? "nil"
+        let state = request.task?.state ?? .suspended
+        print("➡️ [Network][\(phase)] \(method) \(url) | task: \(state.rawValue)")
+    }
+    
+    private func logResponse<T>(_ response: DataResponse<T, AFError>) {
+        let url = response.request?.url?.absoluteString ?? "unknown url"
+        let statusCode = response.response?.statusCode ?? -1
+        print("🌐 [Network] URL: \(url)")
+        print("🌐 [Network] Status Code: \(statusCode)")
+        if let error = response.error {
+            print("❌ [Network] Error: \(error)")
+        }
+        if let data = response.data,
+           let body = String(data: data, encoding: .utf8),
+           !body.isEmpty {
+            print("📄 [Network] Body: \(body)")
+        }
+    }
+    
     private func makeHedgeError(_ error: AFError, data: Data?) -> HedgeError {
         // 네트워크 에러 (URLError)
         if case let .sessionTaskFailed(underlyingError) = error,

@@ -19,6 +19,8 @@ public struct FetchPrinciples: FetchPrinciplesUseCase {
     
     public func execute(_ tradeType: String) async throws -> [PrincipleGroup] {
         var principleGroup = try await repository.fetch()
+        
+        principleGroup = principleGroup
             .filter { group in
                 group.principleType == tradeType
             }
@@ -38,6 +40,7 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
                 id: 1,
                 groupName: "초보자를 위한 매도 원칙",
                 principleType: tradeType,
+                thumbnail: "🫶",
                 groupType: .system,
                 displayOrder: 1,
                 principles: [
@@ -73,7 +76,9 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
             PrincipleGroup(
                 id: 2,
                 groupName: "초보자를 위한 매수 원칙",
-                principleType: tradeType, groupType: .custom,
+                principleType: tradeType,
+                thumbnail: "🫶",
+                groupType: .custom,
                 displayOrder: 2,
                 principles: [
                     Principle(
@@ -99,7 +104,9 @@ public struct MockFetchPrinciples: FetchPrinciplesUseCase {
             PrincipleGroup(
                 id: 3,
                 groupName: "이건 좀 지키자 제발",
-                principleType: "CUSTOM", groupType: .custom,
+                principleType: "CUSTOM",
+                thumbnail: "🫶",
+                groupType: .custom,
                 displayOrder: 1,
                 principles: [
                     Principle(

@@ -95,33 +95,18 @@ extension DefaultRootCoordinator {
         stock: StockSearch,
         tradeHistory: TradeHistory
     ) {
-        // let principlesCoordinator = DefaultPrinciplesCoordinator(
-        //     navigationController: navigationController,
-        //     tradeType: tradeType,
-        //     stock: stock,
-        //     tradeHistory: tradeHistory,
-        //     viewBuilder: PrinciplesViewBuilder()
-        // )
-        // principlesCoordinator.parentCoordinator = self
-        // principlesCoordinator.finishDelegate = self
-        // principlesCoordinator.start()
-        // 
-        // childCoordinators.append(principlesCoordinator)
-    }
-    
-    public func showEmotionSelection(
-        tradeType: TradeType,
-        stock: StockSearch,
-        tradeHistory: TradeHistory
-    ) {
-        // let principlesCoordinator = DefaultPrinciplesCoordinator(
-        //     navigationController: navigationController,
-        //     tradeType: tradeType,
-        //     stock: stock,
-        //     tradeHistory: tradeHistory
-        // )
-        // principlesCoordinator.parentCoordinator = self
-        // principlesCoordinator.start()
+        
+        let principlesCoordinator = DefaultPrinciplesCoordinator(
+            navigationController: navigationController,
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory
+        )
+        principlesCoordinator.parentCoordinator = self
+        principlesCoordinator.principleDelegate = self
+        principlesCoordinator.start()
+        
+        childCoordinators.append(principlesCoordinator)
     }
     
     public func pushToFeedback(tradeData: TradeData) {
@@ -139,17 +124,11 @@ extension DefaultRootCoordinator {
     }
     
     public func popToHome(selectingStock stockSymbol: String) {
-        // // Pop all view controllers until we reach the root (home screen)
-        // navigationController.popToRootViewController(animated: true)
-        // 
-        // // Remove finished coordinators
-        // childCoordinators.removeAll { $0.type == .tradeFeedback }
-        // 
-        // // Delay sending action to ensure navigation animation completes and view is ready
-        // DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-        //     guard let self = self, let store = self.tabBarStore else { return }
-        //     store.send(.delegate(.homeAction(.view(.stockSelected(stockSymbol)))))
-        // }
+        
+    }
+    
+    func pushToPrinciplesReview(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
+        
     }
 }
 
@@ -160,5 +139,11 @@ extension DefaultRootCoordinator: CoordinatorFinishDelegate {
         self.childCoordinators.removeAll{ $0.type == childCoordinator.type }
         
         navigationController.popViewController(animated: true)
+    }
+}
+
+extension DefaultRootCoordinator: PrincipleDelegate {
+    public func choosePrincipleGroup(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
+        
     }
 }

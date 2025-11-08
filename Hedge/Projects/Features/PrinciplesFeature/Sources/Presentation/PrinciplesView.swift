@@ -76,11 +76,15 @@ public struct PrinciplesView: View {
     // MARK: - Default Group Section
     private var systemGroupSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("기본")
-                .font(.label2Medium)
-                .foregroundStyle(Color.hedgeUI.textAlternative)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 4)
+            HStack {
+                Text("기본")
+                    .font(.label2Medium)
+                    .foregroundStyle(Color.hedgeUI.textAlternative)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 4)
+                
+                Spacer()
+            }
             
             // Principle Items
             VStack(spacing: 0) {
@@ -94,13 +98,16 @@ public struct PrinciplesView: View {
     // MARK: - Custom Group Section
     private var customGroupSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("내가 만든")
-                .font(.label2Medium)
-                .foregroundStyle(Color.hedgeUI.textAlternative)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 4)
+            HStack {
+                Text("내가 만든")
+                    .font(.label2Medium)
+                    .foregroundStyle(Color.hedgeUI.textAlternative)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 4)
+                
+                Spacer()
+            }
             
-            // #123
             if store.state.viewType == .management {
                 addNewGroupButton
             }
