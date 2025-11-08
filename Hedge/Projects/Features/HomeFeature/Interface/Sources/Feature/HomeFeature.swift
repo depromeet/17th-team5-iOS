@@ -17,6 +17,7 @@ public struct HomeFeature {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
         public var selectedCompanyName: String?
+        public var isBadgePopupPresented: Bool = false
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -43,6 +44,8 @@ public struct HomeFeature {
         case retrospectTapped(TradeType)
         case homeTabTapped
         case principleTabTapped
+        
+        case badgePopupTapped(Bool)
     }
     public enum InnerAction {
         case fetchRetrospectionsSuccess([RetrospectionCompany])
@@ -109,6 +112,10 @@ extension HomeFeature {
             return .none
         case .principleTabTapped:
             state.selectedType = .principle
+            return .none
+            
+        case .badgePopupTapped(let isPresented):
+            state.isBadgePopupPresented = isPresented
             return .none
         }
     }

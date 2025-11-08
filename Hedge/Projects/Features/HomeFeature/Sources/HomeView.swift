@@ -39,10 +39,27 @@ public struct HomeView: View {
             }
             
             startArea
+            
+            if store.state.isBadgePopupPresented {
+                Color.init(hex: "#242424")
+                    .opacity(0.5)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            _ = send(.badgePopupTapped(false))
+                        }
+                    }
+                
+                badgePopup
+                    .padding(.horizontal, 20)
+                    .transition(.scale(scale: 0.95).combined(with: .opacity))
+            }
         }
         .onAppear {
             send(.onAppear)
         }
+        .animation(.easeInOut(duration: 0.2), value: store.state.isBadgePopupPresented)
     }
 }
 
@@ -174,6 +191,11 @@ extension HomeView {
         .frame(height: 148)
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                _ = send(.badgePopupTapped(true))
+            }
+        }
     }
     
     private var retrospectArea: some View {
@@ -439,6 +461,68 @@ extension HomeView {
                 .font(FontModel.label2Medium)
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .padding(.vertical, 1)
+        }
+    }
+    
+    private var badgePopup: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 24) {
+                badgePopupRow(
+                    image: Image.hedgeUI.emerald,
+                    title: "감각의 전성기",
+                    description: "시장의 흐름을 넓고 깊게 이해하며, 스스로의 기준으로 움직였어요"
+                )
+                
+                badgePopupRow(
+                    image: Image.hedgeUI.gold,
+                    title: "안정의 흐름",
+                    description: "근거 있는 판단으로 흔들림 없이 결정했어요"
+                )
+                
+                badgePopupRow(
+                    image: Image.hedgeUI.silver,
+                    title: "유연의 구간",
+                    description: "계획과는 조금 달랐지만 상황에 맞게 판단을 잘 조정했어요"
+                )
+                
+                badgePopupRow(
+                    image: Image.hedgeUI.bronze,
+                    title: "성찰의 시간기",
+                    description: "기대와 다른 결과였지만, 이번 회고로 배움을 쌓고 있어요"
+                )
+            }
+            
+            HedgeActionButton("확인") {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    _ = send(.badgePopupTapped(false))
+                }
+            }
+            .color(.secondary)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 28)
+        .background(
+            RoundedRectangle(cornerRadius: 28)
+                .fill(Color.hedgeUI.backgroundWhite)
+        )
+    }
+    
+    private func badgePopupRow(image: Image, title: String, description: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            image
+                .resizable()
+                .frame(width: 32, height: 38)
+            
+            HedgeSpacer(height: 8)
+            
+            Text(title)
+                .font(FontModel.body1Semibold)
+                .foregroundStyle(Color.hedgeUI.textTitle)
+            
+            Text(description)
+                .font(FontModel.body3Medium)
+                .foregroundStyle(Color.hedgeUI.textPrimary)
+                // .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
