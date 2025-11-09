@@ -1,10 +1,3 @@
-//
-//  NetworkEventMonitor.swift
-//  Networker
-//
-//  Created by ChatGPT on 11/8/25.
-//
-
 import Foundation
 import Alamofire
 

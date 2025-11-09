@@ -18,6 +18,7 @@ public struct PrincipleReviewView: View {
     @State private var focusWithoutAnimation: Bool = false
     @FocusState private var isFocused: Bool
     @State private var currentPageIndex: Int = 0
+    @State private var modalPresented: Bool = true
     
     public init(store: StoreOf<PrincipleReviewFeature>) {
         self.store = store
@@ -82,6 +83,9 @@ public struct PrincipleReviewView: View {
                 }
             }
         }
+        // .hedgeModal(isPresented: $modalPresented, title: "123", actions: .init(primaryTitle: "1", onPrimary: {
+        //     print("44")
+        // }))
     }
     
     // MARK: - Single Review View
@@ -172,7 +176,9 @@ public struct PrincipleReviewView: View {
     private var navigationBar: some View {
         return HedgeNavigationBar(title: "원칙이름", buttonText: "완료", state: store.state.isComplete ? .active : .disabled, onLeftButtonTap: {
             send(.backButtonTapped)
-        })
+        }) {
+            send(.completeButtonTapped)
+        }
     }
     
     private var stockSummaryView: some View {

@@ -22,9 +22,9 @@ public struct StockSearchDataWrapperDTO: Decodable {
 }
 
 public struct StockSearchDataResponseDTO: Decodable {
+    public let market: String
     public let code: String
     public let companyName: String
-    public let market: String
     public let logo: String?
 }
 

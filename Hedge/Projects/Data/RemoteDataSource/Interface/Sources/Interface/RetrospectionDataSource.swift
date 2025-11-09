@@ -10,5 +10,11 @@ import Foundation
 
 public protocol RetrospectionDataSource {
     func fetch() async throws -> RetrospectionResponseDTO
+    func uploadImage(
+        domain: String,
+        fileData: Data,
+        fileName: String,
+        mimeType: String
+    ) async throws -> UploadImageResponseDTO
 }
 

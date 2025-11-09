@@ -71,6 +71,36 @@ public struct Provider: ProviderProtocol {
         }
     }
     
+    public func upload<T: Decodable>(
+        _ urlConvertible: URLRequestConvertible,
+        multipartFormData: @escaping (MultipartFormData) -> Void
+    ) async throws -> T {
+        let uploadRequest = session.upload(
+            multipartFormData: multipartFormData,
+            with: urlConvertible
+        )
+        
+        logRequest(uploadRequest, phase: "start")
+        
+        let response = await uploadRequest
+            .validate(statusCode: 200 ..< 300)
+            .serializingDecodable(T.self)
+            .response
+        
+        logRequest(uploadRequest, phase: "end")
+        logResponse(response)
+        
+        if let error = response.error {
+            throw makeHedgeError(error, data: response.data)
+        }
+        
+        guard let value = response.value else {
+            throw HedgeError.client(.emptyData)
+        }
+        
+        return value
+    }
+    
     public func request(_ urlConvertible: URLRequestConvertible) async throws {
         do {
             let response = await session.request(urlConvertible)

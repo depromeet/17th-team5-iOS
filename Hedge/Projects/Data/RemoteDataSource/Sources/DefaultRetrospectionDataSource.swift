@@ -22,17 +22,39 @@ public struct DefaultRetrospectionDataSource: RetrospectionDataSource {
     }
     
     public func fetch() async throws -> RetrospectionResponseDTO {
-        try await provider.request(RetrospectionFetchTarget.fetch)
+        try await provider.request(RetrospectionTarget.fetch)
+    }
+    
+    public func uploadImage(
+        domain: String,
+        fileData: Data,
+        fileName: String,
+        mimeType: String
+    ) async throws -> UploadImageResponseDTO {
+        try await provider.upload(RetrospectionTarget.upload(domain: domain)) { multipart in
+            multipart.append(
+                fileData,
+                withName: "file",
+                fileName: fileName,
+                mimeType: mimeType
+            )
+        }
     }
 }
 
-enum RetrospectionFetchTarget {
+enum RetrospectionTarget {
     case fetch
+    case upload(domain: String)
 }
 
-extension RetrospectionFetchTarget: TargetType {
+extension RetrospectionTarget: TargetType {
     var baseURL: String {
-        return Configuration.baseURL + "/api/v1/retrospections"
+        switch self {
+        case .fetch:
+            return Configuration.baseURL + "/api/v1/retrospections"
+        case .upload(let domain):
+            return Configuration.baseURL + "/api/v1/\(domain)"
+        }
     }
     
     var header: Alamofire.HTTPHeaders {
@@ -43,6 +65,8 @@ extension RetrospectionFetchTarget: TargetType {
         switch self {
         case .fetch:
             return .get
+        case .upload:
+            return .post
         }
     }
     
@@ -50,6 +74,8 @@ extension RetrospectionFetchTarget: TargetType {
         switch self {
         case .fetch:
             return ""
+        case .upload:
+            return "/images/upload"
         }
     }
     
@@ -57,12 +83,16 @@ extension RetrospectionFetchTarget: TargetType {
         switch self {
         case .fetch:
             return nil
+        case .upload:
+            return nil
         }
     }
     
     var encoding: any Alamofire.ParameterEncoding {
         switch self {
         case .fetch:
+            return makeEncoder(contentType: .json)
+        case .upload:
             return makeEncoder(contentType: .json)
         }
     }

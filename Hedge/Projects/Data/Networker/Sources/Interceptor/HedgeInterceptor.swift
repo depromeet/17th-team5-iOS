@@ -40,7 +40,17 @@ public final class HedgeInterceptor: RequestInterceptor {
         dueTo error: any Error,
         completion: @escaping (RetryResult) -> Void
     ) {
+        guard let response = request.task?.response as? HTTPURLResponse else {
+            completion(.doNotRetryWithError(error))
+            return
+        }
         
+        switch response.statusCode {
+        case 401:
+            enqueueRefreshTask(for: request, completion: completion)
+        default:
+            completion(.doNotRetryWithError(error))
+        }
     }
 }
 
@@ -83,6 +93,8 @@ extension HedgeInterceptor {
                 completion(.retry)
                 
             case .failure(let error):
+                UserDefaults.standard.removeObject(forKey: "accessToken")
+                UserDefaults.standard.removeObject(forKey: "refreshToken")
                 completion(.doNotRetryWithError(error))
             }
             

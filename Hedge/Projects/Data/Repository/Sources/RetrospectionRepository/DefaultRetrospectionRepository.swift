@@ -30,4 +30,19 @@ public struct DefaultRetrospectionRepository: RetrospectionRepository {
         let response = try await dataSource.fetch()
         return response.data.map { $0.toDomain() }
     }
+    
+    public func uploadImage(
+        domain: String,
+        fileData: Data,
+        fileName: String,
+        mimeType: String
+    ) async throws -> UploadedImage {
+        let response = try await dataSource.uploadImage(
+            domain: domain,
+            fileData: fileData,
+            fileName: fileName,
+            mimeType: mimeType
+        )
+        return response.data.toDomain()
+    }
 }

@@ -75,5 +75,13 @@ public struct DomainAssembly: Assembly {
             
             return FetchRetrospection(repository: repository)
         }
+        
+        container.register(UploadRetrospectionImageUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return UploadRetrospectionImage(repository: repository)
+        }
     }
 }

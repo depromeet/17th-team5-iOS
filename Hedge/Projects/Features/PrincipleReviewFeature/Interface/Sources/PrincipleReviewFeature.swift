@@ -12,98 +12,34 @@ import DesignKit
 import LinkDomainInterface
 import StockDomainInterface
 import PrinciplesDomainInterface
-
-public struct PhotoItem: Identifiable, Equatable {
-    public let id = UUID()
-    public let photosPickerItem: PhotosPickerItem
-    public var loadedImage: Image?
-    
-    public init(photosPickerItem: PhotosPickerItem, loadedImage: Image? = nil) {
-        self.photosPickerItem = photosPickerItem
-        self.loadedImage = loadedImage
-    }
-}
+import RetrospectionDomainInterface
 
 @Reducer
 public struct PrincipleReviewFeature {
     private let fetchLinkUseCase: FetchLinkUseCase
+    private let uploadImageUseCase: UploadRetrospectionImageUseCase
     
-    public init(fetchLinkUseCase: FetchLinkUseCase) {
+    public init(
+        fetchLinkUseCase: FetchLinkUseCase,
+        uploadImageUseCase: UploadRetrospectionImageUseCase
+    ) {
         self.fetchLinkUseCase = fetchLinkUseCase
-    }
-    
-    public enum Evaluation {
-        case keep
-        case normal
-        case notKeep
-        
-        public var selectedImage: Image {
-            switch self {
-            case .keep:
-                return Image.hedgeUI.keep
-            case .normal:
-                return Image.hedgeUI.normal
-            case .notKeep:
-                return Image.hedgeUI.notKeep
-            }
-        }
-        
-        public var unselectedImage: Image {
-            switch self {
-            case .keep:
-                return Image.hedgeUI.keepDisabled
-            case .normal:
-                return Image.hedgeUI.normalDisabled
-            case .notKeep:
-                return Image.hedgeUI.notKeepDisabled
-            }
-        }
-        
-        public var title: String {
-            switch self {
-            case .keep:
-                return "지켰어요"
-            case .normal:
-                return "보통이에요"
-            case .notKeep:
-                return "안지켰어요"
-            }
-        }
-        
-        public struct Style {
-            public let title: String
-            public let lineWidth: CGFloat
-            public let foregroundColor: Color
-            public let image: Image
-            public let textColor: Color
-            public let font: FontModel
-        }
-    }
-    
-    // 각 페이지별 독립적인 상태
-    public struct PageState: Equatable {
-        public var selectedEvaluation: Evaluation? = nil
-        public var principleDetailShown: Bool = false
-        public var text: String = ""
-        public var linkMetadataList: [LinkMetadata] = []
-        public var selectedPhotoItems: [PhotosPickerItem] = []
-        public var loadedImages: [Image] = []
-        public var photoItems: [PhotoItem] = []
-        
-        public init() {}
+        self.uploadImageUseCase = uploadImageUseCase
     }
     
     @ObservableState
     public struct State: Equatable {
+        
         public var tradeType: TradeType
         public var stock: StockSearch
         public var tradeHistory: TradeHistory
         public var principleGroup: PrincipleGroup
         public var principles: [Principle]
-        public var pageStates: [PageState] = []
+        public var pageStates: [PrincipleReviewPageState] = []
         public var linkModalShown: Bool = false
         public var addLink: String = ""
         public var currentPageIndex: Int = 0
+        public var uploadedImagesPerPage: [[UploadedImage]] = []
         
         public var totalIndex: Int {
             principles.count
@@ -129,12 +65,12 @@ public struct PrincipleReviewFeature {
             principles[currentPageIndex]
         }
         
-        public var currentPageState: PageState {
+        public var currentPageState: PrincipleReviewPageState {
             get {
                 if currentPageIndex < pageStates.count {
                     return pageStates[currentPageIndex]
                 }
-                return PageState()
+                return PrincipleReviewPageState()
             }
             set {
                 if currentPageIndex < pageStates.count {
@@ -152,14 +88,15 @@ public struct PrincipleReviewFeature {
             self.tradeHistory = tradeHistory
             self.principleGroup = principleGroup
             self.principles = principleGroup.principles
-            self.pageStates = Array(repeating: PageState(), count: principles.count)
+            self.pageStates = Array(repeating: PrincipleReviewPageState(), count: principles.count)
+            self.uploadedImagesPerPage = Array(repeating: [], count: principles.count)
         }
         
-        public func evalutionStyle(_ lhs: Evaluation?, _ rhs: Evaluation) -> Evaluation.Style {
+        public func evalutionStyle(_ lhs: PrincipleEvaluation?, _ rhs: PrincipleEvaluation) -> PrincipleEvaluation.Style {
             let isSelected: Bool = lhs == rhs
             let image: Image = isSelected ? rhs.selectedImage : rhs.unselectedImage
             
-            return Evaluation.Style(title: rhs.title,
+            return PrincipleEvaluation.Style(title: rhs.title,
                          lineWidth: isSelected ? 1.5 : 1,
                          foregroundColor: isSelected ? Color.hedgeUI.brandPrimary : Color.hedgeUI.neutralBgSecondary,
                          image: image,
@@ -185,6 +122,7 @@ public struct PrincipleReviewFeature {
         case notKeepButtonTapped
         case pricipleToggleButtonTapped
         case linkButtonTapped
+        case completeButtonTapped
         case loadPhotos
         case addLinkButtonTapped(String)
         case deletePhoto(UUID)
@@ -193,10 +131,13 @@ public struct PrincipleReviewFeature {
     }
     public enum InnerAction {
         case linkDismiss
+        case uploadImagesSuccess([[UploadedImage]])
+        case uploadImagesFailure(Error)
     }
     public enum AsyncAction {
         case loadImagesFromPhotos([PhotosPickerItem])
         case fetchLinkMetadata(String)
+        case uploadImages([(Int, [Data])], total: Int)
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -265,6 +206,15 @@ extension PrincipleReviewFeature {
         case .linkButtonTapped:
             state.linkModalShown = true
             return .none
+        case .completeButtonTapped:
+            let uploadTargets = state.pageStates.enumerated().compactMap { index, page -> (Int, [Data])? in
+                guard !page.imageDatas.isEmpty else { return nil }
+                return (index, page.imageDatas)
+            }
+            guard !uploadTargets.isEmpty else {
+                return .none
+            }
+            return .send(.async(.uploadImages(uploadTargets, total: state.pageStates.count)))
         case .loadPhotos:
             // selectedPhotoItems를 photoItems로 동기화
             state.currentPageState.photoItems = state.currentPageState.selectedPhotoItems.map { PhotoItem(photosPickerItem: $0) }
@@ -279,6 +229,9 @@ extension PrincipleReviewFeature {
                 }
                 if index < state.currentPageState.loadedImages.count {
                     state.currentPageState.loadedImages.remove(at: index)
+                }
+                if index < state.currentPageState.imageDatas.count {
+                    state.currentPageState.imageDatas.remove(at: index)
                 }
             }
             return .none
@@ -304,6 +257,13 @@ extension PrincipleReviewFeature {
         case .linkDismiss:
             state.linkModalShown = false
             return .none
+        case .uploadImagesSuccess(let perPage):
+            dump(perPage)
+            state.uploadedImagesPerPage = perPage
+            return .none
+        case .uploadImagesFailure(let error):
+            Log.error("Failed to upload images: \(error)")
+            return .none
         }
     }
     
@@ -316,20 +276,30 @@ extension PrincipleReviewFeature {
         case .loadImagesFromPhotos(let photoItems):
             return .run { send in
                 var images: [Image] = []
+                var datas: [Data] = []
                 var updatedPhotoItems: [PhotoItem] = []
                 
                 for photoItem in photoItems {
-                    if let data = try? await photoItem.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
-                        let loadedImage = Image(uiImage: uiImage)
-                        images.append(loadedImage)
-                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: loadedImage))
+                    guard let data = try? await photoItem.loadTransferable(type: Data.self),
+                          let uiImage = UIImage(data: data) else {
+                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: nil, imageData: nil))
+                        continue
+                    }
+                    
+                    let loadedImage = Image(uiImage: uiImage)
+                    images.append(loadedImage)
+                    
+                    if let jpegData = uiImage.jpegData(compressionQuality: 0.8) {
+                        datas.append(jpegData)
+                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: loadedImage, imageData: jpegData))
                     } else {
-                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: nil))
+                        datas.append(data)
+                        updatedPhotoItems.append(PhotoItem(photosPickerItem: photoItem, loadedImage: loadedImage, imageData: data))
                     }
                 }
                 
                 await send(.binding(.set(\.currentPageState.loadedImages, images)))
+                await send(.binding(.set(\.currentPageState.imageDatas, datas)))
                 await send(.binding(.set(\.currentPageState.photoItems, updatedPhotoItems)))
             }
             
@@ -341,6 +311,31 @@ extension PrincipleReviewFeature {
                 } catch {
                     // 에러 처리는 필요에 따라 추가
                     print("Failed to fetch link metadata: \(error)")
+                }
+            }
+        case .uploadImages(let uploadTargets, let total):
+            return .run { [uploadImageUseCase] send in
+                var perPageResults = Array(repeating: [UploadedImage](), count: total)
+                do {
+                    for (index, datas) in uploadTargets {
+                        var uploadedForPage: [UploadedImage] = []
+                        for data in datas {
+                            let fileName = "retrospection_\(UUID().uuidString).jpg"
+                            let result = try await uploadImageUseCase.execute(
+                                domain: "retrospection",
+                                fileData: data,
+                                fileName: fileName,
+                                mimeType: "image/jpeg"
+                            )
+                            uploadedForPage.append(result)
+                        }
+                        if index < perPageResults.count {
+                            perPageResults[index] = uploadedForPage
+                        }
+                    }
+                    await send(.inner(.uploadImagesSuccess(perPageResults)))
+                } catch {
+                    await send(.inner(.uploadImagesFailure(error)))
                 }
             }
         }
