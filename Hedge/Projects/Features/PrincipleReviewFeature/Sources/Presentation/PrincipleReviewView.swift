@@ -6,6 +6,7 @@ import ComposableArchitecture
 import PrincipleReviewFeatureInterface
 import LinkDomainInterface
 import DesignKit
+import Kingfisher
 import Core
 
 @ViewAction(for: PrincipleReviewFeature.self)
@@ -167,7 +168,9 @@ public struct PrincipleReviewView: View {
                 .foregroundStyle(.clear)
             
             if let logo = store.state.stock.logo {
-                
+                KFImage(URL(string: logo)!)
+                    .resizable()
+                    .frame(width: 22, height: 22)
             } else {
                 Image.hedgeUI.stockThumbnailDemo
             }

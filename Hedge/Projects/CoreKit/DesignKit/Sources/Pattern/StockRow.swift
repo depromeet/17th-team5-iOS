@@ -25,7 +25,9 @@ public struct StockRow: View {
     public var body: some View {
         HStack(spacing: 16) {
             if let logo {
-                Text(logo)
+                KFImage(URL(string: logo)!)
+                    .resizable()
+                    .frame(width: 32, height: 32)
             } else {
                 Image.hedgeUI.stockThumbnailDemo
                     .resizable()

@@ -8,28 +8,30 @@
 
 import SwiftUI
 
+import Kingfisher
+
 /// 상단 정보를 표시하는 컴포넌트
 /// 
 /// 종목 정보나 상단 헤더 정보를 표시할 때 사용합니다.
 public struct HedgeTopView: View {
     
-    let symbolImage: Image
-    let title: String
+    let logo: String?
+    let companyName: String
     let description: String
     let footnote: String?
     let buttonImage: Image?
     let buttonImageOnTapped: (() -> Void)?
     
     public init(
-        symbolImage: Image,
-        title: String,
+        logo: String?,
+        companyName: String,
         description: String,
         footnote: String? = nil,
         buttonImage: Image? = nil,
         buttonImageOnTapped: (() -> Void)? = nil
     ) {
-        self.symbolImage = symbolImage
-        self.title = title
+        self.logo = logo
+        self.companyName = companyName
         self.description = description
         self.footnote = footnote
         self.buttonImage = buttonImage
@@ -39,11 +41,18 @@ public struct HedgeTopView: View {
     public var body: some View {
         VStack(spacing: 4) {
             HStack(spacing: 7) {
-                symbolImage
-                    .resizable()
-                    .frame(width: 22, height: 22)
                 
-                Text(title)
+                if let logo {
+                    KFImage(URL(string: logo)!)
+                        .resizable()
+                        .frame(width: 22, height: 22)
+                } else {
+                    Image.hedgeUI.stockThumbnailDemo
+                        .resizable()
+                        .frame(width: 22, height: 22)
+                }
+                
+                Text(companyName)
                     .font(FontModel.body3Medium)
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,8 +90,8 @@ public struct HedgeTopView: View {
 
 #Preview {
     HedgeTopView(
-        symbolImage: HedgeUI.search,
-        title: "삼성전자",
+        logo: nil,
+        companyName: "삼성전자",
         description: "얼마에 매도하셨나요?",
         footnote: "얼마에 매도하셨나요?",
         buttonImage: HedgeUI.closeFill) {
