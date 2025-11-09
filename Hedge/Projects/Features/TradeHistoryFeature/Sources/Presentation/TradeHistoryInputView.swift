@@ -105,7 +105,7 @@ public struct TradeHistoryInputView: View {
                 VStack(spacing: 16) {
                     HedgeTopView(
                         symbolImage: Image.hedgeUI.stockThumbnailDemo,
-                        title: store.stock.title,
+                        title: store.stock.companyName,
                         description: description
                     )
                     

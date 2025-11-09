@@ -41,22 +41,22 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public func start() {
         
         let principlesView = PrinciplesView(
-                store: Store(
-                    initialState: PrinciplesFeature.State(viewType: .select),
-                    reducer: {
-                        PrinciplesFeature(
-                            coordinator: self,
-                            fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
-                            tradeType: tradeType,
-                            stock: stock,
-                            tradeHistory: tradeHistory
-                        )
-                    }
-                )
+            store: Store(
+                initialState: PrinciplesFeature.State(viewType: .select),
+                reducer: {
+                    PrinciplesFeature(
+                        coordinator: self,
+                        fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
+                        tradeType: tradeType,
+                        stock: stock,
+                        tradeHistory: tradeHistory
+                    )
+                }
             )
-            
-            let principlesViewController = UIHostingController(rootView: principlesView)
-            navigationController.present(principlesViewController, animated: true)
+        )
+        
+        let principlesViewController = UIHostingController(rootView: principlesView)
+        navigationController.present(principlesViewController, animated: true)
     }
     
     public func dismiss(animated: Bool) {

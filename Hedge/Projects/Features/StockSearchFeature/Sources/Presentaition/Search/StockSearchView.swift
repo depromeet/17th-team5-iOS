@@ -86,8 +86,8 @@ public struct StockSearchView: View {
             LazyVStack {
                 ForEach(store.stocks, id: \.self) { stock in
                     StockRow(
-                        symbol: stock.symbol,
-                        title: stock.title
+                        logo: stock.logo,
+                        companyName: stock.companyName
                     )
                     .onTapGesture {
                         send(.stockTapped(stock))

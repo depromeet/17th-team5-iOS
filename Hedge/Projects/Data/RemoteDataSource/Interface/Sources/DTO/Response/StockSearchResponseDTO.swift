@@ -25,6 +25,7 @@ public struct StockSearchDataResponseDTO: Decodable {
     public let code: String
     public let companyName: String
     public let market: String
+    public let logo: String?
 }
 
 extension StockSearchDataWrapperDTO {
@@ -36,9 +37,10 @@ extension StockSearchDataWrapperDTO {
 extension StockSearchDataResponseDTO {
     public func toDomain() -> StockSearch {
         return StockSearch(
-            symbol: code,
-            title: companyName,
-            market: market
+            market: self.market,
+            code: self.code,
+            companyName: self.companyName,
+            logo: self.logo
         )
     }
 }

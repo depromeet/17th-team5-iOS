@@ -23,6 +23,7 @@ import StockDomainInterface
 import TradeFeedbackFeature
 import TradeFeedbackFeatureInterface
 import PrinciplesDomainInterface
+import PrincipleReviewFeature
 
 public final class DefaultRootCoordinator: RootCoordinator {
     
@@ -123,11 +124,24 @@ extension DefaultRootCoordinator {
         Log.debug("📱 RootCoordinator: TradeFeedbackCoordinator started and pushed to navigation stack")
     }
     
-    public func popToHome(selectingStock stockSymbol: String) {
+    public func pushToPrinciplesReview(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
         
+        let principleReviewCoordinator = DefaultPrincipleReviewCoordinator(
+            navigationController: self.navigationController,
+            tradeType: tradeType,
+            stock: stock,
+            tradeHistory: tradeHistory,
+            principleGroup: group
+        )
+        
+        principleReviewCoordinator.parentCoordinator = self
+        principleReviewCoordinator.finishDelegate = self
+        principleReviewCoordinator.start()
+        
+        childCoordinators.append(principleReviewCoordinator)
     }
     
-    func pushToPrinciplesReview(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
+    public func popToHome(selectingStock stockSymbol: String) {
         
     }
 }
@@ -145,5 +159,6 @@ extension DefaultRootCoordinator: CoordinatorFinishDelegate {
 extension DefaultRootCoordinator: PrincipleDelegate {
     public func choosePrincipleGroup(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
         
+        pushToPrinciplesReview(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: group)
     }
 }

@@ -14,6 +14,7 @@ public enum CoordinatorType {
     case login
     case home
     case principles
+    case principleReview
     case stockSearch
     case tradeHistory
     case tradeReason

@@ -166,15 +166,17 @@ public struct PrincipleReviewView: View {
                 .frame(width: 20, height: 0)
                 .foregroundStyle(.clear)
             
-            Image.hedgeUI.stockThumbnailDemo
-                .resizable()
-                .frame(width: 22, height: 22)
+            if let logo = store.state.stock.logo {
+                
+            } else {
+                Image.hedgeUI.stockThumbnailDemo
+            }
             
             Rectangle()
                 .frame(width: 8, height: 0)
                 .foregroundStyle(.clear)
             
-            Text(store.stock.title)
+            Text(store.stock.companyName)
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .font(FontModel.label2Medium)
             

@@ -98,6 +98,7 @@ public struct PrincipleReviewFeature {
         public var tradeType: TradeType
         public var stock: StockSearch
         public var tradeHistory: TradeHistory
+        public var principleGroup: PrincipleGroup
         public var principles: [Principle]
         public var pageStates: [PageState] = []
         public var linkModalShown: Bool = false
@@ -138,11 +139,12 @@ public struct PrincipleReviewFeature {
         public init(tradeType: TradeType,
                     stock: StockSearch,
                     tradeHistory: TradeHistory,
-                    principles: [Principle]) {
+                    principleGroup: PrincipleGroup) {
             self.tradeType = tradeType
             self.stock = stock
             self.tradeHistory = tradeHistory
-            self.principles = principles
+            self.principleGroup = principleGroup
+            self.principles = principleGroup.principles
             self.pageStates = Array(repeating: PageState(), count: principles.count)
         }
         
