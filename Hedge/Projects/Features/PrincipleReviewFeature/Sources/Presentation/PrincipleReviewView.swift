@@ -24,10 +24,31 @@ public struct PrincipleReviewView: View {
     }
     
     public var body: some View {
-        TabView(selection: $currentPageIndex) {
-            ForEach(0..<store.principles.count, id: \.self) { index in
-                singleReviewView(for: index)
-                    .tag(index)
+        
+        VStack(spacing: 0) {
+            if isFocused == false {
+                navigationBar
+                stockSummaryView
+                
+                HedgeSpacer(height: 1)
+                    .color(Color.hedgeUI.neutralBgSecondary)
+                    .padding(.horizontal, 20)
+                
+                HedgeSpacer(height: 16)
+                    
+                
+                Text("지키셨나요?")
+                    .foregroundStyle(Color.hedgeUI.grey900)
+                    .font(FontModel.body3Medium)
+                    .padding(.horizontal, 20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            TabView(selection: $currentPageIndex) {
+                ForEach(0..<store.principles.count, id: \.self) { index in
+                    singleReviewView(for: index)
+                        .tag(index)
+                }
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
@@ -35,8 +56,10 @@ public struct PrincipleReviewView: View {
             send(.pageChanged(newValue))
         }
         .overlay(alignment: .bottom) {
-            VStack(spacing: 0) {
-                pageFloatingView
+            if !focusWithAnimation {
+                VStack(spacing: 0) {
+                    pageFloatingView
+                }
             }
         }
         .onAppear {
@@ -65,10 +88,10 @@ public struct PrincipleReviewView: View {
     private func singleReviewView(for index: Int) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            HedgeSpacer(height: 16)
-            
             ZStack(alignment: .topLeading) {
                 if focusWithAnimation {
+                    HedgeSpacer(height: 16)
+                    
                     VStack(alignment: .leading, spacing: 4) {
                         Text(store.principles[index].principle)
                             .foregroundStyle(Color.hedgeUI.textTitle)
@@ -118,16 +141,7 @@ public struct PrincipleReviewView: View {
                     .padding(.horizontal, 20)
                 } else {
                     VStack(alignment: .leading, spacing: 0) {
-                        navigationBar
                         
-                        stockSummaryView
-                        
-                        HedgeSpacer(height: 1)
-                            .color(Color.hedgeUI.neutralBgSecondary)
-                            .padding(.horizontal, 20)
-                        
-                        HedgeSpacer(height: 16)
-                            .padding(.horizontal, 20)
                         
                         // 원칙 요약 (현재 페이지의 원칙)
                         principleSummaryView(for: index)
@@ -156,7 +170,7 @@ public struct PrincipleReviewView: View {
     }
     
     private var navigationBar: some View {
-        HedgeNavigationBar(buttonText: "", onLeftButtonTap: {
+        return HedgeNavigationBar(title: "원칙이름", buttonText: "완료", state: store.state.isComplete ? .active : .disabled, onLeftButtonTap: {
             send(.backButtonTapped)
         })
     }
@@ -187,8 +201,8 @@ public struct PrincipleReviewView: View {
                 .frame(width: 2, height: 0)
                 .foregroundStyle(.clear)
             
-            Text("\(store.tradeHistory.tradingPrice)\(store.tradeHistory.concurrency)・" +
-                 "\(store.tradeHistory.tradingQuantity)주 \(store.tradeType.rawValue)")
+            Text("\(store.tradeHistory.tradingPrice)・" +
+                 "\(store.tradeHistory.tradingQuantity) \(store.tradeType.rawValue)")
             .foregroundStyle(
                 store.tradeType == .buy ?
                 Color.hedgeUI.tradeBuy : Color.hedgeUI.tradeSell
@@ -204,10 +218,6 @@ public struct PrincipleReviewView: View {
     private func principleSummaryView(for index: Int) -> some View {
         VStack(alignment: .leading,
                spacing: 4) {
-            
-            Text("지키셨나요?")
-                .foregroundStyle(Color.hedgeUI.grey900)
-                .font(FontModel.body3Medium)
             
             HStack(spacing: 0) {
                 Text(store.principles[index].principle)

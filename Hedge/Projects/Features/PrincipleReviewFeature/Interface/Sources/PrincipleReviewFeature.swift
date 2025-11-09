@@ -118,6 +118,13 @@ public struct PrincipleReviewFeature {
             return selectedCount / totalCount
         }
         
+        public var isComplete: Bool {
+            let totalCount = pageStates.count
+            let selectedCount = pageStates.compactMap { $0.selectedEvaluation }.count
+            
+            return totalCount == selectedCount
+        }
+        
         public var selectedPrinciple: Principle {
             principles[currentPageIndex]
         }
