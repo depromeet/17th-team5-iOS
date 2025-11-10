@@ -54,6 +54,7 @@ public struct PrincipleReviewFeature {
         public var submissionResult: RetrospectionCreateResult?
         public var feedback: FeedbackData?
         public var cautionModalPresented: Bool = false
+        public var backCautionModalPresented: Bool = false
         
         public var totalIndex: Int {
             principles.count
@@ -143,6 +144,8 @@ public struct PrincipleReviewFeature {
         case deleteLink(Int)
         case pageChanged(Int)
         case cautionModalTapped
+        case backCancelButttonTapped
+        case backConfirmButtonTapped
     }
     public enum InnerAction {
         case linkDismiss
@@ -339,7 +342,13 @@ extension PrincipleReviewFeature {
         case .onAppear:
             return .none
         case .backButtonTapped:
-            coordinator.popToProv()
+            state.backCautionModalPresented = true
+            return .none
+        case .backCancelButttonTapped:
+            state.backCautionModalPresented = false
+            return .none
+        case .backConfirmButtonTapped:
+            state.backCautionModalPresented = false
             return .none
         case .keepButtonTapped:
             state.currentPageState.selectedEvaluation = state.currentPageState.selectedEvaluation == .keep ? nil : .keep

@@ -111,6 +111,20 @@ public struct PrincipleReviewView: View {
                 onPrimary: {
                     send(.cautionModalTapped)
         }))
+        .hedgeModal(
+            isPresented: $store.state.backCautionModalPresented,
+            title: "정말 이전으로 갈까요?",
+            subtitle: "기록 중인 회고가 저장되지 않아요",
+            actions: .init(
+                primaryTitle: "이전으로",
+                onPrimary: {
+                    
+                },
+                secondaryTitle: "취소",
+                onSecondary: {
+                    send(.backCancelButttonTapped)
+                })
+        )
         .overlay(alignment: .bottom) {
             if !focusWithAnimation {
                 ZStack() {
