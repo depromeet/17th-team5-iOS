@@ -4,6 +4,7 @@ import PrincipleReviewFeatureInterface
 import LinkDomainInterface
 import LinkDomain
 import RetrospectionDomainInterface
+import FeedbackDomainInterface
 import Shared
 
 @main
@@ -16,6 +17,7 @@ struct PrincipleReviewApp: App {
             let linkUseCase = MockFetchLink()
             let uploadUseCase = MockUploadRetrospectionImageUseCase()
             let createUseCase = MockCreateRetrospectionUseCase()
+            let feedbackUseCase = MockFetchFeedbackUseCase()
             
             PrincipleReviewView(store: .init(initialState: PrincipleReviewFeature.State(
                 tradeType: .sell,
@@ -30,7 +32,8 @@ struct PrincipleReviewApp: App {
                 PrincipleReviewFeature(
                     fetchLinkUseCase: linkUseCase,
                     uploadImageUseCase: uploadUseCase,
-                    createRetrospectionUseCase: createUseCase
+                    createRetrospectionUseCase: createUseCase,
+                    fetchFeedbackUseCase: feedbackUseCase
                 )
             } ))
         }
@@ -58,6 +61,24 @@ struct MockCreateRetrospectionUseCase: CreateRetrospectionUseCase {
             returnRate: request.returnRate,
             createdAt: ISO8601DateFormatter().string(from: .now),
             updatedAt: ISO8601DateFormatter().string(from: .now)
+        )
+    }
+}
+
+struct MockFetchFeedbackUseCase: FetchFeedbackUseCase {
+    func execute(id: Int) async throws -> FeedbackData {
+        FeedbackData(
+            symbol: "005930",
+            price: 10000,
+            volume: 5,
+            orderType: "BUY",
+            keptCount: 2,
+            neutralCount: 1,
+            notKeptCount: 1,
+            badge: "감각의 전성기",
+            keep: ["시장 흐름을 정확히 읽었어요."],
+            fix: ["기록을 조금 더 구체화해보세요."],
+            next: ["다음에도 침착하게 대응하세요."]
         )
     }
 }

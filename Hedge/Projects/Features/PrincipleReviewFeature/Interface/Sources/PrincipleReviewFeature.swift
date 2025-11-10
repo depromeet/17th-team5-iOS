@@ -13,21 +13,25 @@ import LinkDomainInterface
 import StockDomainInterface
 import PrinciplesDomainInterface
 import RetrospectionDomainInterface
+import FeedbackDomainInterface
 
 @Reducer
 public struct PrincipleReviewFeature {
     private let fetchLinkUseCase: FetchLinkUseCase
     private let uploadImageUseCase: UploadRetrospectionImageUseCase
     private let createRetrospectionUseCase: CreateRetrospectionUseCase
+    private let fetchFeedbackUseCase: FetchFeedbackUseCase
     
     public init(
         fetchLinkUseCase: FetchLinkUseCase,
         uploadImageUseCase: UploadRetrospectionImageUseCase,
-        createRetrospectionUseCase: CreateRetrospectionUseCase
+        createRetrospectionUseCase: CreateRetrospectionUseCase,
+        fetchFeedbackUseCase: FetchFeedbackUseCase
     ) {
         self.fetchLinkUseCase = fetchLinkUseCase
         self.uploadImageUseCase = uploadImageUseCase
         self.createRetrospectionUseCase = createRetrospectionUseCase
+        self.fetchFeedbackUseCase = fetchFeedbackUseCase
     }
     
     @ObservableState
@@ -45,6 +49,7 @@ public struct PrincipleReviewFeature {
         public var uploadedImagesPerPage: [[UploadedImage]] = []
         public var isSubmitting: Bool = false
         public var submissionResult: RetrospectionCreateResult?
+        public var feedback: FeedbackData?
         
         public var totalIndex: Int {
             principles.count
@@ -141,12 +146,15 @@ public struct PrincipleReviewFeature {
         case resetUploadedImages(pageIndex: Int)
         case createRetrospectionSuccess(RetrospectionCreateResult)
         case createRetrospectionFailure(Error)
+        case fetchFeedbackSuccess(FeedbackData)
+        case fetchFeedbackFailure(Error)
     }
     public enum AsyncAction {
         case loadImagesFromPhotos([PhotosPickerItem])
         case fetchLinkMetadata(String)
         case uploadImages([(Int, [Data])], total: Int)
         case createRetrospection(RetrospectionCreateRequest)
+        case fetchFeedback(Int)
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -193,10 +201,7 @@ private func buildCreateRequest(state: PrincipleReviewFeature.State) -> Retrospe
         let status = evaluation.toRetrospectionStatus()
         let reason = pageState.text
         let imageIds = index < imageResults.count ? imageResults[index].map { $0.imageId } : []
-        let linksSource = !pageState.linkSources.isEmpty
-        ? pageState.linkSources
-        : pageState.linkMetadataList.map { $0.newsSource }
-        let links = linksSource
+        let links = pageState.linkSources
         
         let check = RetrospectionPrincipleCheckRequest(
             principleId: principle.id,
@@ -422,12 +427,20 @@ extension PrincipleReviewFeature {
             }
             return .none
         case .createRetrospectionSuccess(let result):
-            state.isSubmitting = false
+            state.isSubmitting = true
             state.submissionResult = result
-            return .none
+            return .send(.async(.fetchFeedback(result.id)))
         case .createRetrospectionFailure(let error):
             state.isSubmitting = false
             Log.error("Failed to create retrospection: \(error)")
+            return .none
+        case .fetchFeedbackSuccess(let feedbackData):
+            state.isSubmitting = false
+            state.feedback = feedbackData
+            return .none
+        case .fetchFeedbackFailure(let error):
+            state.isSubmitting = false
+            Log.error("Failed to fetch feedback: \(error)")
             return .none
         }
     }
@@ -514,6 +527,15 @@ extension PrincipleReviewFeature {
                     await send(.inner(.createRetrospectionSuccess(result)))
                 } catch {
                     await send(.inner(.createRetrospectionFailure(error)))
+                }
+            }
+        case .fetchFeedback(let retrospectionId):
+            return .run { [fetchFeedbackUseCase] send in
+                do {
+                    let feedback = try await fetchFeedbackUseCase.execute(id: retrospectionId)
+                    await send(.inner(.fetchFeedbackSuccess(feedback)))
+                } catch {
+                    await send(.inner(.fetchFeedbackFailure(error)))
                 }
             }
         }

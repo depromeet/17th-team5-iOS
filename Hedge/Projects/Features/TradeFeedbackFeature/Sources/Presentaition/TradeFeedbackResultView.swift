@@ -131,7 +131,7 @@ struct TradeFeedbackResultView: View {
     }
     
     private var heroSubtitle: String {
-        store.feedback?.summary ?? "원칙을 잘 지키지는 않았지만, 시장 상황에 잘 대처한 투자였어요"
+        store.feedback?.badge ?? "원칙을 잘 지키지는 않았지만, 시장 상황에 잘 대처한 투자였어요"
     }
     
     
@@ -219,60 +219,15 @@ struct TradeFeedbackResultView: View {
                 }
                 .frame(height: 42)
                 
-                HStack(spacing: 0) {
-                    indicator(
-                        icon: AnyView(
-                            Image.hedgeUI.circle
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 28)
-                                .foregroundColor(Color.hedgeUI.brandPrimary)
-                        ),
-                        label: "4개"
-                    )
-                    divider()
-                    indicator(
-                        icon: AnyView(
-                            Image.hedgeUI.triangle
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 28)
-                                .foregroundColor(Color.hedgeUI.brandPrimary)
-                        ),
-                        label: "1개"
-                    )
-                    divider()
-                    indicator(
-                        icon: AnyView(
-                            Image.hedgeUI.cross
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 28)
-                                .foregroundColor(Color.hedgeUI.brandPrimary)
-                        ),
-                        label: "0개"
-                    )
+                if let feedback = store.feedback {
+                    HStack(spacing: 12) {
+                        countChip(title: "지켰어요", count: feedback.keptCount, color: Color.hedgeUI.brandPrimary)
+                        countChip(title: "보통이에요", count: feedback.neutralCount, color: Color.hedgeUI.textAlternative)
+                        countChip(title: "안지켰어요", count: feedback.notKeptCount, color: Color.hedgeUI.tradeSell)
+                    }
                 }
-                .padding(.vertical, 8)
             }
         }
-    }
-    
-    private func indicator(icon: AnyView, label: String) -> some View {
-        VStack(spacing: 6) {
-            icon
-            Text(label)
-                .font(FontModel.label2Regular)
-                .foregroundColor(Color.hedgeUI.textSecondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-    
-    private func divider() -> some View {
-        Rectangle().fill(Color.hedgeUI.grey300).frame(width: 1, height: 44)
     }
     
     // MARK: - Common gradient for titles
@@ -297,16 +252,16 @@ struct TradeFeedbackResultView: View {
                     .font(FontModel.body1Semibold)
                     .foregroundStyle(titleGradient)
                 VStack(alignment: .leading, spacing: 7) {
-                    ForEach(Array(keepItUpRecommendations.enumerated()), id: \.offset) { index, recommendation in
-                        bullet(recommendation.1)
+                    ForEach(Array(keepItUpRecommendations.enumerated()), id: \.offset) { _, recommendation in
+                        bullet(recommendation)
                     }
                 }
             }
         }
     }
     
-    private var keepItUpRecommendations: [(String, String)] {
-        store.feedback?.principle.filter { $0.0.contains("유지") || $0.0.contains("앞으로") } ?? []
+    private var keepItUpRecommendations: [String] {
+        store.feedback?.keep ?? []
     }
     
     private var improveCard: some View {
@@ -316,16 +271,16 @@ struct TradeFeedbackResultView: View {
                     .font(FontModel.body1Semibold)
                     .foregroundStyle(titleGradient)
                 VStack(alignment: .leading, spacing: 7) {
-                    ForEach(Array(improveRecommendations.enumerated()), id: \.offset) { index, recommendation in
-                        bullet(recommendation.1)
+                    ForEach(Array(improveRecommendations.enumerated()), id: \.offset) { _, recommendation in
+                        bullet(recommendation)
                     }
                 }
             }
         }
     }
     
-    private var improveRecommendations: [(String, String)] {
-        store.feedback?.principle.filter { $0.0.contains("고쳐") || $0.0.contains("개선") } ?? []
+    private var improveRecommendations: [String] {
+        store.feedback?.fix ?? []
     }
     
     // MARK: - Next time (with CTA inside)
@@ -336,8 +291,8 @@ struct TradeFeedbackResultView: View {
                     .font(FontModel.body1Semibold)
                     .foregroundStyle(titleGradient)
                 VStack(alignment: .leading, spacing: 7) {
-                    ForEach(Array(nextTimeRecommendations.enumerated()), id: \.offset) { index, recommendation in
-                        bullet(recommendation.1)
+                    ForEach(Array(nextTimeRecommendations.enumerated()), id: \.offset) { _, recommendation in
+                        bullet(recommendation)
                     }
                 }
                 
@@ -357,8 +312,8 @@ struct TradeFeedbackResultView: View {
         }
     }
     
-    private var nextTimeRecommendations: [(String, String)] {
-        store.feedback?.principle.filter { $0.0.contains("다음") || $0.0.contains("투자") } ?? []
+    private var nextTimeRecommendations: [String] {
+        store.feedback?.next ?? []
     }
     
     private func bullet(_ text: String) -> some View {
@@ -369,6 +324,23 @@ struct TradeFeedbackResultView: View {
                 .foregroundColor(Color.hedgeUI.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+    
+    private func countChip(title: String, count: Int, color: Color) -> some View {
+        VStack(spacing: 6) {
+            Text("\(count)")
+                .font(FontModel.h2Semibold)
+                .foregroundStyle(color)
+            Text(title)
+                .font(FontModel.label2Regular)
+                .foregroundColor(Color.hedgeUI.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.hedgeUI.neutralBgDefault)
+        )
     }
     
     // MARK: - Disclaimer (simple row)

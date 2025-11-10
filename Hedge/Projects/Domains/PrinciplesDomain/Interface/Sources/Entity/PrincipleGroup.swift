@@ -10,7 +10,7 @@ import Foundation
 
 public struct PrincipleGroup: Equatable, Hashable {
     
-    public enum GroupType {
+    public enum GroupType: String {
         case system
         case custom
     }

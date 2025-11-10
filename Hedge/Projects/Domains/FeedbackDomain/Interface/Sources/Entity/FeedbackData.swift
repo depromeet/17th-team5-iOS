@@ -8,18 +8,42 @@
 
 import Foundation
 
-public struct FeedbackData {
-    public let summary: String
-    public let marketCondition: String
-    public let aiRecommendedPrinciples: [[String: String]]
+public struct FeedbackData: Equatable {
+    public let symbol: String
+    public let price: Int
+    public let volume: Int
+    public let orderType: String
+    public let keptCount: Int
+    public let neutralCount: Int
+    public let notKeptCount: Int
+    public let badge: String
+    public let keep: [String]
+    public let fix: [String]
+    public let next: [String]
     
     public init(
-        summary: String,
-        marketCondition: String,
-        aiRecommendedPrinciples: [[String: String]]
+        symbol: String,
+        price: Int,
+        volume: Int,
+        orderType: String,
+        keptCount: Int,
+        neutralCount: Int,
+        notKeptCount: Int,
+        badge: String,
+        keep: [String],
+        fix: [String],
+        next: [String]
     ) {
-        self.summary = summary
-        self.marketCondition = marketCondition
-        self.aiRecommendedPrinciples = aiRecommendedPrinciples
+        self.symbol = symbol
+        self.price = price
+        self.volume = volume
+        self.orderType = orderType
+        self.keptCount = keptCount
+        self.neutralCount = neutralCount
+        self.notKeptCount = notKeptCount
+        self.badge = badge
+        self.keep = keep
+        self.fix = fix
+        self.next = next
     }
 }

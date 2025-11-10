@@ -15,21 +15,57 @@ public struct Feedback: Equatable {
     }
     
     public let uuid: UUID = UUID()
-    public let summary: String
-    public let marketStatus: String
-    public let principle: [(String, String)]
+    public let symbol: String
+    public let price: Int
+    public let volume: Int
+    public let orderType: String
+    public let keptCount: Int
+    public let neutralCount: Int
+    public let notKeptCount: Int
+    public let badge: String
+    public let keep: [String]
+    public let fix: [String]
+    public let next: [String]
     
-    public init(summary: String, marketStatus: String, principle: [(String, String)]) {
-        self.summary = summary
-        self.marketStatus = marketStatus
-        self.principle = principle
+    public init(
+        symbol: String,
+        price: Int,
+        volume: Int,
+        orderType: String,
+        keptCount: Int,
+        neutralCount: Int,
+        notKeptCount: Int,
+        badge: String,
+        keep: [String],
+        fix: [String],
+        next: [String]
+    ) {
+        self.symbol = symbol
+        self.price = price
+        self.volume = volume
+        self.orderType = orderType
+        self.keptCount = keptCount
+        self.neutralCount = neutralCount
+        self.notKeptCount = notKeptCount
+        self.badge = badge
+        self.keep = keep
+        self.fix = fix
+        self.next = next
     }
     
     public static func mock() -> Self {
-        return Feedback(summary: "사실 몇 줄까지 나올지 모르겠음 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까? 최대 4~5줄 정도가 좋지 않을까?",
-                        marketStatus: "최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지 설명 최대 3줄까지",
-                        principle: [("원칙 타이틀 최대 2줄까지 원칙 타이틀 최대 2줄까지 원칙 타이틀 최대 2줄까", "최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄"),
-                                    ("원칙 타이틀 1줄일 때", "최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄"),
-                                    ("원칙 타이틀 최대 2줄까지 원칙 타이틀최대 2줄까지 원칙 타이틀 최대 2줄까", "최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄까지 최대 3줄")])
+        Feedback(
+            symbol: "005930",
+            price: 10000,
+            volume: 10,
+            orderType: "BUY",
+            keptCount: 2,
+            neutralCount: 1,
+            notKeptCount: 1,
+            badge: "감각의 전성기",
+            keep: ["시장 흐름을 잘 읽고 판단했어요."],
+            fix: ["근거를 조금 더 정리해 보세요."],
+            next: ["비슷한 상황에서도 침착하게 대응해 보세요."]
+        )
     }
 }

@@ -130,15 +130,19 @@ extension TradeFeedbackFeature {
         switch action {
         case .fetchFeedbackSuccess(let response):
             Log.debug("\(response)")
-            var principles: [(String, String)] = []
-            response.aiRecommendedPrinciples.forEach { dataArr in
-                if let data = dataArr.first {
-                    let principle = (data.key, data.value)
-                    principles.append(principle)
-                }
-            }
-            
-            state.feedback = Feedback(summary: response.summary, marketStatus: response.marketCondition, principle: principles)
+            state.feedback = Feedback(
+                symbol: response.symbol,
+                price: response.price,
+                volume: response.volume,
+                orderType: response.orderType,
+                keptCount: response.keptCount,
+                neutralCount: response.neutralCount,
+                notKeptCount: response.notKeptCount,
+                badge: response.badge,
+                keep: response.keep,
+                fix: response.fix,
+                next: response.next
+            )
             return .none
             
         case .fetchFeedbackFailure(let error):

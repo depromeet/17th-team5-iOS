@@ -189,6 +189,7 @@ extension PrinciplesFeature {
         case .fetchPrincipleGroups:
             return .run { [tradeType] send in
                 do {
+                    print(tradeType)
                     let response = try await fetchPrinciplesUseCase.execute(tradeType.toRequest)
                     await send(.inner(.fetchPrincipleGroupsSuccess(response)))
                 } catch {

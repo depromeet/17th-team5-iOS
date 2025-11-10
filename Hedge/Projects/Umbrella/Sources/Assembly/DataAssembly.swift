@@ -74,6 +74,12 @@ public struct DataAssembly: Assembly {
             )
         }
         
+        container.register(FeedbackRepository.self) { _ in
+            DefaultFeedbackRepository(
+                dataSource: DefaultFeedbackDataSource()
+            )
+        }
+        
         // RetrospectionRepository
         container.register(RetrospectionRepository.self) { _ in
             DefaultRetrospectionRepository(
