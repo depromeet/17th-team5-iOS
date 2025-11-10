@@ -10,4 +10,5 @@ import Foundation
 
 public protocol AuthDataSource {
     func social(_ request: SocialLoginRequestDTO) async throws -> SocialLoginResponseDTO
+    func withdraw(_ request: AuthCodeRequestDTO?) async throws
 }

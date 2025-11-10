@@ -25,9 +25,10 @@ import TradeFeedbackFeatureInterface
 import PrinciplesDomainInterface
 import PrincipleReviewFeature
 import FeedbackDomainInterface
+import SettingFeature
+import SettingFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
-    
     public var navigationController: UINavigationController
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public var type: Core.CoordinatorType = .root
@@ -128,7 +129,6 @@ extension DefaultRootCoordinator {
     }
     
     public func pushToPrinciplesReview(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
-        
         let principleReviewCoordinator = DefaultPrincipleReviewCoordinator(
             navigationController: self.navigationController,
             tradeType: tradeType,
@@ -147,6 +147,21 @@ extension DefaultRootCoordinator {
     public func popToHome() {
         navigationController.popToRootViewController(animated: false)
         childCoordinators.removeAll()
+    }
+    
+    public func pushToSetting() {
+        let settingCoordinator = DefaultSettingCoordinator(navigationController: navigationController)
+        settingCoordinator.finishDelegate = self
+        settingCoordinator.parentCoordinator = self
+        
+        childCoordinators.append(settingCoordinator)
+        
+        settingCoordinator.start()
+    }
+    
+    public func signOut() {
+        self.childCoordinators.removeAll()
+        self.finish()
     }
 }
 

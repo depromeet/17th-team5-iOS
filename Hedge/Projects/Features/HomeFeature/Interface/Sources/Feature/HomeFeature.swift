@@ -7,19 +7,25 @@ import RetrospectionDomainInterface
 @Reducer
 public struct HomeFeature {
     private let fetchRetrospectionUseCase: RetrospectionUseCase
+    private let fetchBadgeReportUseCase: FetchBadgeReportUseCase
     
-    public init(fetchRetrospectionUseCase: RetrospectionUseCase) {
+    public init(
+        fetchRetrospectionUseCase: RetrospectionUseCase,
+        fetchBadgeReportUseCase: FetchBadgeReportUseCase
+    ) {
         self.fetchRetrospectionUseCase = fetchRetrospectionUseCase
+        self.fetchBadgeReportUseCase = fetchBadgeReportUseCase
     }
     
     @ObservableState
     public struct State: Equatable {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
-        public var lastRetrospectionComapnyName: String? = nil
+        public var lastRetrospectionComapnyName: String?
         public var selectedCompanyName: String?
         public var isBadgePopupPresented: Bool = false
         public var isLoadingRetrospections: Bool = false
+        public var badgeReport: RetrospectionBadgeReport?
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -46,19 +52,24 @@ public struct HomeFeature {
         case retrospectTapped(TradeType)
         case homeTabTapped
         case principleTabTapped
+        case pushToSetting
         
         case badgePopupTapped(Bool)
     }
     public enum InnerAction {
         case fetchRetrospectionsSuccess([RetrospectionCompany])
-        case failure(Error)
+        case fetchRetrospectionsFailure(Error)
+        case fetchBadgeReportSuccess(RetrospectionBadgeReport)
+        case fetchBadgeReportFailure(Error)
     }
     public enum AsyncAction {
         case fetchRetrospections
+        case fetchBadgeReport
     }
     public enum ScopeAction { }
     public enum DelegateAction {
         case pushToStockSearch(TradeType)
+        case pushToSetting
         case finish
     }
     
@@ -108,7 +119,11 @@ extension HomeFeature {
             UserDefaults.standard.removeObject(forKey: "companyName")
             
             state.isLoadingRetrospections = true
-            return .send(.async(.fetchRetrospections))
+            
+            return .merge(
+                .send(.async(.fetchRetrospections)),
+                .send(.async(.fetchBadgeReport))
+            )
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
@@ -125,6 +140,10 @@ extension HomeFeature {
         case .badgePopupTapped(let isPresented):
             state.isBadgePopupPresented = isPresented
             return .none
+        case .pushToSetting:
+            return .run { send in
+                await send(.delegate(.pushToSetting))
+            }
         }
     }
     
@@ -150,10 +169,18 @@ extension HomeFeature {
             state.isLoadingRetrospections = false
             return .none
             
-        case .failure(let error):
-            print("Failed to fetch retrospections: \(error)")
+        case .fetchRetrospectionsFailure(let error):
             state.isLoadingRetrospections = false
+            print("Failed to fetch retrospections: \(error)")
             return .send(.delegate(.finish))
+            
+        case .fetchBadgeReportSuccess(let report):
+            state.badgeReport = report
+            return .none
+            
+        case .fetchBadgeReportFailure(let error):
+            print("Failed to fetch badge report: \(error)")
+            return .none
         }
     }
     
@@ -169,7 +196,16 @@ extension HomeFeature {
                     let companies = try await fetchRetrospectionUseCase.execute()
                     await send(.inner(.fetchRetrospectionsSuccess(companies)))
                 } catch {
-                    await send(.inner(.failure(error)))
+                    await send(.inner(.fetchRetrospectionsFailure(error)))
+                }
+            }
+        case .fetchBadgeReport:
+            return .run { send in
+                do {
+                    let report = try await fetchBadgeReportUseCase.execute()
+                    await send(.inner(.fetchBadgeReportSuccess(report)))
+                } catch {
+                    await send(.inner(.fetchBadgeReportFailure(error)))
                 }
             }
         }
@@ -194,6 +230,8 @@ extension HomeFeature {
         case .pushToStockSearch(let tradeType):
             // 여기서는 단순히 .none을 반환
             // 실제 처리는 TabBarFeature에서 담당
+            return .none
+        case .pushToSetting:
             return .none
         case .finish:
             return .none

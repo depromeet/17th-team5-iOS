@@ -31,6 +31,11 @@ public struct DefaultRetrospectionRepository: RetrospectionRepository {
         return response.data.map { $0.toDomain() }
     }
     
+    public func fetchBadgeReport() async throws -> RetrospectionBadgeReport {
+        let response = try await dataSource.fetchBadgeReport()
+        return response.data.toDomain()
+    }
+    
     public func uploadImage(
         domain: String,
         fileData: Data,

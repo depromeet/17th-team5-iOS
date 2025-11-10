@@ -19,4 +19,6 @@ public protocol RootCoordinator: Coordinator {
     func pushToPrinciplesReview(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup)
     func pushToFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: Core.TradeHistory, feedback: FeedbackData)
     func popToHome()
+    func pushToSetting()
+    func signOut()
 }

@@ -61,9 +61,14 @@ public struct DataAssembly: Assembly {
             DefaultTokenDataSource(tokenPersistence: TokenPersistence())
         }
         
+        container.register(UserDataSource.self) { _ in
+            DefaultUserDataSource(userPersistence: UserPersistence())
+        }
+        
         container.register(AuthRepository.self) { resolver in
             DefaultAuthRepository(
                 tokenDataSource: resolver.resolve(TokenDataSource.self)!,
+                userDataSource: resolver.resolve(UserDataSource.self)!,
                 authDataSource: resolver.resolve(AuthDataSource.self)!
                 )
         }

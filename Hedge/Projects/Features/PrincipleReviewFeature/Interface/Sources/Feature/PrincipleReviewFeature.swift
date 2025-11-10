@@ -204,7 +204,14 @@ private func buildCreateRequest(state: PrincipleReviewFeature.State) -> Retrospe
         let status = evaluation.toRetrospectionStatus()
         let reason = pageState.text
         let imageIds = index < imageResults.count ? imageResults[index].map { $0.imageId } : []
+// <<<<<<< HEAD
         let links = pageState.linkSources
+// =======
+//         let linksSource = !pageState.linkSources.isEmpty
+//         ? pageState.linkSources
+//         : pageState.linkMetadataList.map { $0.newsSource }
+//         let links = linksSource
+// >>>>>>> main
         
         let check = RetrospectionPrincipleCheckRequest(
             principleId: principle.id,

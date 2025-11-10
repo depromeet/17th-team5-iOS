@@ -18,7 +18,7 @@ public struct AppConfiguration {
     let shortVersion: String = "1.0.0"
     let bundleIdentifier: String = "com.og.hedge"
     let displayName: String = "햇제"
-    let destination: Set<Destination> = [.iPhone, .iPad]
+    let destination: Set<Destination> = [.iPhone]
     var entitlements: Entitlements? = "Hedge.entitlements"
     let deploymentTarget: DeploymentTargets = .iOS("17.0")
     

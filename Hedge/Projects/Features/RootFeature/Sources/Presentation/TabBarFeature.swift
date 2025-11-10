@@ -51,7 +51,8 @@ public struct TabBarFeature {
         Reduce(reducerCore)
             .ifLet(\.homeState, action: \.delegate.homeAction) {
                 HomeFeature(
-                    fetchRetrospectionUseCase: DIContainer.resolve(RetrospectionUseCase.self)
+                    fetchRetrospectionUseCase: DIContainer.resolve(RetrospectionUseCase.self),
+                    fetchBadgeReportUseCase: DIContainer.resolve(FetchBadgeReportUseCase.self)
                 )
             }
     }
@@ -131,6 +132,9 @@ extension TabBarFeature {
         switch action {
         case .homeAction(.delegate(.pushToStockSearch(let tradeType))):
             coordinator.pushToStockSearch(with: tradeType)
+            return .none
+        case .homeAction(.delegate(.pushToSetting)):
+            coordinator.pushToSetting()
             return .none
         case .homeAction(.delegate(.finish)):
             coordinator.finish()

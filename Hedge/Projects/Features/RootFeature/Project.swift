@@ -19,5 +19,6 @@ let project = Project.configure(
         .Feature.Principles.feature,
         .Feature.Login.feature,
         .Feature.PrincipleReview.feature,
+        .Feature.Setting.feature,
     ]
 )
