@@ -19,6 +19,7 @@ public struct HomeFeature {
     
     @ObservableState
     public struct State: Equatable {
+        public var retrospectionButtonActive: Bool = false
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
         public var lastRetrospectionComapnyName: String?
@@ -52,6 +53,7 @@ public struct HomeFeature {
         case retrospectTapped(TradeType)
         case homeTabTapped
         case principleTabTapped
+        case restrospectionButtonTapped
         case pushToSetting
         
         case badgePopupTapped(Bool)
@@ -124,11 +126,15 @@ extension HomeFeature {
                 .send(.async(.fetchRetrospections)),
                 .send(.async(.fetchBadgeReport))
             )
+        case .restrospectionButtonTapped:
+            state.retrospectionButtonActive.toggle()
+            return .none
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
             return .none
         case .retrospectTapped(let type):
+            state.retrospectionButtonActive = false
             return .send(.delegate(.pushToStockSearch(type)))
         case .homeTabTapped:
             state.selectedType = .home

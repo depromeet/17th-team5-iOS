@@ -9,7 +9,6 @@ import ComposableArchitecture
 @ViewAction(for: HomeFeature.self)
 public struct HomeView: View {
     
-    @State var isActive: Bool = false
     @State private var rotationAngle: Double = 0
     @State private var showCompanyTopGradient: Bool = false
     @State private var isRetrospectLoadingAnimating: Bool = false
@@ -424,7 +423,7 @@ extension HomeView {
     
     private var startArea: some View {
         ZStack {
-            if isActive {
+            if store.state.retrospectionButtonActive {
                 (Color.init(hex: "#242424") ?? Color.clear)
                     .opacity(0.5)
                     .ignoresSafeArea()
@@ -466,7 +465,7 @@ extension HomeView {
                     )
                     .cornerRadius(18)
                     .frame(width: 136)
-                    .opacity(isActive ? 1 : 0)
+                    .opacity(store.state.retrospectionButtonActive ? 1 : 0)
                     
                     
                     Rectangle()
@@ -481,7 +480,7 @@ extension HomeView {
                     Spacer()
                     
                     Group {
-                        if isActive {
+                        if store.state.retrospectionButtonActive {
                             Image.hedgeUI.cancelDemo
                                 .transition(.scale.combined(with: .opacity))
                         } else {
@@ -490,10 +489,10 @@ extension HomeView {
                         }
                     }
                     .rotationEffect(.degrees(rotationAngle))
-                    .animation(.easeInOut(duration: 0.3), value: isActive)
+                    .animation(.easeInOut(duration: 0.3), value: store.state.retrospectionButtonActive)
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            isActive.toggle()
+                            send(.restrospectionButtonTapped)
                             rotationAngle += 180
                         }
                     }
