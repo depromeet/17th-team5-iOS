@@ -20,7 +20,8 @@ public struct PrincipleGroupResponseDTO: Decodable {
     public let id: Int
     public let groupName: String
     public let principleType: String
-    public let displayOrder: Int
+    public let thumbnail: String
+    public let displayOrder: Int?
     public let principles: [PrincipleResponseDTO]
 }
 
@@ -40,6 +41,7 @@ extension PrincipleGroupResponseDTO {
             id: self.id,
             groupName: self.groupName,
             principleType: self.principleType,
+            thumbnail: self.thumbnail,
             groupType: .custom,
             displayOrder: self.displayOrder,
             principles: self.principles.map { $0.toDomain() }

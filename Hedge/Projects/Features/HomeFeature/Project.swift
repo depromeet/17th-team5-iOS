@@ -6,6 +6,5 @@ let project = Project.configure(
     product: .staticFramework,
     dependencies: [
         .Core.core,
-        .Domain.Trade.interface // Required for FetchTradeRecordsUseCase
     ]
 )

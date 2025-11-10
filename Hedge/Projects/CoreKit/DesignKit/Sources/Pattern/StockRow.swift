@@ -11,25 +11,31 @@ import SwiftUI
 import Kingfisher
 
 public struct StockRow: View {
-    private let symbol: String
-    private let title: String
+    private let logo: String?
+    private let companyName: String
     
     public init(
-        symbol: String,
-        title: String
+        logo: String?,
+        companyName: String
     ) {
-        self.symbol = symbol
-        self.title = title
+        self.logo = logo
+        self.companyName = companyName
     }
     
     public var body: some View {
         HStack(spacing: 16) {
-            Image.hedgeUI.stockThumbnailDemo
-                .resizable()
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
+            if let logo {
+                KFImage(URL(string: logo)!)
+                    .resizable()
+                    .frame(width: 32, height: 32)
+            } else {
+                Image.hedgeUI.stockThumbnailDemo
+                    .resizable()
+                    .frame(width: 32, height: 32)
+                    .clipShape(Circle())
+            }
             
-            Text(title)
+            Text(companyName)
                 .font(.body1Semibold)
                 .foregroundStyle(Color.hedgeUI.grey900)
             
@@ -43,7 +49,7 @@ public struct StockRow: View {
 
 #Preview {
     StockRow(
-        symbol: "https://plchldr.co/i/50x50",
-        title: "삼성전자"
+        logo: "https://plchldr.co/i/50x50",
+        companyName: "삼성전자"
     )
 }

@@ -12,8 +12,6 @@ import Swinject
 
 import StockDomainInterface
 import StockDomain
-import RetrospectDomainInterface
-import RetrospectDomain
 import FeedbackDomainInterface
 import FeedbackDomain
 
@@ -23,8 +21,8 @@ import AnalysisDomainInterface
 import AnalysisDomain
 import LinkDomainInterface
 import LinkDomain
-import TradeDomainInterface
-import TradeDomain
+import RetrospectionDomainInterface
+import RetrospectionDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -36,14 +34,6 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchStockSearch(repository: repository)
-        }
-        
-        container.register(GenerateRetrospectUseCase.self) { resolver in
-            guard let repository = resolver.resolve(RetrospectRepository.self) else {
-                fatalError("Could not resolve StockRepository")
-            }
-            
-            return GenerateRetrospect(retrospectRepository: repository)
         }
         
         container.register(FetchFeedbackUseCase.self) { resolver in
@@ -78,20 +68,28 @@ public struct DomainAssembly: Assembly {
             return FetchLink(repository: repository)
         }
         
-        container.register(FetchTradeRecordsUseCase.self) { resolver in
-            guard let repository = resolver.resolve(TradeRepository.self) else {
-                fatalError("Could not resolve TradeRepository")
+        container.register(RetrospectionUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
             }
             
-            return FetchTradeRecords(tradeRepository: repository)
+            return FetchRetrospection(repository: repository)
         }
         
-        container.register(FetchBadgeCountsUseCase.self) { resolver in
-            guard let repository = resolver.resolve(TradeRepository.self) else {
-                fatalError("Could not resolve TradeRepository")
+        container.register(UploadRetrospectionImageUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
             }
             
-            return FetchBadgeCounts(tradeRepository: repository)
+            return UploadRetrospectionImage(repository: repository)
+        }
+        
+        container.register(CreateRetrospectionUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return CreateRetrospection(repository: repository)
         }
     }
 }

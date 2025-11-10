@@ -15,11 +15,9 @@ let project = Project.configure(
         .Module.networker,
         .Domain.Stock.interface,
         .Domain.Principles.interface,
-        .Domain.Retrospect.interface,
         .Domain.Feedback.interface,
         .Domain.Analysis.interface,
         .Domain.Link.interface,
-        .Domain.Trade.interface
     ],
     hasInterface: true
 )

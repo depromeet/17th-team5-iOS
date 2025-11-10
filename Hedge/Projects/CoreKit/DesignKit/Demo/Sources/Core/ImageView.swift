@@ -41,11 +41,6 @@ struct ImageView: View {
                 ImageSection(title: "Status") {
                     ImageRow(name: "error", image: Image.hedgeUI.error)
                 }
-                
-                // Temporary Images
-                ImageSection(title: "Temporary") {
-                    ImageRow(name: "tmpChart", image: Image.hedgeUI.tmpChart)
-                }
             }
             .padding()
         }

@@ -16,20 +16,20 @@ import PrinciplesDomainInterface
 
 @Reducer
 public struct PrinciplesFeature {
-    // private let coordinator: PrinciplesCoordinator
+    private let coordinator: PrinciplesCoordinator
     private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradeHistory: TradeHistory
     
     public init(
-        // coordinator: PrinciplesCoordinator,
+        coordinator: PrinciplesCoordinator,
         fetchPrinciplesUseCase: FetchPrinciplesUseCase,
         tradeType: TradeType,
         stock: StockSearch,
         tradeHistory: TradeHistory
     ) {
-        // self.coordinator = coordinator
+        self.coordinator = coordinator
         self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
         self.tradeType = tradeType
         self.stock = stock
@@ -43,6 +43,7 @@ public struct PrinciplesFeature {
     
     @ObservableState
     public struct State: Equatable {
+        public var principleGroups: [PrincipleGroup] = []
         public var systemPrincipleGroups: [PrincipleGroup] = []
         public var customPrincipleGroups: [PrincipleGroup] = []
         public var selectedGroupId: Int?
@@ -137,7 +138,7 @@ extension PrinciplesFeature {
             return .send(.async(.fetchPrincipleGroups))
             
         case .closeButtonTapped:
-            
+            coordinator.dismiss(animated: true)
             return .none
             
         case .groupTapped(let groupId):
@@ -149,6 +150,14 @@ extension PrinciplesFeature {
             return .none
             
         case .confirmButtonTapped:
+            
+            coordinator.dismiss(animated: false)
+            if let principleGroup = state.principleGroups.first(where: { principleGroup in
+                principleGroup.id == state.selectedGroupId
+            }) {
+                coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
+            }
+            
             return .none
         }
     }
@@ -160,6 +169,7 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrincipleGroupsSuccess(let principleGroups):
+            state.principleGroups = principleGroups
             state.systemPrincipleGroups = principleGroups.filter { $0.groupType == .system }
             state.customPrincipleGroups = principleGroups.filter { $0.groupType == .custom }
             return .none

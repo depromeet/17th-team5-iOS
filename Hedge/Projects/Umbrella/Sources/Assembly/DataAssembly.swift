@@ -20,13 +20,12 @@ import LocalDataSourceInterface
 import LocalDataSource
 import StockDomainInterface
 import PrinciplesDomainInterface
-import RetrospectDomainInterface
 import FeedbackDomainInterface
 import AnalysisDomainInterface
 import AuthDomain
 import AuthDomainInterface
 import LinkDomainInterface
-import TradeDomainInterface
+import RetrospectionDomainInterface
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -43,18 +42,6 @@ public struct DataAssembly: Assembly {
         container.register(PrinciplesRepository.self) { _ in
             DefaultPrinciplesRepository(
                 dataSource: DefaultsPrinciplesDataSource()
-            )
-        }
-              
-        container.register(RetrospectRepository.self) { _ in
-            DefaultRetrospectRepository(
-                dataSource: DefaultRetrospectDataSource()
-            )
-        }
-        
-        container.register(FeedbackRepository.self) { _ in
-            DefaultFeedbackRepository(
-                dataSource: DefaultFeedbackDataSource()
             )
         }
         
@@ -87,25 +74,10 @@ public struct DataAssembly: Assembly {
             )
         }
         
-        // TradeLocalDataSource
-        container.register(TradeLocalDataSource.self) { _ in
-            DefaultTradeLocalDataSource()
-        }
-        
-        // RetrospectionListDataSource
-        container.register(RetrospectionListDataSource.self) { _ in
-            DefaultRetrospectionListDataSource()
-        }
-        
-        // TradeRepository
-        container.register(TradeRepository.self) { resolver in
-            guard let remoteDataSource = resolver.resolve(RetrospectionListDataSource.self),
-                  let localDataSource = resolver.resolve(TradeLocalDataSource.self) else {
-                fatalError("Could not resolve RetrospectionListDataSource or TradeLocalDataSource")
-            }
-            return DefaultTradeRepository(
-                remoteDataSource: remoteDataSource,
-                localDataSource: localDataSource
+        // RetrospectionRepository
+        container.register(RetrospectionRepository.self) { _ in
+            DefaultRetrospectionRepository(
+                dataSource: DefaultRetrospectionDataSource()
             )
         }
     }

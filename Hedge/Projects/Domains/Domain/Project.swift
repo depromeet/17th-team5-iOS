@@ -14,11 +14,11 @@ let project = Project.configure(
     dependencies: [
         .Domain.Stock.implement,
         .Domain.Principles.implement,
-        .Domain.Retrospect.implement,
         .Domain.Feedback.implement,
         .Domain.Analysis.implement,
         .Domain.Auth.implement,
         .Domain.Link.implement,
+        .Domain.Retrospection.implement,
     ],
     hasTests: true
 )

@@ -32,7 +32,8 @@ public struct Provider: ProviderProtocol {
         configuration.timeoutIntervalForRequest = 5
         configuration.timeoutIntervalForResource = 5
         
-        let session = Session(configuration: configuration)
+        let monitor = NetworkEventMonitor()
+        let session = Session(configuration: configuration, eventMonitors: [monitor])
         return Provider(session: session)
     }()
     
@@ -42,9 +43,11 @@ public struct Provider: ProviderProtocol {
         configuration.timeoutIntervalForRequest = 5
         configuration.timeoutIntervalForResource = 5
         
+        let monitor = NetworkEventMonitor()
         let session = Session(
             configuration: configuration,
-            interceptor: HedgeInterceptor()
+            interceptor: HedgeInterceptor(),
+            eventMonitors: [monitor]
         )
         return Provider(session: session)
     }()
@@ -68,6 +71,36 @@ public struct Provider: ProviderProtocol {
         }
     }
     
+    public func upload<T: Decodable>(
+        _ urlConvertible: URLRequestConvertible,
+        multipartFormData: @escaping (MultipartFormData) -> Void
+    ) async throws -> T {
+        let uploadRequest = session.upload(
+            multipartFormData: multipartFormData,
+            with: urlConvertible
+        )
+        
+        logRequest(uploadRequest, phase: "start")
+        
+        let response = await uploadRequest
+            .validate(statusCode: 200 ..< 300)
+            .serializingDecodable(T.self)
+            .response
+        
+        logRequest(uploadRequest, phase: "end")
+        logResponse(response)
+        
+        if let error = response.error {
+            throw makeHedgeError(error, data: response.data)
+        }
+        
+        guard let value = response.value else {
+            throw HedgeError.client(.emptyData)
+        }
+        
+        return value
+    }
+    
     public func request(_ urlConvertible: URLRequestConvertible) async throws {
         do {
             let response = await session.request(urlConvertible)
@@ -85,6 +118,28 @@ public struct Provider: ProviderProtocol {
 }
 
 extension Provider {
+    private func logRequest(_ request: DataRequest, phase: String) {
+        let url = request.request?.url?.absoluteString ?? "unknown url"
+        let method = request.request?.httpMethod ?? "nil"
+        let state = request.task?.state ?? .suspended
+        print("➡️ [Network][\(phase)] \(method) \(url) | task: \(state.rawValue)")
+    }
+    
+    private func logResponse<T>(_ response: DataResponse<T, AFError>) {
+        let url = response.request?.url?.absoluteString ?? "unknown url"
+        let statusCode = response.response?.statusCode ?? -1
+        print("🌐 [Network] URL: \(url)")
+        print("🌐 [Network] Status Code: \(statusCode)")
+        if let error = response.error {
+            print("❌ [Network] Error: \(error)")
+        }
+        if let data = response.data,
+           let body = String(data: data, encoding: .utf8),
+           !body.isEmpty {
+            print("📄 [Network] Body: \(body)")
+        }
+    }
+    
     private func makeHedgeError(_ error: AFError, data: Data?) -> HedgeError {
         // 네트워크 에러 (URLError)
         if case let .sessionTaskFailed(underlyingError) = error,

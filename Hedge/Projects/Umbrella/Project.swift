@@ -14,7 +14,6 @@ let project = Project.configure(
     dependencies: [
         .Feature.Root.feature,
         .Module.data,
-        .Domain.Trade.implement // DomainAssembly imports TradeDomain implementation
     ],
     hasTests: false
 )

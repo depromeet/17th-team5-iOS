@@ -13,6 +13,7 @@ import SwiftUI
 /// 좌측 뒤로가기 버튼과 우측 액션 버튼을 포함한 네비게이션 바입니다.
 public struct HedgeNavigationBar: View {
     
+    let title: String?
     let buttonText: String
     let color: HedgeTextButton.HedgeTextButtonColor
     let state: HedgeTextButton.HedgeTextButtonState
@@ -20,18 +21,38 @@ public struct HedgeNavigationBar: View {
     let onRightButtonTap: (() -> Void)?
     
     public init(
+        title: String? = nil,
         buttonText: String,
         color: HedgeTextButton.HedgeTextButtonColor = .primary,
         state: HedgeTextButton.HedgeTextButtonState = .active,
         onLeftButtonTap: (() -> Void)? = nil,
         onRightButtonTap: (() -> Void)? = nil
     ) {
+        self.title = title
         self.buttonText = buttonText
         self.color = color
         self.state = state
         self.onLeftButtonTap = onLeftButtonTap
         self.onRightButtonTap = onRightButtonTap
     }
+    
+    // public init(
+    //     title: String? = nil,
+    //     buttonText: String,
+    //     color: HedgeTextButton.HedgeTextButtonColor = .primary,
+    //     state: HedgeTextButton.HedgeTextButtonState = .active,
+    //     onLeftButtonTap: (() -> Void)? = nil,
+    //     onRightButtonTap: (() -> Void)? = nil
+    // ) {
+    //     self.init(
+    //         title: nil,
+    //         buttonText: buttonText,
+    //         color: color,
+    //         state: state,
+    //         onLeftButtonTap: onLeftButtonTap,
+    //         onRightButtonTap: onRightButtonTap
+    //     )
+    // }
     
     public var body: some View {
         HStack {
@@ -41,6 +62,14 @@ public struct HedgeNavigationBar: View {
                 Image.hedgeUI.arrowLeftThick
             }
             .frame(width: 40, height: 40)
+            
+            Spacer()
+            
+            if let title = self.title {
+                Text(title)
+                    .font(FontModel.body3Semibold)
+                    .foregroundStyle(Color.hedgeUI.textPrimary)
+            }
             
             Spacer()
             

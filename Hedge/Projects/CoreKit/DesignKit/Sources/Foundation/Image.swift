@@ -14,11 +14,6 @@ extension HedgeUI where Base == Image {
     // MARK: Size 16
     public static var plus: Image { asset(#function) }
     public static var checkSimple: Image { asset(#function) }
-    public static var anxiousSimple: Image { asset(#function) }
-    public static var confidenceSimple: Image { asset(#function) }
-    public static var convictionSimple: Image { asset(#function) }
-    public static var impulseSimple: Image { asset(#function) }
-    public static var neutralSimple: Image { asset(#function) }
     public static var principleSimple: Image { asset(#function) }
     
     // MARK: Size 18
@@ -48,15 +43,13 @@ extension HedgeUI where Base == Image {
     public static var arrowLeftThick: Image { asset(#function) }
     public static var arrowRightThin: Image { asset(#function) }
     public static var arrowRightThick: Image { asset(#function) }
-    public static var aiGenerateBackground: Image { asset(#function) }
-    public static var generateIcon: Image { asset(#function) }
-    public static var generateCloseIcon: Image { asset(#function) }
     public static var principle: Image { asset(#function) }
     public static var check: Image { asset(#function) }
     public static var checkFill: Image { asset(#function) }
     public static var uncheckFill: Image { asset(#function) }
     public static var image: Image { asset(#function) }
     public static var link: Image { asset(#function) }
+    public static var setting: Image { asset(#function) }
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }
@@ -74,18 +67,6 @@ extension HedgeUI where Base == Image {
     public static var toastCheck: Image { asset(#function) }
     public static var slider: Image { asset(#function) }
     public static var thumbnailAdd: Image { asset(#function) }
-
-    // MARK: Size 35
-    public static var anxious: Image { asset(#function) }
-    public static var anxiousOff: Image { asset(#function) }
-    public static var confidence: Image { asset(#function) }
-    public static var confidenceOff: Image { asset(#function) }
-    public static var conviction: Image { asset(#function) }
-    public static var convictionOff: Image { asset(#function) }
-    public static var impulse: Image { asset(#function) }
-    public static var impulseOff: Image { asset(#function) }
-    public static var neutral: Image { asset(#function) }
-    public static var neutralOff: Image { asset(#function) }
     
     // MARK: Size 40
     public static var keep: Image { asset(#function) }
@@ -95,13 +76,7 @@ extension HedgeUI where Base == Image {
     public static var notKeep: Image { asset(#function) }
     public static var notKeepDisabled: Image { asset(#function) }
     
-    // MARK: Size 48
-    public static var anxiousOn: Image { asset(#function) }
-    public static var confidenceOn: Image { asset(#function) }
-    public static var convictionOn: Image { asset(#function) }
-    public static var impulseOn: Image { asset(#function) }
-    public static var neutralOn: Image { asset(#function) }
-    
+    // MARK: Logo
     public static var logo: Image { asset(#function) }
     public static var kakaoLogo: Image { asset(#function) }
     
@@ -112,15 +87,11 @@ extension HedgeUI where Base == Image {
     public static var bronze: Image { asset(#function) }
 
     // TODO: 임시 차트 이미지 추후 삭제
-    public static var tmpChart: Image { asset(#function) }
     public static var buyDemo: Image { asset(#function) }
     public static var sellDemo: Image { asset(#function) }
     public static var plusDemo: Image { asset(#function) }
     public static var cancelDemo: Image { asset(#function) }
     public static var stockThumbnailDemo: Image { asset(#function) }
-    public static var checkDemo: Image { asset(#function) }
-    public static var idleDemo: Image { asset(#function) }
-    public static var chartDemoBuy: Image { asset(#function) }
 }
 
 extension HedgeUI where Base == Image {

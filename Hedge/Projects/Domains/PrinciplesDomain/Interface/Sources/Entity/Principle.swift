@@ -35,8 +35,6 @@ public struct Principle: Equatable, Hashable, Codable {
         self.displayOrder = displayOrder
     }
     
-    // Convenience initializer for backward compatibility
-    // Used when converting from API responses that only have id and principle
     public init(id: Int, principle: String) {
         self.id = id
         self.principle = principle
