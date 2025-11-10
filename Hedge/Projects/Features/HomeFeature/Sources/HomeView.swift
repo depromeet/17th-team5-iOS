@@ -11,6 +11,7 @@ public struct HomeView: View {
     
     @State var isActive: Bool = false
     @State private var rotationAngle: Double = 0
+    @State private var showCompanyTopGradient: Bool = false
     
     public var store: StoreOf<HomeFeature>
     
@@ -98,39 +99,40 @@ extension HomeView {
         // 배경 레이어
         RoundedRectangle(cornerRadius: 22)
             .fill(Color.hedgeUI.backgroundWhite)
-            .overlay(alignment: .topLeading) {
-                Capsule()
-                    .fill(
-                        RadialGradient(
-                            colors: [Color.hedgeUI.shadowGreen.opacity(0.16 / 0.7),
-                                     Color.clear],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 137.5
+            .overlay {
+                ZStack {
+                    Capsule()
+                        .fill(
+                            RadialGradient(
+                                colors: [Color.hedgeUI.shadowGreen.opacity(0.16 / 0.7),
+                                         Color.clear],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 137.5
+                            )
                         )
-                    )
-                    .frame(width: 355, height: 274)
-                    .opacity(0.7)
-                    .blur(radius: 84.6)
-                    .offset(x: -124, y: -117)
-                    .allowsHitTesting(false)
-            }
-            .overlay(alignment: .topTrailing) {
-                Capsule()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 137.5
+                        .frame(width: 355, height: 274)
+                        .opacity(0.7)
+                        .blur(radius: 84.6)
+                        .offset(x: -124, y: -117)
+                        .allowsHitTesting(false)
+                    
+                    Capsule()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 137.5
+                            )
                         )
-                    )
-                    .frame(width: 355, height: 274)
-                    .opacity(0.7)
-                    .blur(radius: 84.6)
-                    .offset(x: 90, y: -117)
-                    .allowsHitTesting(false)
+                        .frame(width: 355, height: 274)
+                        .opacity(0.7)
+                        .blur(radius: 84.6)
+                        .offset(x: 90, y: -117)
+                        .allowsHitTesting(false)
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: 22))
             .overlay(content: {
@@ -209,6 +211,15 @@ extension HomeView {
                 HStack(spacing: 2) {
                     // 주식 종목 리스트 (왼쪽)
                     ScrollView {
+                        GeometryReader { proxy in
+                            Color.clear
+                                .preference(
+                                    key: ScrollOffsetPreferenceKey.self,
+                                    value: proxy.frame(in: .named("CompanyScroll")).minY
+                                )
+                        }
+                        .frame(height: 0)
+                        
                         VStack(alignment: .center, spacing: 12) {
                             ForEach(store.state.companyNames, id: \.self) { symbol in
                                 let isSelected = store.state.selectedCompanyName == symbol
@@ -240,23 +251,25 @@ extension HomeView {
                         .padding(.horizontal, 12)
                     }
                     .scrollIndicators(.hidden)
-                    .overlay {
-                        VStack {
+                    .coordinateSpace(name: "CompanyScroll")
+                    .overlay(alignment: .top) {
+                        if showCompanyTopGradient {
                             LinearGradient(
                                 gradient: Gradient(stops: [
                                     .init(color: Color.white.opacity(1.0), location: 0.0),
                                     .init(color: Color.white.opacity(0.0), location: 0.85),
-                                ]
-                                ),
+                                ]),
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
-                            .frame(height: 70)
+                            .frame(width: 134, height: 70)
                             .allowsHitTesting(false)
-                            
-                            Spacer()
                         }
                     }
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        showCompanyTopGradient = value < -1
+                    }
+                    .frame(width: 134, alignment: .leading)
                     
                     // 회고 리스트 (오른쪽) - 월별 -> 일별 -> 개별 항목
                     ScrollViewReader { proxy in
@@ -443,14 +456,14 @@ extension HomeView {
     }
 }
 
-// // MARK: - ScrollOffsetPreferenceKey
-// private struct ScrollOffsetPreferenceKey: PreferenceKey {
-//     static var defaultValue: CGFloat = 0
-//     
-//     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-//         value = nextValue()
-//     }
-// }
+// MARK: - ScrollOffsetPreferenceKey
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value += nextValue()
+    }
+}
 
 extension HomeView {
     func badge(image: Image, count: Int) -> some View {
@@ -541,3 +554,4 @@ extension HomeView {
 //         return attributed
 //     }
 // }
+
