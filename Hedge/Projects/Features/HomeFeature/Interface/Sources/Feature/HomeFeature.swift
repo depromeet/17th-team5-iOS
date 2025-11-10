@@ -7,17 +7,25 @@ import RetrospectionDomainInterface
 @Reducer
 public struct HomeFeature {
     private let fetchRetrospectionUseCase: RetrospectionUseCase
+    private let fetchBadgeReportUseCase: FetchBadgeReportUseCase
     
-    public init(fetchRetrospectionUseCase: RetrospectionUseCase) {
+    public init(
+        fetchRetrospectionUseCase: RetrospectionUseCase,
+        fetchBadgeReportUseCase: FetchBadgeReportUseCase
+    ) {
         self.fetchRetrospectionUseCase = fetchRetrospectionUseCase
+        self.fetchBadgeReportUseCase = fetchBadgeReportUseCase
     }
     
     @ObservableState
     public struct State: Equatable {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
+        public var lastRetrospectionCompanyName: String?
         public var selectedCompanyName: String?
         public var isBadgePopupPresented: Bool = false
+        public var isLoadingRetrospections: Bool = false
+        public var badgeReport: RetrospectionBadgeReport?
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -49,10 +57,13 @@ public struct HomeFeature {
     }
     public enum InnerAction {
         case fetchRetrospectionsSuccess([RetrospectionCompany])
-        case failure(Error)
+        case fetchRetrospectionsFailure(Error)
+        case fetchBadgeReportSuccess(RetrospectionBadgeReport)
+        case fetchBadgeReportFailure(Error)
     }
     public enum AsyncAction {
         case fetchRetrospections
+        case fetchBadgeReport
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -101,7 +112,11 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .send(.async(.fetchRetrospections))
+            state.isLoadingRetrospections = true
+            return .merge(
+                .send(.async(.fetchRetrospections)),
+                .send(.async(.fetchBadgeReport))
+            )
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
@@ -128,8 +143,10 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchRetrospectionsSuccess(let companies):
+            state.isLoadingRetrospections = false
             state.retrospectionCompanies = companies
             state.selectedCompanyName = companies.first?.companyName
+            state.lastRetrospectionCompanyName = companies.first?.companyName
             
             if let selectedSymbol = state.selectedCompanyName {
                 updateGroupedRetrospections(for: selectedSymbol, state: &state)
@@ -137,9 +154,18 @@ extension HomeFeature {
             
             return .none
             
-        case .failure(let error):
+        case .fetchRetrospectionsFailure(let error):
+            state.isLoadingRetrospections = false
             print("Failed to fetch retrospections: \(error)")
             return .send(.delegate(.finish))
+            
+        case .fetchBadgeReportSuccess(let report):
+            state.badgeReport = report
+            return .none
+            
+        case .fetchBadgeReportFailure(let error):
+            print("Failed to fetch badge report: \(error)")
+            return .none
         }
     }
     
@@ -155,7 +181,16 @@ extension HomeFeature {
                     let companies = try await fetchRetrospectionUseCase.execute()
                     await send(.inner(.fetchRetrospectionsSuccess(companies)))
                 } catch {
-                    await send(.inner(.failure(error)))
+                    await send(.inner(.fetchRetrospectionsFailure(error)))
+                }
+            }
+        case .fetchBadgeReport:
+            return .run { send in
+                do {
+                    let report = try await fetchBadgeReportUseCase.execute()
+                    await send(.inner(.fetchBadgeReportSuccess(report)))
+                } catch {
+                    await send(.inner(.fetchBadgeReportFailure(error)))
                 }
             }
         }

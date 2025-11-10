@@ -11,6 +11,7 @@ public struct HomeView: View {
     
     @State var isActive: Bool = false
     @State private var rotationAngle: Double = 0
+    @State private var showCompanyTopGradient: Bool = false
     
     public var store: StoreOf<HomeFeature>
     
@@ -95,11 +96,16 @@ extension HomeView {
     }
     
     private var badgeArea: some View {
-        ZStack {
-            // 배경 레이어
-            RoundedRectangle(cornerRadius: 22)
-                .fill(Color.hedgeUI.backgroundWhite)
-                .overlay {
+        let report = store.state.badgeReport
+        let hasBadges = (report?.hedge ?? 0) > 0 ||
+        (report?.gold ?? 0) > 0 ||
+        (report?.silver ?? 0) > 0 ||
+        (report?.bronze ?? 0) > 0
+        
+        return RoundedRectangle(cornerRadius: 22)
+            .fill(Color.hedgeUI.backgroundWhite)
+            .overlay {
+                ZStack {
                     Capsule()
                         .fill(
                             RadialGradient(
@@ -114,6 +120,7 @@ extension HomeView {
                         .opacity(0.7)
                         .blur(radius: 84.6)
                         .offset(x: -124, y: -117)
+                        .allowsHitTesting(false)
                     
                     Capsule()
                         .fill(
@@ -129,68 +136,80 @@ extension HomeView {
                         .opacity(0.7)
                         .blur(radius: 84.6)
                         .offset(x: 90, y: -117)
+                        .allowsHitTesting(false)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 22)) // overlay 내부의 Circle만 clip
-            
-            // Stroke는 별도 레이어
-            RoundedRectangle(cornerRadius: 22)
-                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
-            
-            // 내부 콘텐츠
-            VStack(spacing: 0) {
-                HStack {
-                    Text("아직 모은 뱃지가 없어요")
-                        .font(.body2Semibold)
-                        .foregroundStyle(Color.hedgeUI.textPrimary)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 22))
+            .overlay(content: {
+                VStack(spacing: 0) {
+                    HStack {
+                        
+                        Text("아직 모은 뱃지가 없어요")
+                            .font(.body2Semibold)
+                            .foregroundStyle(Color.hedgeUI.textPrimary)
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    
+                    HStack(alignment: .center) {
+                        badge(image: HedgeUI.emerald, count: report?.hedge ?? 0)
+                        
+                        Spacer()
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .frame(width: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.vertical, 6)
+                        
+                        Spacer()
+                        
+                        badge(image: HedgeUI.gold, count: report?.gold ?? 0)
+                        
+                        Spacer()
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .frame(width: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.vertical, 6)
+                        
+                        Spacer()
+                        
+                        badge(image: HedgeUI.silver, count: report?.silver ?? 0)
+                        
+                        Spacer()
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .frame(width: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.vertical, 6)
+                        
+                        Spacer()
+                        
+                        badge(image: HedgeUI.bronze, count: report?.bronze ?? 0)
+                    }
+                    .padding(.vertical, 20)
+                    .padding(.horizontal, 32)
                     
                     Spacer()
                 }
-                
-                HStack(alignment: .center, spacing: 20) {
-                    badge(image: HedgeUI.emerald, count: 0)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 1)
-                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                        .padding(.vertical, 6)
-                    
-                    badge(image: HedgeUI.gold, count: 0)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 1)
-                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                        .padding(.vertical, 6)
-                    
-                    badge(image: HedgeUI.silver, count: 0)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 1)
-                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                        .padding(.vertical, 6)
-                    
-                    badge(image: HedgeUI.bronze, count: 0)
+            })
+            .shadow(
+                color: Color.black.opacity(0.08),
+                radius: 20,
+                x: 0,
+                y: 6
+            )
+            .frame(height: 148)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    _ = send(.badgePopupTapped(true))
                 }
-                .padding(.vertical, 20)
-                
-                Spacer()
             }
-        }
-        .shadow(
-            color: Color.black.opacity(0.08),
-            radius: 20,
-            x: 0,
-            y: 6
-        )
-        .frame(height: 148)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                _ = send(.badgePopupTapped(true))
-            }
-        }
     }
     
     private var retrospectArea: some View {
@@ -211,6 +230,15 @@ extension HomeView {
                 HStack(spacing: 2) {
                     // 주식 종목 리스트 (왼쪽)
                     ScrollView {
+                        GeometryReader { proxy in
+                            Color.clear
+                                .preference(
+                                    key: ScrollOffsetPreferenceKey.self,
+                                    value: proxy.frame(in: .named("CompanyScroll")).minY
+                                )
+                        }
+                        .frame(height: 0)
+                        
                         VStack(alignment: .center, spacing: 12) {
                             ForEach(store.state.companyNames, id: \.self) { symbol in
                                 let isSelected = store.state.selectedCompanyName == symbol
@@ -242,23 +270,25 @@ extension HomeView {
                         .padding(.horizontal, 12)
                     }
                     .scrollIndicators(.hidden)
-                    .overlay {
-                        VStack {
+                    .coordinateSpace(name: "CompanyScroll")
+                    .overlay(alignment: .top) {
+                        if showCompanyTopGradient {
                             LinearGradient(
                                 gradient: Gradient(stops: [
                                     .init(color: Color.white.opacity(1.0), location: 0.0),
                                     .init(color: Color.white.opacity(0.0), location: 0.85),
-                                ]
-                                ),
+                                ]),
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
-                            .frame(height: 70)
+                            .frame(width: 134, height: 70)
                             .allowsHitTesting(false)
-                            
-                            Spacer()
                         }
                     }
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        showCompanyTopGradient = value < -1
+                    }
+                    .frame(width: 134, alignment: .leading)
                     
                     // 회고 리스트 (오른쪽) - 월별 -> 일별 -> 개별 항목
                     ScrollViewReader { proxy in
@@ -445,14 +475,14 @@ extension HomeView {
     }
 }
 
-// // MARK: - ScrollOffsetPreferenceKey
-// private struct ScrollOffsetPreferenceKey: PreferenceKey {
-//     static var defaultValue: CGFloat = 0
-//     
-//     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-//         value = nextValue()
-//     }
-// }
+// MARK: - ScrollOffsetPreferenceKey
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value += nextValue()
+    }
+}
 
 extension HomeView {
     func badge(image: Image, count: Int) -> some View {
@@ -529,17 +559,3 @@ extension HomeView {
         }
     }
 }
-
-// extension HomeView {
-//     private func makeAttributeText(colorTitle: String, color: Color) -> AttributedString {
-//         var attributed = AttributedString("\(colorTitle) 회고하기")
-//         if let range = attributed.range(of: colorTitle) {
-//             attributed[range].foregroundColor = UIColor(color)
-//         }
-//         if let range = attributed.range(of: " 회고하기") {
-//             attributed[range].foregroundColor = UIColor(Color.hedgeUI.textPrimary)
-//         }
-//         
-//         return attributed
-//     }
-// }

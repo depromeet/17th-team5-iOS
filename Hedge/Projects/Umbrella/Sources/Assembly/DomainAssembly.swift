@@ -91,5 +91,13 @@ public struct DomainAssembly: Assembly {
             
             return CreateRetrospection(repository: repository)
         }
+        
+        container.register(FetchBadgeReportUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return FetchBadgeReport(repository: repository)
+        }
     }
 }

@@ -51,7 +51,8 @@ public struct TabBarFeature {
         Reduce(reducerCore)
             .ifLet(\.homeState, action: \.delegate.homeAction) {
                 HomeFeature(
-                    fetchRetrospectionUseCase: DIContainer.resolve(RetrospectionUseCase.self)
+                    fetchRetrospectionUseCase: DIContainer.resolve(RetrospectionUseCase.self),
+                    fetchBadgeReportUseCase: DIContainer.resolve(FetchBadgeReportUseCase.self)
                 )
             }
     }
