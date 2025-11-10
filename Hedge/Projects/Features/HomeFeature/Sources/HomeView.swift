@@ -11,6 +11,7 @@ public struct HomeView: View {
     
     @State var isActive: Bool = false
     @State private var rotationAngle: Double = 0
+    @State private var showCompanyTopGradient: Bool = false
     
     public var store: StoreOf<HomeFeature>
     
@@ -32,6 +33,7 @@ public struct HomeView: View {
                 
                 Spacer()
             }
+            .ignoresSafeArea(edges: .bottom)
             
             startArea
             
@@ -187,6 +189,7 @@ extension HomeView {
                 }
                 .padding(.vertical, 20)
                 .padding(.horizontal, 32)
+                .frame(maxWidth: .infinity)
                 
                 Spacer()
             }
@@ -216,11 +219,16 @@ extension HomeView {
                 .padding(.vertical, 10)
             
             if store.state.groupedRetrospections.isEmpty {
-                Text("회고 기록이 없습니다")
-                    .font(FontModel.body3Regular)
-                    .foregroundStyle(Color.hedgeUI.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 40)
+                VStack(alignment: .center) {
+                    Spacer()
+                    
+                    Text("아직 내 회고 기록이 없어요\n회고를 시작해볼까요?")
+                        .font(FontModel.h2Semibold)
+                        .foregroundStyle(Color.hedgeUI.textAssistive)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    
+                    Spacer()
+                }
             } else {
                 HStack(spacing: 2) {
                     // 주식 종목 리스트 (왼쪽)
@@ -254,24 +262,34 @@ extension HomeView {
                             }
                         }
                         .padding(.horizontal, 12)
+                        .background(
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .preference(
+                                        key: ScrollOffsetPreferenceKey.self,
+                                        value: proxy.frame(in: .named("CompanyScroll")).minY
+                                    )
+                            }
+                        )
                     }
                     .scrollIndicators(.hidden)
-                    .overlay {
-                        VStack {
+                    .coordinateSpace(name: "CompanyScroll")
+                    .overlay(alignment: .top) {
+                        if showCompanyTopGradient {
                             LinearGradient(
                                 gradient: Gradient(stops: [
                                     .init(color: Color.white.opacity(1.0), location: 0.0),
                                     .init(color: Color.white.opacity(0.0), location: 0.85),
-                                ]
-                                ),
+                                ]),
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
                             .frame(height: 70)
                             .allowsHitTesting(false)
-                            
-                            Spacer()
                         }
+                    }
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        showCompanyTopGradient = value < -1
                     }
                     
                     // 회고 리스트 (오른쪽) - 월별 -> 일별 -> 개별 항목
@@ -459,14 +477,13 @@ extension HomeView {
     }
 }
 
-// // MARK: - ScrollOffsetPreferenceKey
-// private struct ScrollOffsetPreferenceKey: PreferenceKey {
-//     static var defaultValue: CGFloat = 0
-//     
-//     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-//         value = nextValue()
-//     }
-// }
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value += nextValue()
+    }
+}
 
 extension HomeView {
     func badge(image: Image, count: Int) -> some View {
@@ -543,17 +560,3 @@ extension HomeView {
         }
     }
 }
-
-// extension HomeView {
-//     private func makeAttributeText(colorTitle: String, color: Color) -> AttributedString {
-//         var attributed = AttributedString("\(colorTitle) 회고하기")
-//         if let range = attributed.range(of: colorTitle) {
-//             attributed[range].foregroundColor = UIColor(color)
-//         }
-//         if let range = attributed.range(of: " 회고하기") {
-//             attributed[range].foregroundColor = UIColor(Color.hedgeUI.textPrimary)
-//         }
-//         
-//         return attributed
-//     }
-// }
