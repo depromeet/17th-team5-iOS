@@ -63,7 +63,6 @@ public struct PrincipleReviewView: View {
                 
                 HedgeSpacer(height: 16)
                     
-                
                 Text("지키셨나요?")
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .font(FontModel.body3Medium)
@@ -109,9 +108,16 @@ public struct PrincipleReviewView: View {
                 }
             }
         }
-        // .hedgeModal(isPresented: $modalPresented, title: "123", actions: .init(primaryTitle: "1", onPrimary: {
-        //     print("44")
-        // }))
+        .hedgeModal(
+            isPresented: $store.state.cautionModalPresented,
+            title: "사진을 더 추가할 수 없어요",
+            subtitle: "3장까지만 추가할 수 있어요",
+            showIcon: false,
+            actions: .init(
+                primaryTitle: "확인",
+                onPrimary: {
+                    send(.cautionModalTapped)
+        }))
     }
     
     // MARK: - Single Review View
@@ -171,7 +177,6 @@ public struct PrincipleReviewView: View {
                     .padding(.horizontal, 20)
                 } else {
                     VStack(alignment: .leading, spacing: 0) {
-                        
                         
                         // 원칙 요약 (현재 페이지의 원칙)
                         principleSummaryView(for: index)
@@ -490,6 +495,7 @@ public struct PrincipleReviewView: View {
     private var photoPickerView: some View {
         PhotosPicker(
             selection: $store.currentPageState.selectedPhotoItems,
+            maxSelectionCount: 3,
             matching: .images
         ) {
             Image.hedgeUI.image
