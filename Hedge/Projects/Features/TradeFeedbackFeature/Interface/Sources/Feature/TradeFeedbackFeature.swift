@@ -31,11 +31,14 @@ public struct TradeFeedbackFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public var tradeData: TradeData
-        public var feedback: Feedback? = nil
+        public var stock: StockSearch
+        public var tradeHistory: TradeHistory
+        public var feedback: FeedbackData
         
-        public init(tradeData: TradeData) {
-            self.tradeData = tradeData
+        public init(stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+            self.stock = stock
+            self.tradeHistory = tradeHistory
+            self.feedback = feedback
         }
     }
     
@@ -105,9 +108,7 @@ extension TradeFeedbackFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            Log.debug("\(state.tradeData)")
-            return .send(.async(.fetchFeedback(state.tradeData.id)))
-            
+            return .none
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
@@ -117,7 +118,7 @@ extension TradeFeedbackFeature {
             
         case .completeButtonTapped:
             // Navigate back to home and select the stock symbol
-            coordinator.popToHome(selectingStock: state.tradeData.stockSymbol)
+            // coordinator.popToHome(selectingStock: state.tradeData.stockSymbol)
             return .none
         }
     }
@@ -130,7 +131,7 @@ extension TradeFeedbackFeature {
         switch action {
         case .fetchFeedbackSuccess(let response):
             Log.debug("\(response)")
-            state.feedback = Feedback(
+            state.feedback = FeedbackData(
                 symbol: response.symbol,
                 price: response.price,
                 volume: response.volume,

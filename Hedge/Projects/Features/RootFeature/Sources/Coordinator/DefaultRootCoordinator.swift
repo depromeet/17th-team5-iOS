@@ -24,6 +24,7 @@ import TradeFeedbackFeature
 import TradeFeedbackFeatureInterface
 import PrinciplesDomainInterface
 import PrincipleReviewFeature
+import FeedbackDomainInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     
@@ -110,11 +111,12 @@ extension DefaultRootCoordinator {
         childCoordinators.append(principlesCoordinator)
     }
     
-    public func pushToFeedback(tradeData: TradeData) {
-        Log.debug("📱 RootCoordinator: Creating TradeFeedbackCoordinator for trade ID: \(tradeData.id)")
+    public func pushToFeedback(stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
         let tradeFeedbackCoordinator = DefaultTradeFeedbackCoordinator(
             navigationController: self.navigationController,
-            tradeData: tradeData
+            stock: stock,
+            tradeHistory: tradeHistory,
+            feedback: feedback
         )
         tradeFeedbackCoordinator.parentCoordinator = self
         tradeFeedbackCoordinator.finishDelegate = self

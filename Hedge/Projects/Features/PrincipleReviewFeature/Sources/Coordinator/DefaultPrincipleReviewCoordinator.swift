@@ -53,6 +53,7 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
                         principleGroup: principleGroup),
                     reducer: {
                         PrincipleReviewFeature(
+                            coordinator: self,
                             fetchLinkUseCase: DIContainer.resolve(FetchLinkUseCase.self),
                             uploadImageUseCase: DIContainer.resolve(UploadRetrospectionImageUseCase.self),
                             createRetrospectionUseCase: DIContainer.resolve(CreateRetrospectionUseCase.self),
@@ -64,6 +65,10 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
         
         let principleReviewViewController = UIHostingController(rootView: principleReviewView)
         navigationController.pushViewController(principleReviewViewController, animated: true)
+    }
+    
+    public func pushToTradeFeedback(stock: StockSearch, tradeHistory: Core.TradeHistory, feedback: FeedbackData) {
+        parentCoordinator?.pushToFeedback(stock: stock, tradeHistory: tradeHistory, feedback: feedback)
     }
     
     public func popToProv() {

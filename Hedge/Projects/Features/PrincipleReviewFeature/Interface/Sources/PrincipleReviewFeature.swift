@@ -17,17 +17,20 @@ import FeedbackDomainInterface
 
 @Reducer
 public struct PrincipleReviewFeature {
+    private let coordinator: PrincipleReviewCoordinator
     private let fetchLinkUseCase: FetchLinkUseCase
     private let uploadImageUseCase: UploadRetrospectionImageUseCase
     private let createRetrospectionUseCase: CreateRetrospectionUseCase
     private let fetchFeedbackUseCase: FetchFeedbackUseCase
     
     public init(
+        coordinator: PrincipleReviewCoordinator,
         fetchLinkUseCase: FetchLinkUseCase,
         uploadImageUseCase: UploadRetrospectionImageUseCase,
         createRetrospectionUseCase: CreateRetrospectionUseCase,
         fetchFeedbackUseCase: FetchFeedbackUseCase
     ) {
+        self.coordinator = coordinator
         self.fetchLinkUseCase = fetchLinkUseCase
         self.uploadImageUseCase = uploadImageUseCase
         self.createRetrospectionUseCase = createRetrospectionUseCase
@@ -327,6 +330,7 @@ extension PrincipleReviewFeature {
         case .onAppear:
             return .none
         case .backButtonTapped:
+            coordinator.popToProv()
             return .none
         case .keepButtonTapped:
             state.currentPageState.selectedEvaluation = state.currentPageState.selectedEvaluation == .keep ? nil : .keep
@@ -437,6 +441,9 @@ extension PrincipleReviewFeature {
         case .fetchFeedbackSuccess(let feedbackData):
             state.isSubmitting = false
             state.feedback = feedbackData
+            
+            coordinator.pushToTradeFeedback(stock: state.stock, tradeHistory: state.tradeHistory, feedback: feedbackData)
+            
             return .none
         case .fetchFeedbackFailure(let error):
             state.isSubmitting = false

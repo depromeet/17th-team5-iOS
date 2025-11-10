@@ -109,29 +109,31 @@ struct TradeFeedbackResultView: View {
     @Bindable public var store: StoreOf<TradeFeedbackFeature>
     
     private var badgeImage: Image {
-        let grade: BadgeGrade = store.tradeData.grade
-        switch grade {
-        case .emerald: return Image.hedgeUI.emerald
-        case .gold:    return Image.hedgeUI.gold
-        case .silver:  return Image.hedgeUI.silver
-        case .bronze:  return Image.hedgeUI.bronze
-        }
+        // let grade: BadgeGrade = store.tradeData.grade
+        // switch grade {
+        // case .emerald: return Image.hedgeUI.emerald
+        // case .gold:    return Image.hedgeUI.gold
+        // case .silver:  return Image.hedgeUI.silver
+        // case .bronze:  return Image.hedgeUI.bronze
+        // }
+        Image.hedgeUI.bronze
     }
     
     // MARK: - Hero text from data
     private var heroTitle: String {
         // This should be tied to the badge grade
-        let grade: BadgeGrade = store.tradeData.grade
-        switch grade {
-        case .emerald: return "완벽한 매매"
-        case .gold:    return "훌륭한 매매"
-        case .silver:  return "아쉬운 매매"
-        case .bronze:  return "아쉬운 매매"
-        }
+        // let grade: BadgeGrade = store.tradeData.grade
+        // switch grade {
+        // case .emerald: return "완벽한 매매"
+        // case .gold:    return "훌륭한 매매"
+        // case .silver:  return "아쉬운 매매"
+        // case .bronze:  return "아쉬운 매매"
+        // }
+        return "test123"
     }
     
     private var heroSubtitle: String {
-        store.feedback?.badge ?? "원칙을 잘 지키지는 않았지만, 시장 상황에 잘 대처한 투자였어요"
+        store.feedback.badge
     }
     
     
@@ -206,12 +208,12 @@ struct TradeFeedbackResultView: View {
             VStack(spacing: 16) {
                 HStack(spacing: 8) {
                     Circle().fill(Color.blue).frame(width: 28, height: 28)
-                        .overlay(Text(store.tradeData.stockSymbol.prefix(1)).font(.system(size: 12, weight: .bold)).foregroundColor(.white))
+                        .overlay(Text(store.feedback.symbol.prefix(1)).font(.system(size: 12, weight: .bold)).foregroundColor(.white))
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(store.tradeData.stockTitle)
+                        Text(store.feedback.symbol)
                             .font(FontModel.label2Medium)
                             .foregroundColor(Color.hedgeUI.textAlternative)
-                        Text("\(store.tradeData.tradingPrice)원 • \(store.tradeData.tradingQuantity)주 \(store.tradeData.tradeType.rawValue)")
+                        Text("\(store.feedback.price)원 • \(store.feedback.volume)주 \(store.feedback.orderType)")
                             .font(FontModel.body2Semibold)
                             .foregroundColor(Color.hedgeUI.textPrimary)
                     }
@@ -219,12 +221,10 @@ struct TradeFeedbackResultView: View {
                 }
                 .frame(height: 42)
                 
-                if let feedback = store.feedback {
-                    HStack(spacing: 12) {
-                        countChip(title: "지켰어요", count: feedback.keptCount, color: Color.hedgeUI.brandPrimary)
-                        countChip(title: "보통이에요", count: feedback.neutralCount, color: Color.hedgeUI.textAlternative)
-                        countChip(title: "안지켰어요", count: feedback.notKeptCount, color: Color.hedgeUI.tradeSell)
-                    }
+                HStack(spacing: 12) {
+                    countChip(title: "지켰어요", count: store.feedback.keptCount, color: Color.hedgeUI.brandPrimary)
+                    countChip(title: "보통이에요", count: store.feedback.neutralCount, color: Color.hedgeUI.textAlternative)
+                    countChip(title: "안지켰어요", count: store.feedback.notKeptCount, color: Color.hedgeUI.tradeSell)
                 }
             }
         }
@@ -261,7 +261,7 @@ struct TradeFeedbackResultView: View {
     }
     
     private var keepItUpRecommendations: [String] {
-        store.feedback?.keep ?? []
+        store.feedback.keep
     }
     
     private var improveCard: some View {
@@ -280,7 +280,7 @@ struct TradeFeedbackResultView: View {
     }
     
     private var improveRecommendations: [String] {
-        store.feedback?.fix ?? []
+        store.feedback.fix
     }
     
     // MARK: - Next time (with CTA inside)
@@ -313,7 +313,7 @@ struct TradeFeedbackResultView: View {
     }
     
     private var nextTimeRecommendations: [String] {
-        store.feedback?.next ?? []
+        store.feedback.next
     }
     
     private func bullet(_ text: String) -> some View {

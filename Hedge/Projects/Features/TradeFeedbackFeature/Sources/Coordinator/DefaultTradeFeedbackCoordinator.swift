@@ -14,22 +14,32 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     public weak var parentCoordinator: RootCoordinator?
     public weak var finishDelegate: CoordinatorFinishDelegate?
     
-    public let tradeData: TradeData
+    public let feedback: FeedbackData
+    public let stock: StockSearch
+    public let tradeHistory: TradeHistory
     private let fetchFeedbackUseCase = DIContainer.resolve(FetchFeedbackUseCase.self)
     
     public init(
         navigationController: UINavigationController,
-        tradeData: TradeData
+        stock: StockSearch,
+        tradeHistory: TradeHistory,
+        feedback: FeedbackData
     ) {
         self.navigationController = navigationController
-        self.tradeData = tradeData
+        self.stock = stock
+        self.tradeHistory = tradeHistory
+        self.feedback = feedback
     }
     
     public func start() {
         let viewController = UIHostingController(
             rootView: TradeFeedbackResultView(
                 store: .init(
-                    initialState: TradeFeedbackFeature.State(tradeData: tradeData),
+                    initialState: TradeFeedbackFeature.State(
+                        stock: stock,
+                        tradeHistory: tradeHistory,
+                        feedback: feedback
+                    ),
                     reducer: {
                         TradeFeedbackFeature(
                             coordinator: self,

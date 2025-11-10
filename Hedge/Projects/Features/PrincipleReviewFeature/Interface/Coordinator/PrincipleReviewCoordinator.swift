@@ -10,8 +10,10 @@ import Foundation
 import Core
 import StockDomainInterface
 import PrinciplesDomainInterface
+import FeedbackDomainInterface
 
 public protocol PrincipleReviewCoordinator: Coordinator {
     
+    func pushToTradeFeedback(stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData)
     func popToProv()
 }
