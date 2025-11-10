@@ -19,6 +19,7 @@ public struct HomeFeature {
         public var lastRetrospectionComapnyName: String? = nil
         public var selectedCompanyName: String?
         public var isBadgePopupPresented: Bool = false
+        public var isLoadingRetrospections: Bool = false
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -106,6 +107,7 @@ extension HomeFeature {
             state.lastRetrospectionComapnyName = UserDefaults.standard.string(forKey: "companyName")
             UserDefaults.standard.removeObject(forKey: "companyName")
             
+            state.isLoadingRetrospections = true
             return .send(.async(.fetchRetrospections))
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
@@ -145,10 +147,12 @@ extension HomeFeature {
                 updateGroupedRetrospections(for: selectedSymbol, state: &state)
             }
             
+            state.isLoadingRetrospections = false
             return .none
             
         case .failure(let error):
             print("Failed to fetch retrospections: \(error)")
+            state.isLoadingRetrospections = false
             return .send(.delegate(.finish))
         }
     }
