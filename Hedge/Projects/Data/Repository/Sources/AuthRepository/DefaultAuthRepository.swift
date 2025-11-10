@@ -56,6 +56,11 @@ public final class DefaultAuthRepository: AuthRepository {
     
     public func withdraw(_ code: String?) async throws {
         let request = AuthCodeRequestDTO(authCode: code)
-        return try await authDataSource.withdraw(request)
+        try await authDataSource.withdraw(request)
+        tokenDataSource.clear()
+    }
+    
+    public func logOut() {
+        tokenDataSource.clear()
     }
 }

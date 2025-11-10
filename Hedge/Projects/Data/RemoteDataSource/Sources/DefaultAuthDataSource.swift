@@ -37,7 +37,7 @@ enum AuthTarget {
 
 extension AuthTarget: TargetType {
     var baseURL: String {
-        return Configuration.baseURL + "/api/v1/auth"
+        return Configuration.baseURL + "/api/v1"
     }
     
     var header: Alamofire.HTTPHeaders {
@@ -45,15 +45,20 @@ extension AuthTarget: TargetType {
     }
     
     var method: Alamofire.HTTPMethod {
-        return .post
+        switch self {
+        case .social:
+            .post
+        case .withdraw:
+            .delete
+        }
     }
     
     var path: String {
         switch self {
         case .social:
-            "/social-login"
+            "/auth/social-login"
         case .withdraw:
-            ""
+            "/user"
         }
     }
     
@@ -62,7 +67,7 @@ extension AuthTarget: TargetType {
         case .social(let request):
             return .body(request)
         case .withdraw(let request):
-            return .body(request)
+            return .query(request)
         }
     }
     

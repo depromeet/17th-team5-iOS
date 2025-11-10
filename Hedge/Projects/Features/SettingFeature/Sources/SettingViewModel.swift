@@ -22,6 +22,21 @@ public final class SettingViewModel: ObservableObject {
 }
 
 extension SettingViewModel {
+    func popToPrev() {
+        coordinator?.finish()
+    }
+    
+    func withdrawTapped() {
+        Task {
+            try await withdraw()
+        }
+    }
+    
+    func logOutTapped() {
+        authRepository.logOut()
+        coordinator?.signOut()
+    }
+    
     private func withdraw() async throws {
         let type = authRepository.fetchSocialProvider()
         
@@ -34,6 +49,7 @@ extension SettingViewModel {
                 let authCode = try await handler.revokeAppleAccount()
                 print("authCode: \(authCode)")
                 try await authRepository.withdraw(authCode)
+                coordinator?.signOut()
                 
             } catch {
                 print("Apple 회원탈퇴 실패: \(error.localizedDescription)")

@@ -16,6 +16,8 @@ import SettingFeatureInterface
 public final class DefaultSettingCoordinator: SettingCoordinator {
     public var navigationController: UINavigationController
     
+    public var parentCoordinator: (any RootCoordinator)?
+    
     public var childCoordinators: [any Core.Coordinator] = []
     
     public var finishDelegate: (any Core.CoordinatorFinishDelegate)?
@@ -35,5 +37,11 @@ public final class DefaultSettingCoordinator: SettingCoordinator {
         let hostingViewController = UIHostingController(rootView: view)
         
         self.navigationController.pushViewController(hostingViewController, animated: true)
+    }
+    
+    public func signOut() {
+        DispatchQueue.main.async {
+            self.parentCoordinator?.signOut()
+        }
     }
 }

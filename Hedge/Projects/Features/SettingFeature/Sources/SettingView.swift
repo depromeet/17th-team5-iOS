@@ -35,7 +35,7 @@ extension SettingView {
     private var backButtonView: some View {
         HStack(alignment: .center) {
             Button {
-                
+                viewModel.popToPrev()
             } label: {
                 HedgeUI.arrowLeftThick
                     .resizable()
@@ -119,7 +119,7 @@ extension SettingView {
             
             VStack(alignment: .leading, spacing: 16) {
                 Button {
-                    
+                    viewModel.logOutTapped()
                 } label: {
                     HStack {
                         Text("로그아웃")
@@ -134,7 +134,7 @@ extension SettingView {
                     }
                 }
                 Button {
-                    
+                    viewModel.withdrawTapped()
                 } label: {
                     HStack {
                         Text("회원탈퇴")
