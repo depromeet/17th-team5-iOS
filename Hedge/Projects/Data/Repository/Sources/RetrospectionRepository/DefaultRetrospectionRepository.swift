@@ -45,4 +45,14 @@ public struct DefaultRetrospectionRepository: RetrospectionRepository {
         )
         return response.data.toDomain()
     }
+    
+    public func createRetrospection(_ request: RetrospectionCreateRequest) async throws -> RetrospectionCreateResult {
+        let dto = RetrospectionCreateRequestDTO(request)
+        do {
+            let response = try await dataSource.createRetrospection(dto)
+            return response.data.toDomain()
+        } catch {
+            throw error
+        }
+    }
 }

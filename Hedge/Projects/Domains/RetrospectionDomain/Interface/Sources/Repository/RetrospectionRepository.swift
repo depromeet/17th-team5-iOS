@@ -16,4 +16,5 @@ public protocol RetrospectionRepository {
         fileName: String,
         mimeType: String
     ) async throws -> UploadedImage
+    func createRetrospection(_ request: RetrospectionCreateRequest) async throws -> RetrospectionCreateResult
 }

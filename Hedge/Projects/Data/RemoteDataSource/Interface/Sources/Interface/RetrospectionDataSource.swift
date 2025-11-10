@@ -16,5 +16,6 @@ public protocol RetrospectionDataSource {
         fileName: String,
         mimeType: String
     ) async throws -> UploadImageResponseDTO
+    func createRetrospection(_ request: RetrospectionCreateRequestDTO) async throws -> RetrospectionCreateResponseDTO
 }
 

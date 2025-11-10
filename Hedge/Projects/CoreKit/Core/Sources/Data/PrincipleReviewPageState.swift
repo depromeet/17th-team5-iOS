@@ -94,6 +94,7 @@ public struct PrincipleReviewPageState: Equatable {
     public var principleDetailShown: Bool
     public var text: String
     public var linkMetadataList: [LinkMetadata]
+    public var linkSources: [String]
     public var selectedPhotoItems: [PhotosPickerItem]
     public var loadedImages: [Image]
     public var imageDatas: [Data]
@@ -104,6 +105,7 @@ public struct PrincipleReviewPageState: Equatable {
         principleDetailShown: Bool = false,
         text: String = "",
         linkMetadataList: [LinkMetadata] = [],
+        linkSources: [String] = [],
         selectedPhotoItems: [PhotosPickerItem] = [],
         loadedImages: [Image] = [],
         imageDatas: [Data] = [],
@@ -113,6 +115,7 @@ public struct PrincipleReviewPageState: Equatable {
         self.principleDetailShown = principleDetailShown
         self.text = text
         self.linkMetadataList = linkMetadataList
+        self.linkSources = linkSources
         self.selectedPhotoItems = selectedPhotoItems
         self.loadedImages = loadedImages
         self.imageDatas = imageDatas

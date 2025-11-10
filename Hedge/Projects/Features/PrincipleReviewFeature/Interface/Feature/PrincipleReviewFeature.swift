@@ -18,13 +18,16 @@ import RetrospectionDomainInterface
 public struct PrincipleReviewFeature {
     private let fetchLinkUseCase: FetchLinkUseCase
     private let uploadImageUseCase: UploadRetrospectionImageUseCase
+    private let createRetrospectionUseCase: CreateRetrospectionUseCase
     
     public init(
         fetchLinkUseCase: FetchLinkUseCase,
-        uploadImageUseCase: UploadRetrospectionImageUseCase
+        uploadImageUseCase: UploadRetrospectionImageUseCase,
+        createRetrospectionUseCase: CreateRetrospectionUseCase
     ) {
         self.fetchLinkUseCase = fetchLinkUseCase
         self.uploadImageUseCase = uploadImageUseCase
+        self.createRetrospectionUseCase = createRetrospectionUseCase
     }
     
     @ObservableState
@@ -40,6 +43,8 @@ public struct PrincipleReviewFeature {
         public var addLink: String = ""
         public var currentPageIndex: Int = 0
         public var uploadedImagesPerPage: [[UploadedImage]] = []
+        public var isSubmitting: Bool = false
+        public var submissionResult: RetrospectionCreateResult?
         
         public var totalIndex: Int {
             principles.count
@@ -133,11 +138,15 @@ public struct PrincipleReviewFeature {
         case linkDismiss
         case uploadImagesSuccess([[UploadedImage]])
         case uploadImagesFailure(Error)
+        case resetUploadedImages(pageIndex: Int)
+        case createRetrospectionSuccess(RetrospectionCreateResult)
+        case createRetrospectionFailure(Error)
     }
     public enum AsyncAction {
         case loadImagesFromPhotos([PhotosPickerItem])
         case fetchLinkMetadata(String)
         case uploadImages([(Int, [Data])], total: Int)
+        case createRetrospection(RetrospectionCreateRequest)
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -151,6 +160,129 @@ public struct PrincipleReviewFeature {
         BindingReducer()
         
         Reduce(reducerCore)
+    }
+}
+
+private func buildCreateRequest(state: PrincipleReviewFeature.State) -> RetrospectionCreateRequest? {
+    let symbol = state.stock.code
+    let market = state.stock.market //"NASDAQ"
+    let orderType = state.tradeType.toRequest
+    let price = parseInteger(from: state.tradeHistory.tradingPrice)
+    let volume = parseInteger(from: state.tradeHistory.tradingQuantity)
+    let currency = state.tradeHistory.concurrency.isEmpty ? "KRW" : state.tradeHistory.concurrency
+    guard let orderDate = normalizeDateString(state.tradeHistory.tradingDate) else { return nil }
+    let returnRate = parseDouble(from: state.tradeHistory.yield)
+    
+    guard !state.principles.isEmpty, !state.pageStates.isEmpty else {
+        return nil
+    }
+    
+    let pageCount = state.pageStates.count
+    let imageResults = state.uploadedImagesPerPage.count == pageCount
+    ? state.uploadedImagesPerPage
+    : Array(repeating: [UploadedImage](), count: pageCount)
+    
+    var checks: [RetrospectionPrincipleCheckRequest] = []
+    
+    for index in 0..<min(state.principles.count, state.pageStates.count) {
+        let principle = state.principles[index]
+        let pageState = state.pageStates[index]
+        
+        guard let evaluation = pageState.selectedEvaluation else { continue }
+        
+        let status = evaluation.toRetrospectionStatus()
+        let reason = pageState.text
+        let imageIds = index < imageResults.count ? imageResults[index].map { $0.imageId } : []
+        let linksSource = !pageState.linkSources.isEmpty
+        ? pageState.linkSources
+        : pageState.linkMetadataList.map { $0.newsSource }
+        let links = linksSource
+        
+        let check = RetrospectionPrincipleCheckRequest(
+            principleId: principle.id,
+            status: status,
+            reason: reason,
+            imageIds: imageIds,
+            links: links
+        )
+        checks.append(check)
+    }
+    
+    guard !checks.isEmpty else { return nil }
+    
+    return RetrospectionCreateRequest(
+        symbol: symbol,
+        market: market,
+        orderType: orderType,
+        price: price,
+        currency: currency,
+        volume: volume,
+        orderDate: orderDate,
+        returnRate: returnRate,
+        principleChecks: checks
+    )
+}
+
+private func parseInteger(from string: String) -> Int {
+    let filtered = string.filter { "0123456789".contains($0) }
+    return Int(filtered) ?? 0
+}
+
+private func parseDouble(from string: String?) -> Double? {
+    guard let string = string else { return nil }
+    let trimmed = string
+        .replacingOccurrences(of: "%", with: "")
+        .replacingOccurrences(of: ",", with: "")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    return Double(trimmed)
+}
+
+private func normalizeDateString(_ string: String) -> String? {
+    let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+    
+    let sanitized = trimmed.replacingOccurrences(of: ".", with: "-")
+        .replacingOccurrences(of: "/", with: "-")
+    
+    let inputPatterns = ["yyyy-MM-dd", "yyyyMMdd"]
+    let outputFormatter = DateFormatter()
+    outputFormatter.dateFormat = "yyyy-MM-dd"
+    outputFormatter.locale = Locale(identifier: "en_US_POSIX")
+    outputFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+    
+    let inputFormatter = DateFormatter()
+    inputFormatter.locale = Locale(identifier: "en_US_POSIX")
+    inputFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+    
+    for pattern in inputPatterns {
+        inputFormatter.dateFormat = pattern
+        if let date = inputFormatter.date(from: sanitized) {
+            return outputFormatter.string(from: date)
+        }
+    }
+    
+    // 직접 숫자만 남아있고 길이가 8인 경우 수동 포맷
+    let digits = sanitized.filter { $0.isNumber }
+    if digits.count == 8 {
+        let year = digits.prefix(4)
+        let month = digits.dropFirst(4).prefix(2)
+        let day = digits.suffix(2)
+        return "\(year)-\(month)-\(day)"
+    }
+    
+    return nil
+}
+
+private extension PrincipleEvaluation {
+    func toRetrospectionStatus() -> RetrospectionPrincipleStatus {
+        switch self {
+        case .keep:
+            return .kept
+        case .normal:
+            return .neutral
+        case .notKeep:
+            return .notKept
+        }
     }
 }
 
@@ -207,14 +339,24 @@ extension PrincipleReviewFeature {
             state.linkModalShown = true
             return .none
         case .completeButtonTapped:
+            state.isSubmitting = true
+            state.submissionResult = nil
+            state.uploadedImagesPerPage = Array(repeating: [], count: state.pageStates.count)
+            
             let uploadTargets = state.pageStates.enumerated().compactMap { index, page -> (Int, [Data])? in
                 guard !page.imageDatas.isEmpty else { return nil }
                 return (index, page.imageDatas)
             }
-            guard !uploadTargets.isEmpty else {
-                return .none
+            
+            if uploadTargets.isEmpty {
+                guard let request = buildCreateRequest(state: state) else {
+                    state.isSubmitting = false
+                    return .none
+                }
+                return .send(.async(.createRetrospection(request)))
+            } else {
+                return .send(.async(.uploadImages(uploadTargets, total: state.pageStates.count)))
             }
-            return .send(.async(.uploadImages(uploadTargets, total: state.pageStates.count)))
         case .loadPhotos:
             // selectedPhotoItems를 photoItems로 동기화
             state.currentPageState.photoItems = state.currentPageState.selectedPhotoItems.map { PhotoItem(photosPickerItem: $0) }
@@ -234,12 +376,18 @@ extension PrincipleReviewFeature {
                     state.currentPageState.imageDatas.remove(at: index)
                 }
             }
+            if state.currentPageIndex < state.uploadedImagesPerPage.count {
+                state.uploadedImagesPerPage[state.currentPageIndex] = []
+            }
             return .none
         case .addLinkButtonTapped(let link):
             return .send(.delegate(.addLink(link)))
         case .deleteLink(let index):
             if index < state.currentPageState.linkMetadataList.count {
                 state.currentPageState.linkMetadataList.remove(at: index)
+            }
+            if index < state.currentPageState.linkSources.count {
+                state.currentPageState.linkSources.remove(at: index)
             }
             return .none
         case .pageChanged(let newIndex):
@@ -258,11 +406,28 @@ extension PrincipleReviewFeature {
             state.linkModalShown = false
             return .none
         case .uploadImagesSuccess(let perPage):
-            dump(perPage)
             state.uploadedImagesPerPage = perPage
-            return .none
+            guard let request = buildCreateRequest(state: state) else {
+                state.isSubmitting = false
+                return .none
+            }
+            return .send(.async(.createRetrospection(request)))
         case .uploadImagesFailure(let error):
             Log.error("Failed to upload images: \(error)")
+            state.isSubmitting = false
+            return .none
+        case .resetUploadedImages(let pageIndex):
+            if pageIndex < state.uploadedImagesPerPage.count {
+                state.uploadedImagesPerPage[pageIndex] = []
+            }
+            return .none
+        case .createRetrospectionSuccess(let result):
+            state.isSubmitting = false
+            state.submissionResult = result
+            return .none
+        case .createRetrospectionFailure(let error):
+            state.isSubmitting = false
+            Log.error("Failed to create retrospection: \(error)")
             return .none
         }
     }
@@ -274,6 +439,7 @@ extension PrincipleReviewFeature {
     ) -> Effect<Action> {
         switch action {
         case .loadImagesFromPhotos(let photoItems):
+            let pageIndex = state.currentPageIndex
             return .run { send in
                 var images: [Image] = []
                 var datas: [Data] = []
@@ -301,13 +467,16 @@ extension PrincipleReviewFeature {
                 await send(.binding(.set(\.currentPageState.loadedImages, images)))
                 await send(.binding(.set(\.currentPageState.imageDatas, datas)))
                 await send(.binding(.set(\.currentPageState.photoItems, updatedPhotoItems)))
+                await send(.inner(.resetUploadedImages(pageIndex: pageIndex)))
             }
             
         case .fetchLinkMetadata(let urlString):
-            return .run { [linkMetadataList = state.currentPageState.linkMetadataList] send in
+            return .run { [linkMetadataList = state.currentPageState.linkMetadataList,
+                           linkSources = state.currentPageState.linkSources] send in
                 do {
                     let metadata = try await fetchLinkUseCase.execute(urlString: urlString)
                     await send(.binding(.set(\.currentPageState.linkMetadataList, linkMetadataList + [metadata])))
+                    await send(.binding(.set(\.currentPageState.linkSources, linkSources + [urlString])))
                 } catch {
                     // 에러 처리는 필요에 따라 추가
                     print("Failed to fetch link metadata: \(error)")
@@ -336,6 +505,15 @@ extension PrincipleReviewFeature {
                     await send(.inner(.uploadImagesSuccess(perPageResults)))
                 } catch {
                     await send(.inner(.uploadImagesFailure(error)))
+                }
+            }
+        case .createRetrospection(let request):
+            return .run { [createRetrospectionUseCase] send in
+                do {
+                    let result = try await createRetrospectionUseCase.execute(request)
+                    await send(.inner(.createRetrospectionSuccess(result)))
+                } catch {
+                    await send(.inner(.createRetrospectionFailure(error)))
                 }
             }
         }

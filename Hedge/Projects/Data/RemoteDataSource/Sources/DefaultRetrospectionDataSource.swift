@@ -40,11 +40,16 @@ public struct DefaultRetrospectionDataSource: RetrospectionDataSource {
             )
         }
     }
+    
+    public func createRetrospection(_ request: RetrospectionCreateRequestDTO) async throws -> RetrospectionCreateResponseDTO {
+        try await provider.request(RetrospectionTarget.create(request))
+    }
 }
 
 enum RetrospectionTarget {
     case fetch
     case upload(domain: String)
+    case create(RetrospectionCreateRequestDTO)
 }
 
 extension RetrospectionTarget: TargetType {
@@ -54,6 +59,8 @@ extension RetrospectionTarget: TargetType {
             return Configuration.baseURL + "/api/v1/retrospections"
         case .upload(let domain):
             return Configuration.baseURL + "/api/v1/\(domain)"
+        case .create:
+            return Configuration.baseURL + "/api/v1/retrospections"
         }
     }
     
@@ -67,6 +74,8 @@ extension RetrospectionTarget: TargetType {
             return .get
         case .upload:
             return .post
+        case .create:
+            return .post
         }
     }
     
@@ -76,6 +85,8 @@ extension RetrospectionTarget: TargetType {
             return ""
         case .upload:
             return "/images/upload"
+        case .create:
+            return ""
         }
     }
     
@@ -85,6 +96,8 @@ extension RetrospectionTarget: TargetType {
             return nil
         case .upload:
             return nil
+        case .create(let request):
+            return .body(request)
         }
     }
     
@@ -93,6 +106,8 @@ extension RetrospectionTarget: TargetType {
         case .fetch:
             return makeEncoder(contentType: .json)
         case .upload:
+            return makeEncoder(contentType: .json)
+        case .create:
             return makeEncoder(contentType: .json)
         }
     }

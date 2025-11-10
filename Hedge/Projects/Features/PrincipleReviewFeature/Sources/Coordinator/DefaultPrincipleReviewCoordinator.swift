@@ -53,7 +53,8 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
                     reducer: {
                         PrincipleReviewFeature(
                             fetchLinkUseCase: DIContainer.resolve(FetchLinkUseCase.self),
-                            uploadImageUseCase: DIContainer.resolve(UploadRetrospectionImageUseCase.self)
+                            uploadImageUseCase: DIContainer.resolve(UploadRetrospectionImageUseCase.self),
+                            createRetrospectionUseCase: DIContainer.resolve(CreateRetrospectionUseCase.self)
                         )
                     }
                 )
