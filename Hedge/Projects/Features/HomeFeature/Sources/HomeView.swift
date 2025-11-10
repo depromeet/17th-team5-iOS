@@ -70,6 +70,9 @@ extension HomeView {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
+        .onTapGesture {
+            send(.pushToSetting)
+        }
     }
     
     private var tabArea: some View {

@@ -24,9 +24,10 @@ import TradeFeedbackFeature
 import TradeFeedbackFeatureInterface
 import PrinciplesDomainInterface
 import PrincipleReviewFeature
+import SettingFeature
+import SettingFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
-    
     public var navigationController: UINavigationController
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public var type: Core.CoordinatorType = .root
@@ -143,6 +144,21 @@ extension DefaultRootCoordinator {
     
     public func popToHome(selectingStock stockSymbol: String) {
         
+    }
+    
+    public func pushToSetting() {
+        let settingCoordinator = DefaultSettingCoordinator(navigationController: navigationController)
+        settingCoordinator.finishDelegate = self
+        settingCoordinator.parentCoordinator = self
+        
+        childCoordinators.append(settingCoordinator)
+        
+        settingCoordinator.start()
+    }
+    
+    public func signOut() {
+        self.childCoordinators.removeAll()
+        self.finish()
     }
 }
 

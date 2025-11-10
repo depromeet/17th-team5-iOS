@@ -8,4 +8,6 @@
 
 import Core
 
-public protocol SettingCoordinator: Coordinator {}
+public protocol SettingCoordinator: Coordinator {
+    func signOut()
+}

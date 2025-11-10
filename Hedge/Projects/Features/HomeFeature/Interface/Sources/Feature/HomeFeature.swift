@@ -52,6 +52,7 @@ public struct HomeFeature {
         case retrospectTapped(TradeType)
         case homeTabTapped
         case principleTabTapped
+        case pushToSetting
         
         case badgePopupTapped(Bool)
     }
@@ -68,6 +69,7 @@ public struct HomeFeature {
     public enum ScopeAction { }
     public enum DelegateAction {
         case pushToStockSearch(TradeType)
+        case pushToSetting
         case finish
     }
     
@@ -133,6 +135,11 @@ extension HomeFeature {
         case .badgePopupTapped(let isPresented):
             state.isBadgePopupPresented = isPresented
             return .none
+            
+        case .pushToSetting:
+            return .run { send in
+                await send(.delegate(.pushToSetting))
+            }
         }
     }
     
@@ -215,6 +222,8 @@ extension HomeFeature {
         case .pushToStockSearch(let tradeType):
             // 여기서는 단순히 .none을 반환
             // 실제 처리는 TabBarFeature에서 담당
+            return .none
+        case .pushToSetting:
             return .none
         case .finish:
             return .none

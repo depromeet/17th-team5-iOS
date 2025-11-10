@@ -18,5 +18,6 @@ public protocol AuthRepository {
     
     func isAuthorized() -> Bool
     func withdraw(_ authCode: String?) async throws
+    func logOut()
     func fetchSocialProvider() -> SocialProvider
 }

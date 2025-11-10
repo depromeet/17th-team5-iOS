@@ -133,6 +133,9 @@ extension TabBarFeature {
         case .homeAction(.delegate(.pushToStockSearch(let tradeType))):
             coordinator.pushToStockSearch(with: tradeType)
             return .none
+        case .homeAction(.delegate(.pushToSetting)):
+            coordinator.pushToSetting()
+            return .none
         case .homeAction(.delegate(.finish)):
             coordinator.finish()
             return .none
