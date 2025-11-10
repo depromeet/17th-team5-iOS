@@ -147,31 +147,44 @@ extension HomeView {
                         Spacer()
                     }
                     
-                    HStack(alignment: .center, spacing: 20) {
+                    HStack(alignment: .center) {
                         badge(image: HedgeUI.emerald, count: 0)
+                        
+                        Spacer()
                         
                         RoundedRectangle(cornerRadius: 2)
                             .frame(width: 1)
                             .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
                             .padding(.vertical, 6)
+                        
+                        Spacer()
                         
                         badge(image: HedgeUI.gold, count: 0)
                         
+                        Spacer()
+                        
                         RoundedRectangle(cornerRadius: 2)
                             .frame(width: 1)
                             .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
                             .padding(.vertical, 6)
+                        
+                        Spacer()
                         
                         badge(image: HedgeUI.silver, count: 0)
                         
+                        Spacer()
+                        
                         RoundedRectangle(cornerRadius: 2)
                             .frame(width: 1)
                             .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
                             .padding(.vertical, 6)
+                        
+                        Spacer()
                         
                         badge(image: HedgeUI.bronze, count: 0)
                     }
                     .padding(.vertical, 20)
+                    .padding(.horizontal, 32)
                     
                     Spacer()
                 }
