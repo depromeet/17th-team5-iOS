@@ -32,7 +32,7 @@ public struct PrincipleResponseDTO: Decodable {
     public let principleType: String
     public let principle: String
     public let description: String
-    public let displayOrder: Int
+    public let displayOrder: Int?
 }
 
 extension PrincipleGroupResponseDTO {
