@@ -12,4 +12,8 @@ public enum SocialProvider: String {
     case apple = "APPLE"
     case google = "GOOGLE"
     case kakao = "KAKAO"
+    
+    public init(from value: String?) {
+        self = .init(rawValue: value ?? "") ?? .kakao
+    }
 }
