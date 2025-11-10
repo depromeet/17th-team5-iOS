@@ -16,6 +16,7 @@ public struct HomeFeature {
     public struct State: Equatable {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
+        public var lastRetrospectionComapnyName: String? = nil
         public var selectedCompanyName: String?
         public var isBadgePopupPresented: Bool = false
         
@@ -101,6 +102,10 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
+            // TODO: 나중에 UseCase로 뺴기
+            state.lastRetrospectionComapnyName = UserDefaults.standard.string(forKey: "companyName")
+            UserDefaults.standard.removeObject(forKey: "companyName")
+            
             return .send(.async(.fetchRetrospections))
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
@@ -129,7 +134,12 @@ extension HomeFeature {
         switch action {
         case .fetchRetrospectionsSuccess(let companies):
             state.retrospectionCompanies = companies
-            state.selectedCompanyName = companies.first?.companyName
+            
+            if let lastRetrospectionComapnyName = state.lastRetrospectionComapnyName {
+                state.selectedCompanyName = lastRetrospectionComapnyName
+            } else {
+                state.selectedCompanyName = companies.first?.companyName
+            }
             
             if let selectedSymbol = state.selectedCompanyName {
                 updateGroupedRetrospections(for: selectedSymbol, state: &state)

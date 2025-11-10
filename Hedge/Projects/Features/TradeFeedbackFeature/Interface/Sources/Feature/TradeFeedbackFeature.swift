@@ -19,26 +19,27 @@ import FeedbackDomainInterface
 @Reducer
 public struct TradeFeedbackFeature {
     private let coordinator: TradeFeedbackCoordinator
-    private let fetchFeedbackUseCase: FetchFeedbackUseCase
     
     public init(
-        coordinator: TradeFeedbackCoordinator,
-        fetchFeedbackUseCase: FetchFeedbackUseCase
+        coordinator: TradeFeedbackCoordinator
     ) {
         self.coordinator = coordinator
-        self.fetchFeedbackUseCase = fetchFeedbackUseCase
     }
     
     @ObservableState
     public struct State: Equatable {
+        public var tradeType: TradeType
         public var stock: StockSearch
         public var tradeHistory: TradeHistory
         public var feedback: FeedbackData
+        public var badgeGrade: BadgeGrade
         
-        public init(stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+            self.tradeType = tradeType
             self.stock = stock
             self.tradeHistory = tradeHistory
             self.feedback = feedback
+            self.badgeGrade = BadgeGrade(rawValue: feedback.badge) ?? .bronze
         }
     }
     
@@ -62,7 +63,6 @@ public struct TradeFeedbackFeature {
         case fetchFeedbackFailure(Error)
     }
     public enum AsyncAction {
-        case fetchFeedback(Int)
     }
     public enum ScopeAction { }
     public enum DelegateAction { }
@@ -117,8 +117,9 @@ extension TradeFeedbackFeature {
             return .none
             
         case .completeButtonTapped:
-            // Navigate back to home and select the stock symbol
-            // coordinator.popToHome(selectingStock: state.tradeData.stockSymbol)
+            //companyName: state.stock.companyName
+            UserDefaults.standard.set(state.stock.companyName, forKey: "companyName")
+            coordinator.popToHome()
             return .none
         }
     }
@@ -168,15 +169,6 @@ extension TradeFeedbackFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-        case .fetchFeedback(let id):
-            return .run { send in
-                do {
-                    let response = try await fetchFeedbackUseCase.execute(id: id)
-                    await send(.inner(.fetchFeedbackSuccess(response)))
-                } catch {
-                    await send(.inner(.fetchFeedbackFailure(error)))
-                }
-            }
         }
     }
     

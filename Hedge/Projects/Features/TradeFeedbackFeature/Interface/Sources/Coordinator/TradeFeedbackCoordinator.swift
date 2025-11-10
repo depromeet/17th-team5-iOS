@@ -12,5 +12,5 @@ import Core
 
 public protocol TradeFeedbackCoordinator: Coordinator {
     func popToPrev()
-    func popToHome(selectingStock stockSymbol: String)
+    func popToHome()
 }

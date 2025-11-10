@@ -67,8 +67,8 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
         navigationController.pushViewController(principleReviewViewController, animated: true)
     }
     
-    public func pushToTradeFeedback(stock: StockSearch, tradeHistory: Core.TradeHistory, feedback: FeedbackData) {
-        parentCoordinator?.pushToFeedback(stock: stock, tradeHistory: tradeHistory, feedback: feedback)
+    public func pushToTradeFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+        parentCoordinator?.pushToFeedback(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, feedback: feedback)
     }
     
     public func popToProv() {

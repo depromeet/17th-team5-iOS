@@ -14,6 +14,6 @@ import FeedbackDomainInterface
 
 public protocol PrincipleReviewCoordinator: Coordinator {
     
-    func pushToTradeFeedback(stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData)
+    func pushToTradeFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData)
     func popToProv()
 }

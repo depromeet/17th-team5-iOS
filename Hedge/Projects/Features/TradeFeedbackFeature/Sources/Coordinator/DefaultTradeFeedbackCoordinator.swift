@@ -14,6 +14,7 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     public weak var parentCoordinator: RootCoordinator?
     public weak var finishDelegate: CoordinatorFinishDelegate?
     
+    public let tradeType: TradeType
     public let feedback: FeedbackData
     public let stock: StockSearch
     public let tradeHistory: TradeHistory
@@ -21,11 +22,13 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     
     public init(
         navigationController: UINavigationController,
+        tradeType: TradeType,
         stock: StockSearch,
         tradeHistory: TradeHistory,
         feedback: FeedbackData
     ) {
         self.navigationController = navigationController
+        self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
         self.feedback = feedback
@@ -36,14 +39,14 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
             rootView: TradeFeedbackResultView(
                 store: .init(
                     initialState: TradeFeedbackFeature.State(
+                        tradeType: tradeType,
                         stock: stock,
                         tradeHistory: tradeHistory,
                         feedback: feedback
                     ),
                     reducer: {
                         TradeFeedbackFeature(
-                            coordinator: self,
-                            fetchFeedbackUseCase: fetchFeedbackUseCase
+                            coordinator: self
                         )
                     }
                 )
@@ -57,11 +60,7 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
         finish()
     }
     
-    public func popToHome(selectingStock stockSymbol: String) {
-        if let rootCoordinator = parentCoordinator {
-            rootCoordinator.popToHome(selectingStock: stockSymbol)
-        } else {
-            finish()
-        }
+    public func popToHome() {
+        parentCoordinator?.popToHome()
     }
 }

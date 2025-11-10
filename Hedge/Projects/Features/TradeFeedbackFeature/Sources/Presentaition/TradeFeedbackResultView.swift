@@ -11,20 +11,7 @@ import Core
 import Shared
 import FeedbackDomainInterface
 import PrinciplesDomainInterface
-
-
-// MARK: Badge Enum:
-enum BadgeGrade { case emerald, gold, silver, bronze }
-
-extension TradeData {
-    var grade: BadgeGrade {
-        // Badge grade logic based on yield
-        // Implementation pending based on business requirements
-        switch yield {
-        default: return .silver
-        }
-    }
-}
+import Kingfisher
 
 // MARK: - Figma-style color wash (two ellipses)
 // Note: Using Color(hex:) from DesignKit module
@@ -95,7 +82,6 @@ private struct HedgeCard<Content: View>: View {
     init(@ViewBuilder content: () -> Content) { self.content = content() }
     var body: some View {
         VStack(alignment: .leading, spacing: 0) { content }
-            .padding(.vertical, 18)
             .padding(.horizontal, 18)
             .frame(maxWidth: .infinity)
             .background(Color.hedgeUI.backgroundWhite)
@@ -108,42 +94,15 @@ private struct HedgeCard<Content: View>: View {
 struct TradeFeedbackResultView: View {
     @Bindable public var store: StoreOf<TradeFeedbackFeature>
     
-    private var badgeImage: Image {
-        // let grade: BadgeGrade = store.tradeData.grade
-        // switch grade {
-        // case .emerald: return Image.hedgeUI.emerald
-        // case .gold:    return Image.hedgeUI.gold
-        // case .silver:  return Image.hedgeUI.silver
-        // case .bronze:  return Image.hedgeUI.bronze
-        // }
-        Image.hedgeUI.bronze
-    }
-    
-    // MARK: - Hero text from data
-    private var heroTitle: String {
-        // This should be tied to the badge grade
-        // let grade: BadgeGrade = store.tradeData.grade
-        // switch grade {
-        // case .emerald: return "완벽한 매매"
-        // case .gold:    return "훌륭한 매매"
-        // case .silver:  return "아쉬운 매매"
-        // case .bronze:  return "아쉬운 매매"
-        // }
-        return "test123"
-    }
-    
-    private var heroSubtitle: String {
-        store.feedback.badge
-    }
-    
-    
     var body: some View {
         ZStack(alignment: .top) {
             // 1) Neutral base
             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
+            
             TopWhiteOverlay(height: 300)
                 .frame(maxWidth: .infinity, alignment: .top)
                 .ignoresSafeArea(edges: .top)
+            
             BackgroundWash()
             
             // 2) Scrollable content
@@ -165,14 +124,19 @@ struct TradeFeedbackResultView: View {
                 .padding(.vertical, 20)
             }
             
-            // 3) Navigation bar overlaid on top
-            HedgeNavigationBar(
-                buttonText: "완료",
-                color: .primary,
-                onLeftButtonTap: { store.send(.view(.backButtonTapped)) },
-                onRightButtonTap: { store.send(.view(.completeButtonTapped)) }
-            )
-            // .background(.ultraThinMaterial.opacity(0.3))
+            HStack {
+                Spacer()
+                
+                Button {
+                    store.send(.view(.completeButtonTapped))
+                } label: {
+                    Text("완료")
+                        .font(FontModel.body1Semibold)
+                        .foregroundStyle(Color.hedgeUI.brandDarken)
+                        .padding(4)
+                }
+            }
+            .padding(.horizontal, 16)
         }
         .onAppear { store.send(.view(.onAppear)) }
     }
@@ -181,19 +145,19 @@ struct TradeFeedbackResultView: View {
     private var heroSection: some View {
         VStack(spacing: 5) {
             ZStack {
-                badgeImage
+                store.state.badgeGrade.image
                     .renderingMode(.original)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 111, height: 130)
             }
             VStack(spacing: 5) {
-                Text(heroTitle)
+                Text(store.state.badgeGrade.title)
                     .font(FontModel.h1Semibold)
                     .foregroundStyle(titleGradient)
                     .multilineTextAlignment(.center)
                     .frame(height: 30)
-                Text(heroSubtitle)
+                Text(store.state.badgeGrade.content)
                     .font(FontModel.label1Medium)
                     .foregroundColor(Color.hedgeUI.textSecondary)
                     .multilineTextAlignment(.center)
@@ -206,26 +170,47 @@ struct TradeFeedbackResultView: View {
     private var tradeDetailsCard: some View {
         HedgeCard {
             VStack(spacing: 16) {
-                HStack(spacing: 8) {
-                    Circle().fill(Color.blue).frame(width: 28, height: 28)
-                        .overlay(Text(store.feedback.symbol.prefix(1)).font(.system(size: 12, weight: .bold)).foregroundColor(.white))
+                HStack(spacing: 12) {
+                    if let logo = store.state.stock.logo {
+                        KFImage(URL(string: logo)!)
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                    } else {
+                        Image.hedgeUI.stockThumbnailDemo
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                    }
+                    
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(store.feedback.symbol)
+                        Text(store.stock.companyName)
                             .font(FontModel.label2Medium)
                             .foregroundColor(Color.hedgeUI.textAlternative)
-                        Text("\(store.feedback.price)원 • \(store.feedback.volume)주 \(store.feedback.orderType)")
+                        Text("\(store.tradeHistory.tradingPrice) • \(store.tradeHistory.tradingQuantity) \(store.tradeType.rawValue)")
                             .font(FontModel.body2Semibold)
                             .foregroundColor(Color.hedgeUI.textPrimary)
                     }
                     Spacer()
                 }
-                .frame(height: 42)
+                .padding(.top, 16)
+                .padding(.bottom, 10)
                 
-                HStack(spacing: 12) {
-                    countChip(title: "지켰어요", count: store.feedback.keptCount, color: Color.hedgeUI.brandPrimary)
-                    countChip(title: "보통이에요", count: store.feedback.neutralCount, color: Color.hedgeUI.textAlternative)
-                    countChip(title: "안지켰어요", count: store.feedback.notKeptCount, color: Color.hedgeUI.tradeSell)
+                HStack(alignment: .center, spacing: 17.5) {
+                    countChip(image: .hedgeUI.keep, count: store.feedback.keptCount)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .frame(width: 1, height: 32)
+                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    
+                    countChip(image: .hedgeUI.normal, count: store.feedback.neutralCount)
+                    
+                    RoundedRectangle(cornerRadius: 2)
+                        .frame(width: 1, height: 32)
+                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    
+                    countChip(image: .hedgeUI.notKeep, count: store.feedback.notKeptCount)
                 }
+                .padding(.top, 12)
+                .padding(.bottom, 28)
             }
         }
     }
@@ -257,6 +242,7 @@ struct TradeFeedbackResultView: View {
                     }
                 }
             }
+            .padding(.vertical, 18)
         }
     }
     
@@ -276,6 +262,7 @@ struct TradeFeedbackResultView: View {
                     }
                 }
             }
+            .padding(.vertical, 18)
         }
     }
     
@@ -309,6 +296,7 @@ struct TradeFeedbackResultView: View {
                 }
                 .padding(.top, 20)
             }
+            .padding(.vertical, 18)
         }
     }
     
@@ -326,21 +314,17 @@ struct TradeFeedbackResultView: View {
         }
     }
     
-    private func countChip(title: String, count: Int, color: Color) -> some View {
+    private func countChip(image: Image, count: Int) -> some View {
         VStack(spacing: 6) {
-            Text("\(count)")
-                .font(FontModel.h2Semibold)
-                .foregroundStyle(color)
-            Text(title)
-                .font(FontModel.label2Regular)
-                .foregroundColor(Color.hedgeUI.textSecondary)
+            image
+                .resizable()
+                .frame(width: 28, height: 28, alignment: .center)
+                .padding(.horizontal, 0.5)
+            
+            Text("\(count)개")
+                .font(FontModel.label2Semibold)
+                .foregroundStyle(Color.hedgeUI.textSecondary)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.hedgeUI.neutralBgDefault)
-        )
     }
     
     // MARK: - Disclaimer (simple row)
