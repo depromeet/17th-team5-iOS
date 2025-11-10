@@ -15,7 +15,7 @@ public struct Principle: Equatable, Hashable, Codable {
     public let principleType: String
     public let principle: String
     public let description: String
-    public let displayOrder: Int
+    public let displayOrder: Int?
     
     public init(
         id: Int,
@@ -24,7 +24,7 @@ public struct Principle: Equatable, Hashable, Codable {
         principleType: String,
         principle: String,
         description: String,
-        displayOrder: Int
+        displayOrder: Int?
     ) {
         self.id = id
         self.groupId = groupId

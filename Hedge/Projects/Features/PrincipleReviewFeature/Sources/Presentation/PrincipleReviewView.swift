@@ -19,13 +19,39 @@ public struct PrincipleReviewView: View {
     @FocusState private var isFocused: Bool
     @State private var currentPageIndex: Int = 0
     @State private var modalPresented: Bool = true
+    @State private var isAnimating: Bool = false
     
     public init(store: StoreOf<PrincipleReviewFeature>) {
         self.store = store
     }
     
     public var body: some View {
-        
+        ZStack {
+            mainContent
+                .disabled(store.state.isSubmitting)
+            
+            if store.state.isSubmitting {
+                Color.white
+                    .ignoresSafeArea()
+                
+                Circle()
+                    .trim(from: 0.0, to: 0.35)
+                    .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                    .frame(width: 32, height: 32)
+                    .rotationEffect(.degrees(-90))
+                    .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                    .animation(
+                        .linear(duration: 0.8)
+                            .repeatForever(autoreverses: false),
+                        value: isAnimating
+                    )
+                    .onAppear { isAnimating = true }
+                    .onDisappear { isAnimating = false }
+            }
+        }
+    }
+    
+    private var mainContent: some View {
         VStack(spacing: 0) {
             if isFocused == false {
                 navigationBar

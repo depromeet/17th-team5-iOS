@@ -18,6 +18,7 @@ import PrinciplesDomain
 import StockDomainInterface
 import LinkDomainInterface
 import RetrospectionDomainInterface
+import FeedbackDomainInterface
 import Shared
 
 public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator {
@@ -52,9 +53,11 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
                         principleGroup: principleGroup),
                     reducer: {
                         PrincipleReviewFeature(
+                            coordinator: self,
                             fetchLinkUseCase: DIContainer.resolve(FetchLinkUseCase.self),
                             uploadImageUseCase: DIContainer.resolve(UploadRetrospectionImageUseCase.self),
-                            createRetrospectionUseCase: DIContainer.resolve(CreateRetrospectionUseCase.self)
+                            createRetrospectionUseCase: DIContainer.resolve(CreateRetrospectionUseCase.self),
+                            fetchFeedbackUseCase: DIContainer.resolve(FetchFeedbackUseCase.self)
                         )
                     }
                 )
@@ -62,6 +65,10 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
         
         let principleReviewViewController = UIHostingController(rootView: principleReviewView)
         navigationController.pushViewController(principleReviewViewController, animated: true)
+    }
+    
+    public func pushToTradeFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+        parentCoordinator?.pushToFeedback(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, feedback: feedback)
     }
     
     public func popToProv() {

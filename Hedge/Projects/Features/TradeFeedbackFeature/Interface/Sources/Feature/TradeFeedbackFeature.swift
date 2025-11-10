@@ -19,23 +19,27 @@ import FeedbackDomainInterface
 @Reducer
 public struct TradeFeedbackFeature {
     private let coordinator: TradeFeedbackCoordinator
-    private let fetchFeedbackUseCase: FetchFeedbackUseCase
     
     public init(
-        coordinator: TradeFeedbackCoordinator,
-        fetchFeedbackUseCase: FetchFeedbackUseCase
+        coordinator: TradeFeedbackCoordinator
     ) {
         self.coordinator = coordinator
-        self.fetchFeedbackUseCase = fetchFeedbackUseCase
     }
     
     @ObservableState
     public struct State: Equatable {
-        public var tradeData: TradeData
-        public var feedback: Feedback? = nil
+        public var tradeType: TradeType
+        public var stock: StockSearch
+        public var tradeHistory: TradeHistory
+        public var feedback: FeedbackData
+        public var badgeGrade: BadgeGrade
         
-        public init(tradeData: TradeData) {
-            self.tradeData = tradeData
+        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+            self.tradeType = tradeType
+            self.stock = stock
+            self.tradeHistory = tradeHistory
+            self.feedback = feedback
+            self.badgeGrade = BadgeGrade(rawValue: feedback.badge) ?? .bronze
         }
     }
     
@@ -59,7 +63,6 @@ public struct TradeFeedbackFeature {
         case fetchFeedbackFailure(Error)
     }
     public enum AsyncAction {
-        case fetchFeedback(Int)
     }
     public enum ScopeAction { }
     public enum DelegateAction { }
@@ -105,9 +108,7 @@ extension TradeFeedbackFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            Log.debug("\(state.tradeData)")
-            return .send(.async(.fetchFeedback(state.tradeData.id)))
-            
+            return .none
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
@@ -116,8 +117,9 @@ extension TradeFeedbackFeature {
             return .none
             
         case .completeButtonTapped:
-            // Navigate back to home and select the stock symbol
-            coordinator.popToHome(selectingStock: state.tradeData.stockSymbol)
+            //companyName: state.stock.companyName
+            UserDefaults.standard.set(state.stock.companyName, forKey: "companyName")
+            coordinator.popToHome()
             return .none
         }
     }
@@ -130,15 +132,19 @@ extension TradeFeedbackFeature {
         switch action {
         case .fetchFeedbackSuccess(let response):
             Log.debug("\(response)")
-            var principles: [(String, String)] = []
-            response.aiRecommendedPrinciples.forEach { dataArr in
-                if let data = dataArr.first {
-                    let principle = (data.key, data.value)
-                    principles.append(principle)
-                }
-            }
-            
-            state.feedback = Feedback(summary: response.summary, marketStatus: response.marketCondition, principle: principles)
+            state.feedback = FeedbackData(
+                symbol: response.symbol,
+                price: response.price,
+                volume: response.volume,
+                orderType: response.orderType,
+                keptCount: response.keptCount,
+                neutralCount: response.neutralCount,
+                notKeptCount: response.notKeptCount,
+                badge: response.badge,
+                keep: response.keep,
+                fix: response.fix,
+                next: response.next
+            )
             return .none
             
         case .fetchFeedbackFailure(let error):
@@ -163,15 +169,6 @@ extension TradeFeedbackFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-        case .fetchFeedback(let id):
-            return .run { send in
-                do {
-                    let response = try await fetchFeedbackUseCase.execute(id: id)
-                    await send(.inner(.fetchFeedbackSuccess(response)))
-                } catch {
-                    await send(.inner(.fetchFeedbackFailure(error)))
-                }
-            }
         }
     }
     

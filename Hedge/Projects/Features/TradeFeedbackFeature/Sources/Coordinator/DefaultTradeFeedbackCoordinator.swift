@@ -14,26 +14,39 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     public weak var parentCoordinator: RootCoordinator?
     public weak var finishDelegate: CoordinatorFinishDelegate?
     
-    public let tradeData: TradeData
+    public let tradeType: TradeType
+    public let feedback: FeedbackData
+    public let stock: StockSearch
+    public let tradeHistory: TradeHistory
     private let fetchFeedbackUseCase = DIContainer.resolve(FetchFeedbackUseCase.self)
     
     public init(
         navigationController: UINavigationController,
-        tradeData: TradeData
+        tradeType: TradeType,
+        stock: StockSearch,
+        tradeHistory: TradeHistory,
+        feedback: FeedbackData
     ) {
         self.navigationController = navigationController
-        self.tradeData = tradeData
+        self.tradeType = tradeType
+        self.stock = stock
+        self.tradeHistory = tradeHistory
+        self.feedback = feedback
     }
     
     public func start() {
         let viewController = UIHostingController(
             rootView: TradeFeedbackResultView(
                 store: .init(
-                    initialState: TradeFeedbackFeature.State(tradeData: tradeData),
+                    initialState: TradeFeedbackFeature.State(
+                        tradeType: tradeType,
+                        stock: stock,
+                        tradeHistory: tradeHistory,
+                        feedback: feedback
+                    ),
                     reducer: {
                         TradeFeedbackFeature(
-                            coordinator: self,
-                            fetchFeedbackUseCase: fetchFeedbackUseCase
+                            coordinator: self
                         )
                     }
                 )
@@ -47,11 +60,7 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
         finish()
     }
     
-    public func popToHome(selectingStock stockSymbol: String) {
-        if let rootCoordinator = parentCoordinator {
-            rootCoordinator.popToHome(selectingStock: stockSymbol)
-        } else {
-            finish()
-        }
+    public func popToHome() {
+        parentCoordinator?.popToHome()
     }
 }

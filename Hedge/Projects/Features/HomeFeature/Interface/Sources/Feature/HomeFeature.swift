@@ -21,7 +21,7 @@ public struct HomeFeature {
     public struct State: Equatable {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
-        public var lastRetrospectionCompanyName: String?
+        public var lastRetrospectionComapnyName: String?
         public var selectedCompanyName: String?
         public var isBadgePopupPresented: Bool = false
         public var isLoadingRetrospections: Bool = false
@@ -114,7 +114,12 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
+            // TODO: 나중에 UseCase로 뺴기
+            state.lastRetrospectionComapnyName = UserDefaults.standard.string(forKey: "companyName")
+            UserDefaults.standard.removeObject(forKey: "companyName")
+            
             state.isLoadingRetrospections = true
+            
             return .merge(
                 .send(.async(.fetchRetrospections)),
                 .send(.async(.fetchBadgeReport))
@@ -135,7 +140,6 @@ extension HomeFeature {
         case .badgePopupTapped(let isPresented):
             state.isBadgePopupPresented = isPresented
             return .none
-            
         case .pushToSetting:
             return .run { send in
                 await send(.delegate(.pushToSetting))
@@ -150,15 +154,19 @@ extension HomeFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchRetrospectionsSuccess(let companies):
-            state.isLoadingRetrospections = false
             state.retrospectionCompanies = companies
-            state.selectedCompanyName = companies.first?.companyName
-            state.lastRetrospectionCompanyName = companies.first?.companyName
+            
+            if let lastRetrospectionComapnyName = state.lastRetrospectionComapnyName {
+                state.selectedCompanyName = lastRetrospectionComapnyName
+            } else {
+                state.selectedCompanyName = companies.first?.companyName
+            }
             
             if let selectedSymbol = state.selectedCompanyName {
                 updateGroupedRetrospections(for: selectedSymbol, state: &state)
             }
             
+            state.isLoadingRetrospections = false
             return .none
             
         case .fetchRetrospectionsFailure(let error):

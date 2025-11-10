@@ -17,26 +17,6 @@ struct PrinciplesApp: App {
     
     var body: some Scene {
         WindowGroup {
-            let fetchPrinciplesUseCase = MockFetchPrinciples()
-            
-            PrinciplesView(
-                store: Store(
-                    initialState: PrinciplesFeature.State(viewType: .management)
-                ) {
-                    PrinciplesFeature(
-                        fetchPrinciplesUseCase: fetchPrinciplesUseCase,
-                        tradeType: TradeType.buy,
-                        stock: StockSearch(symbol: "005930", title: "삼성전자", market: "KOSPI"),
-                        tradeHistory: TradeHistory(
-                            tradingPrice: "97,700",
-                            tradingQuantity: "10",
-                            tradingDate: "2025-01-01",
-                            yield: nil,
-                            concurrency: "KRW"
-                        )
-                    )
-                }
-            )
         }
     }
 }

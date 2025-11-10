@@ -12,6 +12,7 @@ public struct HomeView: View {
     @State var isActive: Bool = false
     @State private var rotationAngle: Double = 0
     @State private var showCompanyTopGradient: Bool = false
+    @State private var isRetrospectLoadingAnimating: Bool = false
     
     public var store: StoreOf<HomeFeature>
     
@@ -33,6 +34,7 @@ public struct HomeView: View {
                 
                 Spacer()
             }
+            .ignoresSafeArea(edges: .bottom)
             
             startArea
             
@@ -216,19 +218,34 @@ extension HomeView {
     }
     
     private var retrospectArea: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("회고기록")
-                .font(FontModel.h2Semibold)
-                .foregroundStyle(Color.hedgeUI.textTitle)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
+        VStack(alignment: .center, spacing: 10) {
+            HStack {
+                Text("회고기록")
+                    .font(FontModel.h2Semibold)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                
+                Spacer()
+            }
             
-            if store.state.groupedRetrospections.isEmpty {
-                Text("회고 기록이 없습니다")
-                    .font(FontModel.body3Regular)
-                    .foregroundStyle(Color.hedgeUI.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 40)
+            if store.state.isLoadingRetrospections {
+                HedgeSpacer(height: 124)
+                Circle()
+                    .trim(from: 0.0, to: 0.35)
+                    .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                    .frame(width: 32, height: 32, alignment: .center)
+                    .rotationEffect(.degrees(-90))
+                    .modifier(ContinuousRotationEffect(isAnimating: store.state.isLoadingRetrospections))
+            } else if store.state.groupedRetrospections.isEmpty {
+                VStack(alignment: .center) {
+                    HedgeSpacer(height: 124)
+                    
+                    Text("아직 내 회고 기록이 없어요\n회고를 시작해볼까요?")
+                        .font(FontModel.h2Semibold)
+                        .foregroundStyle(Color.hedgeUI.textAssistive)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
             } else {
                 HStack(spacing: 2) {
                     // 주식 종목 리스트 (왼쪽)
@@ -271,6 +288,15 @@ extension HomeView {
                             }
                         }
                         .padding(.horizontal, 12)
+                        .background(
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .preference(
+                                        key: ScrollOffsetPreferenceKey.self,
+                                        value: proxy.frame(in: .named("CompanyScroll")).minY
+                                    )
+                            }
+                        )
                     }
                     .scrollIndicators(.hidden)
                     .coordinateSpace(name: "CompanyScroll")
@@ -351,6 +377,7 @@ extension HomeView {
                 }
             }
         }
+        .onChange(of: store.state.isLoadingRetrospections) { _, _ in }
     }
     
     @ViewBuilder
@@ -484,6 +511,31 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
     
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value += nextValue()
+    }
+}
+
+private struct ContinuousRotationEffect: ViewModifier {
+    let isAnimating: Bool
+    @State private var angle: Double = 0
+    
+    func body(content: Content) -> some View {
+        content
+            .rotationEffect(.degrees(angle))
+            .onAppear {
+                guard isAnimating else { return }
+                angle = 0
+                withAnimation(.linear(duration: 0.8).repeatForever(autoreverses: false)) {
+                    angle = 360
+                }
+            }
+            .onChange(of: isAnimating) { _, newValue in
+                angle = 0
+                if newValue {
+                    withAnimation(.linear(duration: 0.8).repeatForever(autoreverses: false)) {
+                        angle = 360
+                    }
+                }
+            }
     }
 }
 
