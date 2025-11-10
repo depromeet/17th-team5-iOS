@@ -95,102 +95,100 @@ extension HomeView {
     }
     
     private var badgeArea: some View {
-        ZStack {
-            // 배경 레이어
-            RoundedRectangle(cornerRadius: 22)
-                .fill(Color.hedgeUI.backgroundWhite)
-                .overlay {
-                    Capsule()
-                        .fill(
-                            RadialGradient(
-                                colors: [Color.hedgeUI.shadowGreen.opacity(0.16 / 0.7),
-                                         Color.clear],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: 137.5
-                            )
+        // 배경 레이어
+        RoundedRectangle(cornerRadius: 22)
+            .fill(Color.hedgeUI.backgroundWhite)
+            .overlay(alignment: .topLeading) {
+                Capsule()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color.hedgeUI.shadowGreen.opacity(0.16 / 0.7),
+                                     Color.clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 137.5
                         )
-                        .frame(width: 355, height: 274)
-                        .opacity(0.7)
-                        .blur(radius: 84.6)
-                        .offset(x: -124, y: -117)
+                    )
+                    .frame(width: 355, height: 274)
+                    .opacity(0.7)
+                    .blur(radius: 84.6)
+                    .offset(x: -124, y: -117)
+                    .allowsHitTesting(false)
+            }
+            .overlay(alignment: .topTrailing) {
+                Capsule()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 137.5
+                        )
+                    )
+                    .frame(width: 355, height: 274)
+                    .opacity(0.7)
+                    .blur(radius: 84.6)
+                    .offset(x: 90, y: -117)
+                    .allowsHitTesting(false)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 22))
+            .overlay(content: {
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("아직 모은 뱃지가 없어요")
+                            .font(.body2Semibold)
+                            .foregroundStyle(Color.hedgeUI.textPrimary)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 20)
+                        
+                        Spacer()
+                    }
                     
-                    Capsule()
-                        .fill(
-                            RadialGradient(
-                                colors: [
-                                    Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: 137.5
-                            )
-                        )
-                        .frame(width: 355, height: 274)
-                        .opacity(0.7)
-                        .blur(radius: 84.6)
-                        .offset(x: 90, y: -117)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 22)) // overlay 내부의 Circle만 clip
-            
-            // Stroke는 별도 레이어
-            RoundedRectangle(cornerRadius: 22)
-                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
-            
-            // 내부 콘텐츠
-            VStack(spacing: 0) {
-                HStack {
-                    Text("아직 모은 뱃지가 없어요")
-                        .font(.body2Semibold)
-                        .foregroundStyle(Color.hedgeUI.textPrimary)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
+                    HStack(alignment: .center, spacing: 20) {
+                        badge(image: HedgeUI.emerald, count: 0)
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .frame(width: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.vertical, 6)
+                        
+                        badge(image: HedgeUI.gold, count: 0)
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .frame(width: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.vertical, 6)
+                        
+                        badge(image: HedgeUI.silver, count: 0)
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .frame(width: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                            .padding(.vertical, 6)
+                        
+                        badge(image: HedgeUI.bronze, count: 0)
+                    }
+                    .padding(.vertical, 20)
                     
                     Spacer()
                 }
-                
-                HStack(alignment: .center, spacing: 20) {
-                    badge(image: HedgeUI.emerald, count: 0)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 1)
-                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                        .padding(.vertical, 6)
-                    
-                    badge(image: HedgeUI.gold, count: 0)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 1)
-                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                        .padding(.vertical, 6)
-                    
-                    badge(image: HedgeUI.silver, count: 0)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .frame(width: 1)
-                        .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
-                        .padding(.vertical, 6)
-                    
-                    badge(image: HedgeUI.bronze, count: 0)
+            })
+            .shadow(
+                color: Color.black.opacity(0.08),
+                radius: 20,
+                x: 0,
+                y: 6
+            )
+            .frame(height: 148)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    _ = send(.badgePopupTapped(true))
                 }
-                .padding(.vertical, 20)
-                
-                Spacer()
             }
-        }
-        .shadow(
-            color: Color.black.opacity(0.08),
-            radius: 20,
-            x: 0,
-            y: 6
-        )
-        .frame(height: 148)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                _ = send(.badgePopupTapped(true))
-            }
-        }
     }
     
     private var retrospectArea: some View {
