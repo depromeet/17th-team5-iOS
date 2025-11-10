@@ -55,4 +55,10 @@ public extension TargetDependency.Feature {
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }
+
+    struct Setting {
+        private static let name = "SettingFeature"
+        public static let feature = featureDependency(target: name)
+        public static let interface = featureInterfaceDependency(target: name)
+    }
 }

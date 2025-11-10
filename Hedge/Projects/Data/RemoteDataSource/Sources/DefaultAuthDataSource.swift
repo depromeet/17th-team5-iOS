@@ -23,11 +23,16 @@ public struct DefaultAuthDataSource: AuthDataSource {
     public func social(_ request: SocialLoginRequestDTO) async throws -> SocialLoginResponseDTO {
         try await provider.request(AuthTarget.social(request))
     }
+    
+    public func withdraw(_ request: AuthCodeRequestDTO?) async throws {
+        try await provider.request(AuthTarget.withdraw(request))
+    }
 }
 
 
 enum AuthTarget {
     case social(_ request: SocialLoginRequestDTO)
+    case withdraw(_ request: AuthCodeRequestDTO?)
 }
 
 extension AuthTarget: TargetType {
@@ -44,20 +49,24 @@ extension AuthTarget: TargetType {
     }
     
     var path: String {
-        return "/social-login"
+        switch self {
+        case .social:
+            "/social-login"
+        case .withdraw:
+            ""
+        }
     }
     
     var parameters: Networker.RequestParams? {
         switch self {
         case .social(let request):
             return .body(request)
+        case .withdraw(let request):
+            return .body(request)
         }
     }
     
     var encoding: any Alamofire.ParameterEncoding {
-        switch self {
-        case .social:
-            return makeEncoder(contentType: .json)
-        }
+        return makeEncoder(contentType: .json)
     }
 }

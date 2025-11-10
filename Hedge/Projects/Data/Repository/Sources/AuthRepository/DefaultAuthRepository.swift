@@ -12,13 +12,16 @@ import RemoteDataSourceInterface
 
 public final class DefaultAuthRepository: AuthRepository {
     private let tokenDataSource: TokenDataSource
+    private let userDataSource: UserDataSource
     private let authDataSource: AuthDataSource
     
     public init(
         tokenDataSource: TokenDataSource,
+        userDataSource: UserDataSource,
         authDataSource: AuthDataSource
     ) {
         self.tokenDataSource = tokenDataSource
+        self.userDataSource = userDataSource
         self.authDataSource = authDataSource
     }
     
@@ -39,10 +42,20 @@ public final class DefaultAuthRepository: AuthRepository {
         
         let response = try await authDataSource.social(request)
         let token = AuthToken(accessToken: response.accessToken, refreshToken: response.refreshToken)
+        userDataSource.updateLoginType(type: provider.rawValue)
         tokenDataSource.updateToken(token: token)
     }
     
     public func isAuthorized() -> Bool {
         return tokenDataSource.accessToken != nil
+    }
+    
+    public func fetchSocialProvider() -> SocialProvider {
+        SocialProvider(from: userDataSource.loginType)
+    }
+    
+    public func withdraw(_ code: String?) async throws {
+        let request = AuthCodeRequestDTO(authCode: code)
+        return try await authDataSource.withdraw(request)
     }
 }

@@ -19,4 +19,5 @@ public enum CoordinatorType {
     case tradeHistory
     case tradeReason
     case tradeFeedback
+    case setting
 }
