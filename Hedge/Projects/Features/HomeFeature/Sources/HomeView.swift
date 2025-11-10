@@ -96,8 +96,13 @@ extension HomeView {
     }
     
     private var badgeArea: some View {
-        // 배경 레이어
-        RoundedRectangle(cornerRadius: 22)
+        let report = store.state.badgeReport
+        let hasBadges = (report?.hedge ?? 0) > 0 ||
+        (report?.gold ?? 0) > 0 ||
+        (report?.silver ?? 0) > 0 ||
+        (report?.bronze ?? 0) > 0
+        
+        return RoundedRectangle(cornerRadius: 22)
             .fill(Color.hedgeUI.backgroundWhite)
             .overlay {
                 ZStack {
@@ -138,17 +143,18 @@ extension HomeView {
             .overlay(content: {
                 VStack(spacing: 0) {
                     HStack {
+                        
                         Text("아직 모은 뱃지가 없어요")
                             .font(.body2Semibold)
                             .foregroundStyle(Color.hedgeUI.textPrimary)
-                            .padding(.horizontal, 20)
-                            .padding(.top, 20)
                         
                         Spacer()
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                     
                     HStack(alignment: .center) {
-                        badge(image: HedgeUI.emerald, count: 0)
+                        badge(image: HedgeUI.emerald, count: report?.hedge ?? 0)
                         
                         Spacer()
                         
@@ -159,7 +165,7 @@ extension HomeView {
                         
                         Spacer()
                         
-                        badge(image: HedgeUI.gold, count: 0)
+                        badge(image: HedgeUI.gold, count: report?.gold ?? 0)
                         
                         Spacer()
                         
@@ -170,7 +176,7 @@ extension HomeView {
                         
                         Spacer()
                         
-                        badge(image: HedgeUI.silver, count: 0)
+                        badge(image: HedgeUI.silver, count: report?.silver ?? 0)
                         
                         Spacer()
                         
@@ -181,7 +187,7 @@ extension HomeView {
                         
                         Spacer()
                         
-                        badge(image: HedgeUI.bronze, count: 0)
+                        badge(image: HedgeUI.bronze, count: report?.bronze ?? 0)
                     }
                     .padding(.vertical, 20)
                     .padding(.horizontal, 32)
@@ -553,18 +559,3 @@ extension HomeView {
         }
     }
 }
-
-// extension HomeView {
-//     private func makeAttributeText(colorTitle: String, color: Color) -> AttributedString {
-//         var attributed = AttributedString("\(colorTitle) 회고하기")
-//         if let range = attributed.range(of: colorTitle) {
-//             attributed[range].foregroundColor = UIColor(color)
-//         }
-//         if let range = attributed.range(of: " 회고하기") {
-//             attributed[range].foregroundColor = UIColor(Color.hedgeUI.textPrimary)
-//         }
-//         
-//         return attributed
-//     }
-// }
-

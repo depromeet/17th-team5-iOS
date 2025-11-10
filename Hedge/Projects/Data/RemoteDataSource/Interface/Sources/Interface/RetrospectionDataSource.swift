@@ -10,6 +10,7 @@ import Foundation
 
 public protocol RetrospectionDataSource {
     func fetch() async throws -> RetrospectionResponseDTO
+    func fetchBadgeReport() async throws -> BadgeReportResponseDTO
     func uploadImage(
         domain: String,
         fileData: Data,

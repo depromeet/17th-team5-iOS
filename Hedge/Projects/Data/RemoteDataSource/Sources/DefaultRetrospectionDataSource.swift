@@ -25,6 +25,10 @@ public struct DefaultRetrospectionDataSource: RetrospectionDataSource {
         try await provider.request(RetrospectionTarget.fetch)
     }
     
+    public func fetchBadgeReport() async throws -> BadgeReportResponseDTO {
+        try await provider.request(RetrospectionTarget.badgeReport)
+    }
+    
     public func uploadImage(
         domain: String,
         fileData: Data,
@@ -48,6 +52,7 @@ public struct DefaultRetrospectionDataSource: RetrospectionDataSource {
 
 enum RetrospectionTarget {
     case fetch
+    case badgeReport
     case upload(domain: String)
     case create(RetrospectionCreateRequestDTO)
 }
@@ -57,6 +62,8 @@ extension RetrospectionTarget: TargetType {
         switch self {
         case .fetch:
             return Configuration.baseURL + "/api/v1/retrospections"
+        case .badgeReport:
+            return Configuration.baseURL + "/api/v1/reports"
         case .upload(let domain):
             return Configuration.baseURL + "/api/v1/\(domain)"
         case .create:
@@ -72,6 +79,8 @@ extension RetrospectionTarget: TargetType {
         switch self {
         case .fetch:
             return .get
+        case .badgeReport:
+            return .get
         case .upload:
             return .post
         case .create:
@@ -82,6 +91,8 @@ extension RetrospectionTarget: TargetType {
     var path: String {
         switch self {
         case .fetch:
+            return ""
+        case .badgeReport:
             return ""
         case .upload:
             return "/images/upload"
@@ -94,6 +105,8 @@ extension RetrospectionTarget: TargetType {
         switch self {
         case .fetch:
             return nil
+        case .badgeReport:
+            return nil
         case .upload:
             return nil
         case .create(let request):
@@ -104,6 +117,8 @@ extension RetrospectionTarget: TargetType {
     var encoding: any Alamofire.ParameterEncoding {
         switch self {
         case .fetch:
+            return makeEncoder(contentType: .json)
+        case .badgeReport:
             return makeEncoder(contentType: .json)
         case .upload:
             return makeEncoder(contentType: .json)
