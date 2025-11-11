@@ -27,15 +27,18 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public weak var principleDelegate: PrincipleDelegate?
     
+    public var recommendedPrinciples: [String] = []
     public var tradeType: TradeType?
     public var stock: StockSearch?
     public var tradeHistory: TradeHistory?
     
     public init(navigationController: UINavigationController,
+                recommendedPrinciples: [String] = [],
                 tradeType: TradeType? = nil,
                 stock: StockSearch? = nil,
                 tradeHistory: TradeHistory? = nil) {
         self.navigationController = navigationController
+        self.recommendedPrinciples = recommendedPrinciples
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
@@ -53,6 +56,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
                             coordinator: self,
                             fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
                             fetchSystemPrinciplesUseCase: DIContainer.resolve(FetchSystemPrinciplesUseCase.self),
+                            recommendedPrinciples: recommendedPrinciples,
                             tradeType: tradeType,
                             stock: stock,
                             tradeHistory: tradeHistory
@@ -75,6 +79,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
                         coordinator: self,
                         fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
                         fetchSystemPrinciplesUseCase: DIContainer.resolve(FetchSystemPrinciplesUseCase.self),
+                        recommendedPrinciples: [],
                         tradeType: tradeType,
                         stock: stock,
                         tradeHistory: tradeHistory

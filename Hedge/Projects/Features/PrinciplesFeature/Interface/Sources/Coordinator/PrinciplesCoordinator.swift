@@ -16,6 +16,8 @@ public protocol PrincipleDelegate: AnyObject {
                               stock: StockSearch,
                               tradeHistory: TradeHistory,
                               group: PrincipleGroup)
+    
+    func pushSelectPrinciple(title: String, id: Int, recommendedPrinciples: [String])
 }
 
 public protocol PrinciplesCoordinator: Coordinator {

@@ -114,7 +114,7 @@ extension TradeFeedbackFeature {
             coordinator.popToPrev()
             return .none
         case .addPrincipleButtonTapped:
-            coordinator.pushToPrinciples()
+            coordinator.pushToPrinciples(state.feedback.next)
             return .none
         case .nextTapped:
             return .none

@@ -19,6 +19,7 @@ public struct PrinciplesFeature {
     private let coordinator: PrinciplesCoordinator
     private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
     private let fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase
+    private let recommendedPrinciples: [String]
     private let tradeType: TradeType?
     private let stock: StockSearch?
     private let tradeHistory: TradeHistory?
@@ -27,6 +28,7 @@ public struct PrinciplesFeature {
         coordinator: PrinciplesCoordinator,
         fetchPrinciplesUseCase: FetchPrinciplesUseCase,
         fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase,
+        recommendedPrinciples: [String],
         tradeType: TradeType?,
         stock: StockSearch?,
         tradeHistory: TradeHistory?
@@ -34,6 +36,7 @@ public struct PrinciplesFeature {
         self.coordinator = coordinator
         self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
         self.fetchSystemPrinciplesUseCase = fetchSystemPrinciplesUseCase
+        self.recommendedPrinciples = recommendedPrinciples
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
@@ -159,15 +162,26 @@ extension PrinciplesFeature {
             
         case .confirmButtonTapped:
             
-            guard let tradeType, let stock, let tradeHistory else {
-                return .none
-            }
-            
-            coordinator.dismiss(animated: false)
-            if let principleGroup = state.principleGroups.first(where: { principleGroup in
-                principleGroup.id == state.selectedGroupId
-            }) {
-                coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
+            switch state.viewType {
+                
+            case .select:
+                guard let tradeType, let stock, let tradeHistory else {
+                    return .none
+                }
+                
+                coordinator.dismiss(animated: false)
+                if let principleGroup = state.principleGroups.first(where: { principleGroup in
+                    principleGroup.id == state.selectedGroupId
+                }) {
+                    coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
+                }
+            case .management:
+                guard let selectedPrincipleGroup = state.principleGroups.filter({ $0.id == state.selectedGroupId }).first else { return .none }
+                guard let groupId = state.selectedGroupId else { return .none }
+                let title = selectedPrincipleGroup.groupName
+                
+                coordinator.dismiss(animated: false)
+                coordinator.principleDelegate?.pushSelectPrinciple(title: title, id: groupId, recommendedPrinciples: recommendedPrinciples)
             }
             
             return .none
