@@ -194,23 +194,32 @@ struct TradeFeedbackResultView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 10)
                 
-                HStack(alignment: .center, spacing: 17.5) {
+                HStack(alignment: .center) {
                     countChip(image: .hedgeUI.keep, count: store.feedback.keptCount)
+                    
+                    Spacer()
                     
                     RoundedRectangle(cornerRadius: 2)
                         .frame(width: 1, height: 32)
                         .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    
+                    Spacer()
                     
                     countChip(image: .hedgeUI.normal, count: store.feedback.neutralCount)
                     
+                    Spacer()
+                    
                     RoundedRectangle(cornerRadius: 2)
                         .frame(width: 1, height: 32)
                         .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    
+                    Spacer()
                     
                     countChip(image: .hedgeUI.notKeep, count: store.feedback.notKeptCount)
                 }
                 .padding(.top, 12)
                 .padding(.bottom, 28)
+                .padding(.horizontal, 48)
             }
         }
     }

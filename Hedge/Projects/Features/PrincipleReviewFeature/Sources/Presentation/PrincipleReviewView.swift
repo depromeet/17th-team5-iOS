@@ -118,7 +118,7 @@ public struct PrincipleReviewView: View {
             actions: .init(
                 primaryTitle: "이전으로",
                 onPrimary: {
-                    
+                    send(.backConfirmButtonTapped)
                 },
                 secondaryTitle: "취소",
                 onSecondary: {
@@ -318,7 +318,7 @@ public struct PrincipleReviewView: View {
     @ViewBuilder
     private func principleDetailView(for index: Int) -> some View {
         if store.currentPageState.principleDetailShown {
-            Text(store.principles[index].principle)
+            Text(store.principles[index].description)
                 .font(FontModel.body3Medium)
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -423,7 +423,7 @@ public struct PrincipleReviewView: View {
                     .scrollContentBackground(.hidden)
             }
             
-            if !focusWithAnimation {
+            if !isFocused {
                 resourceButtonView
             }
             

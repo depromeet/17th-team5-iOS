@@ -174,7 +174,7 @@ extension TradeHistoryInputView {
                 .type(.tradeDate)
                 .sheet(isPresented: $showDatePicker) {
                     VStack {
-                        DatePicker("날짜 선택", selection: $selectedDate, displayedComponents: .date)
+                        DatePicker("날짜 선택", selection: $selectedDate, in: ...Date(), displayedComponents: .date)
                             .datePickerStyle(.graphical)
                             .tint(Color.hedgeUI.brandPrimary)
                             .padding(.top, 10)

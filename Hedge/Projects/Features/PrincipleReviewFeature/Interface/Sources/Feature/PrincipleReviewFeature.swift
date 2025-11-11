@@ -349,6 +349,7 @@ extension PrincipleReviewFeature {
             return .none
         case .backConfirmButtonTapped:
             state.backCautionModalPresented = false
+            coordinator.popToProv()
             return .none
         case .keepButtonTapped:
             state.currentPageState.selectedEvaluation = state.currentPageState.selectedEvaluation == .keep ? nil : .keep
