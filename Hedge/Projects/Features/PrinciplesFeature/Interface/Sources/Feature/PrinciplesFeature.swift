@@ -169,6 +169,8 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchPrincipleGroupsSuccess(let principleGroups):
+            let principleGroups = principleGroups.filter { !$0.principles.isEmpty }
+            
             state.principleGroups = principleGroups
             state.systemPrincipleGroups = principleGroups.filter { $0.groupType == .system }
             state.customPrincipleGroups = principleGroups.filter { $0.groupType == .custom }
