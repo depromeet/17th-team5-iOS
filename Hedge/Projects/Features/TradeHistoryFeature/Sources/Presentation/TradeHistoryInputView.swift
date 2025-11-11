@@ -127,6 +127,7 @@ public struct TradeHistoryInputView: View {
                 }
                 
                 HedgeBottomCTAButton()
+                    .bg(.transparent)
                     .style(
                         .oneButton(
                             title: "다음",
@@ -135,7 +136,7 @@ public struct TradeHistoryInputView: View {
                             }
                         )
                     )
-                    .bg(.transparent)
+                    .state(store.state.isButtonActive ? .active : .disabled)
             }
         }
         .onAppear {

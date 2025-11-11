@@ -38,8 +38,7 @@ public struct StockRow: View {
             Text(companyName)
                 .font(.body1Semibold)
                 .foregroundStyle(Color.hedgeUI.grey900)
-            
-            Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 20)

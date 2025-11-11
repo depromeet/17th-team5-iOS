@@ -33,6 +33,7 @@ public struct TradeHistoryFeature {
         public var selectedYield: Int
         public var stock: StockSearch
         public var tradeType: TradeType
+        public var isButtonActive: Bool = false
         
         public init(tradeType: TradeType, stock: StockSearch) {
             self.tradingPrice = ""
@@ -85,6 +86,7 @@ extension TradeHistoryFeature {
     ) -> Effect<Action> {
         switch action {
         case .binding:
+            updateButtonState(&state)
             return .none
             
         case .view(let action):
@@ -171,5 +173,28 @@ extension TradeHistoryFeature {
             )
             return .none
         }
+    }
+}
+
+private extension TradeHistoryFeature {
+    func updateButtonState(_ state: inout State) {
+        let priceFilled = !state.tradingPrice.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let quantityFilled = !state.tradingQuantity.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let dateFilled = isValidTradingDateFormat(state.tradingDate)
+        
+        state.isButtonActive = priceFilled && quantityFilled && dateFilled
+    }
+    
+    func isValidTradingDateFormat(_ dateString: String) -> Bool {
+        let trimmed = dateString.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.dateFormat = "yyyy년 MM월 dd일"
+        formatter.isLenient = false
+        
+        return formatter.date(from: trimmed) != nil
     }
 }
