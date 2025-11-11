@@ -19,17 +19,17 @@ public struct PrinciplesFeature {
     private let coordinator: PrinciplesCoordinator
     private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
     private let fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase
-    private let tradeType: TradeType
-    private let stock: StockSearch
-    private let tradeHistory: TradeHistory
+    private let tradeType: TradeType?
+    private let stock: StockSearch?
+    private let tradeHistory: TradeHistory?
     
     public init(
         coordinator: PrinciplesCoordinator,
         fetchPrinciplesUseCase: FetchPrinciplesUseCase,
         fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase,
-        tradeType: TradeType,
-        stock: StockSearch,
-        tradeHistory: TradeHistory
+        tradeType: TradeType?,
+        stock: StockSearch?,
+        tradeHistory: TradeHistory?
     ) {
         self.coordinator = coordinator
         self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
@@ -159,6 +159,10 @@ extension PrinciplesFeature {
             
         case .confirmButtonTapped:
             
+            guard let tradeType, let stock, let tradeHistory else {
+                return .none
+            }
+            
             coordinator.dismiss(animated: false)
             if let principleGroup = state.principleGroups.first(where: { principleGroup in
                 principleGroup.id == state.selectedGroupId
@@ -201,7 +205,7 @@ extension PrinciplesFeature {
         case .fetchCustomPrincipleGroups:
             return .run { [tradeType] send in
                 do {
-                    let response = try await fetchPrinciplesUseCase.execute(tradeType.toRequest)
+                    let response = try await fetchPrinciplesUseCase.execute(tradeType?.toRequest)
                     await send(.inner(.fetchCustomPrincipleGroupsSuccess(response)))
                 } catch {
                     await send(.inner(.failure(error)))
@@ -210,7 +214,7 @@ extension PrinciplesFeature {
         case .fetchSystemPrincipleGroups:
             return .run { [tradeType] send in
                 do {
-                    let response = try await fetchSystemPrinciplesUseCase.execute(tradeType.toRequest)
+                    let response = try await fetchSystemPrinciplesUseCase.execute(tradeType?.toRequest)
                     await send(.inner(.fetchSystemPrincipleGroupsSuccess(response)))
                 } catch {
                     await send(.inner(.failure(error)))

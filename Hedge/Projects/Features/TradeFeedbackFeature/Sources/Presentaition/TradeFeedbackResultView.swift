@@ -292,7 +292,10 @@ struct TradeFeedbackResultView: View {
                     }
                 }
                 
-                Button(action: { /* action */ }) {
+                Button(action: {
+                    store.send(.view(.addPrincipleButtonTapped))
+                })
+                {
                     Text("원칙 추가해보기")
                         .font(FontModel.body1Semibold)
                         .foregroundColor(.white)

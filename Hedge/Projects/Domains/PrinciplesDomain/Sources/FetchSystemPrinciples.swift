@@ -9,9 +9,14 @@ public struct FetchSystemPrinciples: FetchSystemPrinciplesUseCase {
         self.repository = repository
     }
     
-    public func execute(_ tradeType: String) async throws -> [PrincipleGroup] {
-        let groups = try await repository.fetchSystemPrincipleGroups()
-        return groups.filter { $0.principleType == tradeType }
+    public func execute(_ tradeType: String?) async throws -> [PrincipleGroup] {
+        var groups = try await repository.fetchSystemPrincipleGroups()
+        
+        if let tradeType {
+            groups = groups.filter { $0.principleType == tradeType }
+        }
+        
+        return groups
     }
 }
 

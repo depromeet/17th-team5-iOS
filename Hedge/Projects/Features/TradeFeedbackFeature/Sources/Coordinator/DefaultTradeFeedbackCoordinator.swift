@@ -63,4 +63,8 @@ public final class DefaultTradeFeedbackCoordinator: TradeFeedbackCoordinator {
     public func popToHome() {
         parentCoordinator?.popToHome()
     }
+    
+    public func pushToPrinciples() {
+        parentCoordinator?.pushToPrinciples()
+    }
 }

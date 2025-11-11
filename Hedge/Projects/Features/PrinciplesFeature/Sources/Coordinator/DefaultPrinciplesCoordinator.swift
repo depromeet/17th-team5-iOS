@@ -27,11 +27,14 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public weak var principleDelegate: PrincipleDelegate?
     
-    public var tradeType: TradeType
-    public var stock: StockSearch
-    public var tradeHistory: TradeHistory
+    public var tradeType: TradeType?
+    public var stock: StockSearch?
+    public var tradeHistory: TradeHistory?
     
-    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
+    public init(navigationController: UINavigationController,
+                tradeType: TradeType? = nil,
+                stock: StockSearch? = nil,
+                tradeHistory: TradeHistory? = nil) {
         self.navigationController = navigationController
         self.tradeType = tradeType
         self.stock = stock
@@ -39,6 +42,30 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     }
     
     public func start() {
+        
+        guard let tradeType, let stock, let tradeHistory else {
+            
+            let principlesView = PrinciplesView(
+                store: Store(
+                    initialState: PrinciplesFeature.State(viewType: .management),
+                    reducer: {
+                        PrinciplesFeature(
+                            coordinator: self,
+                            fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
+                            fetchSystemPrinciplesUseCase: DIContainer.resolve(FetchSystemPrinciplesUseCase.self),
+                            tradeType: tradeType,
+                            stock: stock,
+                            tradeHistory: tradeHistory
+                        )
+                    }
+                )
+            )
+            
+            let principlesViewController = UIHostingController(rootView: principlesView)
+            navigationController.present(principlesViewController, animated: true)
+            
+            return
+        }
         
         let principlesView = PrinciplesView(
             store: Store(

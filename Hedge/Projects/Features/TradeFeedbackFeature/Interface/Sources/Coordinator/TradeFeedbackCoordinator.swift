@@ -9,8 +9,10 @@
 import Foundation
 
 import Core
+import StockDomainInterface
 
 public protocol TradeFeedbackCoordinator: Coordinator {
     func popToPrev()
     func popToHome()
+    func pushToPrinciples()
 }
