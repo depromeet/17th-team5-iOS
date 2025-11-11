@@ -24,15 +24,30 @@ public struct DefaultsPrinciplesDataSource: PrinciplesDataSource {
     public func fetch() async throws -> RemoteDataSourceInterface.PrinciplesResponseDTO {
         try await provider.request(PrinciplesFetchTarget.fetch)
     }
+    
+    public func fetchSystemGroups() async throws -> PrincipleSystemGroupsResponseDTO {
+        try await provider.request(PrinciplesFetchTarget.system)
+    }
+    
+    public func fetchGroupDetail(groupId: Int) async throws -> PrincipleGroupDetailResponseDTO {
+        try await provider.request(PrinciplesFetchTarget.detail(groupId: groupId))
+    }
 }
 
 enum PrinciplesFetchTarget {
     case fetch
+    case system
+    case detail(groupId: Int)
 }
 
 extension PrinciplesFetchTarget: TargetType {
     var baseURL: String {
-        return Configuration.baseURL + "/api/v1/principle-groups"
+        switch self {
+        case .fetch, .detail:
+            return Configuration.baseURL + "/api/v1/principle-groups"
+        case .system:
+            return Configuration.baseURL + "/api/v1/principle-groups"
+        }
     }
     
     var header: Alamofire.HTTPHeaders {
@@ -41,7 +56,7 @@ extension PrinciplesFetchTarget: TargetType {
     
     var method: Alamofire.HTTPMethod {
         switch self {
-        case .fetch:
+        case .fetch, .system, .detail:
             return .get
         }
     }
@@ -50,19 +65,23 @@ extension PrinciplesFetchTarget: TargetType {
         switch self {
         case .fetch:
             return ""
+        case .system:
+            return "/systems"
+        case .detail(let groupId):
+            return "/\(groupId)"
         }
     }
     
     var parameters: Networker.RequestParams? {
         switch self {
-        case .fetch:
+        case .fetch, .system, .detail:
             return nil
         }
     }
     
     var encoding: any Alamofire.ParameterEncoding {
         switch self {
-        case .fetch:
+        case .fetch, .system, .detail:
             return makeEncoder(contentType: .json)
         }
     }

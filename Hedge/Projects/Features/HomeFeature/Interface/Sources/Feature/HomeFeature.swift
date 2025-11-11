@@ -19,6 +19,7 @@ public struct HomeFeature {
     
     @ObservableState
     public struct State: Equatable {
+        public var retrospectionButtonActive: Bool = false
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
         public var lastRetrospectionComapnyName: String?
@@ -26,6 +27,7 @@ public struct HomeFeature {
         public var isBadgePopupPresented: Bool = false
         public var isLoadingRetrospections: Bool = false
         public var badgeReport: RetrospectionBadgeReport?
+        public var badgeTitle: String = "아직 모은 뱃지가 없어요"
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -52,6 +54,7 @@ public struct HomeFeature {
         case retrospectTapped(TradeType)
         case homeTabTapped
         case principleTabTapped
+        case restrospectionButtonTapped
         case pushToSetting
         
         case badgePopupTapped(Bool)
@@ -117,18 +120,20 @@ extension HomeFeature {
             // TODO: 나중에 UseCase로 뺴기
             state.lastRetrospectionComapnyName = UserDefaults.standard.string(forKey: "companyName")
             UserDefaults.standard.removeObject(forKey: "companyName")
-            
             state.isLoadingRetrospections = true
-            
             return .merge(
                 .send(.async(.fetchRetrospections)),
                 .send(.async(.fetchBadgeReport))
             )
+        case .restrospectionButtonTapped:
+            state.retrospectionButtonActive.toggle()
+            return .none
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
             return .none
         case .retrospectTapped(let type):
+            state.retrospectionButtonActive = false
             return .send(.delegate(.pushToStockSearch(type)))
         case .homeTabTapped:
             state.selectedType = .home
@@ -136,7 +141,6 @@ extension HomeFeature {
         case .principleTabTapped:
             state.selectedType = .principle
             return .none
-            
         case .badgePopupTapped(let isPresented):
             state.isBadgePopupPresented = isPresented
             return .none
@@ -176,6 +180,17 @@ extension HomeFeature {
             
         case .fetchBadgeReportSuccess(let report):
             state.badgeReport = report
+            
+            if report.percentage >= 60 {
+                state.badgeTitle = "좋은 투자 흐름을 이어가고 있어요"
+            } else if report.percentage >= 40 {
+                state.badgeTitle = "판단이 안정적으로 이어지고 있어요"
+            } else if report.percentage >= 20 {
+                state.badgeTitle = "판단이 다소 흔들렸어요"
+            } else {
+                state.badgeTitle = "최근 투자에서 일관성이 낮았어요"
+            }
+            
             return .none
             
         case .fetchBadgeReportFailure(let error):

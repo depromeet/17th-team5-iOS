@@ -84,9 +84,11 @@ public struct HedgeModal: View {
                 HStack(spacing: 9) {
                     HedgeActionButton(secondary) { onSecondary() }
                         .size(.medium)
+                        .color(.secondary)
 
                     HedgeActionButton(actions.primaryTitle) { actions.onPrimary() }
                         .size(.medium)
+                        .color(.primary)
                 }
             } else {
                 HedgeActionButton(actions.primaryTitle) { actions.onPrimary() }
@@ -158,23 +160,23 @@ public extension View {
 }
 
 
-#Preview("Modal – 1 button") {
-    StatefulPreviewWrapper(false) { show in
-        ZStack {
-            Color.hedgeUI.backgroundGrey.ignoresSafeArea()
-            HedgeTextButton("Show") { show.wrappedValue = true }
-        }
-        .hedgeModal(
-            isPresented: show,
-            title: "타이틀",
-            subtitle: "보조 설명",
-            actions: .init(
-                primaryTitle: "버튼명",
-                onPrimary: { show.wrappedValue = false }
-            )
-        )
-    }
-}
+// #Preview("Modal – 1 button") {
+//     StatefulPreviewWrapper(false) { show in
+//         ZStack {
+//             Color.hedgeUI.backgroundGrey.ignoresSafeArea()
+//             HedgeTextButton("Show") { show.wrappedValue = true }
+//         }
+//         .hedgeModal(
+//             isPresented: show,
+//             title: "타이틀",
+//             subtitle: "보조 설명",
+//             actions: .init(
+//                 primaryTitle: "버튼명",
+//                 onPrimary: { show.wrappedValue = false }
+//             )
+//         )
+//     }
+// }
 
 #Preview("Modal – 2 buttons") {
     StatefulPreviewWrapper(false) { show in

@@ -17,13 +17,15 @@ public struct FetchPrinciples: FetchPrinciplesUseCase {
         self.repository = repository
     }
     
-    public func execute(_ tradeType: String) async throws -> [PrincipleGroup] {
+    public func execute(_ tradeType: String?) async throws -> [PrincipleGroup] {
         var principleGroup = try await repository.fetch()
         
-        principleGroup = principleGroup
-            .filter { group in
-                group.principleType == tradeType
-            }
+        if tradeType != nil {
+            principleGroup = principleGroup
+                .filter { group in
+                    group.principleType == tradeType
+                }
+        }
         
         return principleGroup
     }

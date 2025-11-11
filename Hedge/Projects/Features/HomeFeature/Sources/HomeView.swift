@@ -9,7 +9,6 @@ import ComposableArchitecture
 @ViewAction(for: HomeFeature.self)
 public struct HomeView: View {
     
-    @State var isActive: Bool = false
     @State private var rotationAngle: Double = 0
     @State private var showCompanyTopGradient: Bool = false
     @State private var isRetrospectLoadingAnimating: Bool = false
@@ -101,11 +100,7 @@ extension HomeView {
     }
     
     private var badgeArea: some View {
-        let report = store.state.badgeReport
-        let hasBadges = (report?.hedge ?? 0) > 0 ||
-        (report?.gold ?? 0) > 0 ||
-        (report?.silver ?? 0) > 0 ||
-        (report?.bronze ?? 0) > 0
+        let report = store.state.badgeReport ?? RetrospectionBadgeReport.mock
         
         return RoundedRectangle(cornerRadius: 22)
             .fill(Color.hedgeUI.backgroundWhite)
@@ -114,7 +109,7 @@ extension HomeView {
                     Capsule()
                         .fill(
                             RadialGradient(
-                                colors: [Color.hedgeUI.shadowGreen.opacity(0.16 / 0.7),
+                                colors: [Color.hedgeUI.shadowGreen,
                                          Color.clear],
                                 center: .center,
                                 startRadius: 0,
@@ -122,7 +117,7 @@ extension HomeView {
                             )
                         )
                         .frame(width: 355, height: 274)
-                        .opacity(0.7)
+                        .opacity(0.32)
                         .blur(radius: 84.6)
                         .offset(x: -124, y: -117)
                         .allowsHitTesting(false)
@@ -131,16 +126,17 @@ extension HomeView {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Color.hedgeUI.shadowBlue.opacity(0.24 / 0.7), Color.clear],
+                                    Color.hedgeUI.shadowBlue,
+                                    Color.clear],
                                 center: .center,
                                 startRadius: 0,
                                 endRadius: 137.5
                             )
                         )
                         .frame(width: 355, height: 274)
-                        .opacity(0.7)
+                        .opacity(0.48)
                         .blur(radius: 84.6)
-                        .offset(x: 90, y: -117)
+                        .offset(x: 124, y: -117)
                         .allowsHitTesting(false)
                 }
             }
@@ -149,7 +145,7 @@ extension HomeView {
                 VStack(spacing: 0) {
                     HStack {
                         
-                        Text("아직 모은 뱃지가 없어요")
+                        Text(store.state.badgeTitle)
                             .font(.body2Semibold)
                             .foregroundStyle(Color.hedgeUI.textPrimary)
                         
@@ -159,7 +155,7 @@ extension HomeView {
                     .padding(.top, 20)
                     
                     HStack(alignment: .center) {
-                        badge(image: HedgeUI.emerald, count: report?.hedge ?? 0)
+                        badge(image: HedgeUI.emerald, count: report.hedge)
                         
                         Spacer()
                         
@@ -170,7 +166,7 @@ extension HomeView {
                         
                         Spacer()
                         
-                        badge(image: HedgeUI.gold, count: report?.gold ?? 0)
+                        badge(image: HedgeUI.gold, count: report.gold)
                         
                         Spacer()
                         
@@ -181,7 +177,7 @@ extension HomeView {
                         
                         Spacer()
                         
-                        badge(image: HedgeUI.silver, count: report?.silver ?? 0)
+                        badge(image: HedgeUI.silver, count: report.silver)
                         
                         Spacer()
                         
@@ -192,7 +188,7 @@ extension HomeView {
                         
                         Spacer()
                         
-                        badge(image: HedgeUI.bronze, count: report?.bronze ?? 0)
+                        badge(image: HedgeUI.bronze, count: report.bronze)
                     }
                     .padding(.vertical, 20)
                     .padding(.horizontal, 32)
@@ -424,10 +420,9 @@ extension HomeView {
     
     private var startArea: some View {
         ZStack {
-            if isActive {
+            if store.state.retrospectionButtonActive {
                 (Color.init(hex: "#242424") ?? Color.clear)
                     .opacity(0.5)
-                    .ignoresSafeArea()
             }
             
             VStack(spacing: 0) {
@@ -466,7 +461,7 @@ extension HomeView {
                     )
                     .cornerRadius(18)
                     .frame(width: 136)
-                    .opacity(isActive ? 1 : 0)
+                    .opacity(store.state.retrospectionButtonActive ? 1 : 0)
                     
                     
                     Rectangle()
@@ -481,7 +476,7 @@ extension HomeView {
                     Spacer()
                     
                     Group {
-                        if isActive {
+                        if store.state.retrospectionButtonActive {
                             Image.hedgeUI.cancelDemo
                                 .transition(.scale.combined(with: .opacity))
                         } else {
@@ -490,10 +485,10 @@ extension HomeView {
                         }
                     }
                     .rotationEffect(.degrees(rotationAngle))
-                    .animation(.easeInOut(duration: 0.3), value: isActive)
+                    .animation(.easeInOut(duration: 0.3), value: store.state.retrospectionButtonActive)
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            isActive.toggle()
+                            send(.restrospectionButtonTapped)
                             rotationAngle += 180
                         }
                     }
@@ -502,6 +497,7 @@ extension HomeView {
                 .padding(.trailing, 20)
             }
         }
+        .ignoresSafeArea()
     }
 }
 

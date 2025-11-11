@@ -19,6 +19,30 @@ public struct DefaultPrinciplesRepository: PrinciplesRepository {
     }
     
     public func fetch() async throws -> [PrincipleGroup] {
-        return try await dataSource.fetch().data.map { $0.toDomain() }
+        return try await dataSource.fetch().data.map { $0.toDomain(.custom) }
+    }
+    
+    public func fetchSystemPrincipleGroups() async throws -> [PrincipleGroup] {
+        let response = try await dataSource.fetchSystemGroups()
+        let defaults = response.data.defaults
+        guard !defaults.isEmpty else { return [] }
+        
+        return try await withThrowingTaskGroup(of: PrincipleGroup.self) { group in
+            for systemGroup in defaults {
+                group.addTask {
+                    let detail = try await dataSource.fetchGroupDetail(groupId: systemGroup.id)
+                    return detail.toDomain(groupType: .system)
+                }
+            }
+            
+            var results: [PrincipleGroup] = []
+            for try await detail in group {
+                results.append(detail)
+            }
+            
+            return results.sorted { lhs, rhs in
+                (lhs.displayOrder ?? Int.max) < (rhs.displayOrder ?? Int.max)
+            }
+        }
     }
 }

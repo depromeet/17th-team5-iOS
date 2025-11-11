@@ -27,18 +27,49 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public weak var principleDelegate: PrincipleDelegate?
     
-    public var tradeType: TradeType
-    public var stock: StockSearch
-    public var tradeHistory: TradeHistory
+    public var recommendedPrinciples: [String] = []
+    public var tradeType: TradeType?
+    public var stock: StockSearch?
+    public var tradeHistory: TradeHistory?
     
-    public init(navigationController: UINavigationController, tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory) {
+    public init(navigationController: UINavigationController,
+                recommendedPrinciples: [String] = [],
+                tradeType: TradeType? = nil,
+                stock: StockSearch? = nil,
+                tradeHistory: TradeHistory? = nil) {
         self.navigationController = navigationController
+        self.recommendedPrinciples = recommendedPrinciples
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
     }
     
     public func start() {
+        
+        guard let tradeType, let stock, let tradeHistory else {
+            
+            let principlesView = PrinciplesView(
+                store: Store(
+                    initialState: PrinciplesFeature.State(viewType: .management),
+                    reducer: {
+                        PrinciplesFeature(
+                            coordinator: self,
+                            fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
+                            fetchSystemPrinciplesUseCase: DIContainer.resolve(FetchSystemPrinciplesUseCase.self),
+                            recommendedPrinciples: recommendedPrinciples,
+                            tradeType: tradeType,
+                            stock: stock,
+                            tradeHistory: tradeHistory
+                        )
+                    }
+                )
+            )
+            
+            let principlesViewController = UIHostingController(rootView: principlesView)
+            navigationController.present(principlesViewController, animated: true)
+            
+            return
+        }
         
         let principlesView = PrinciplesView(
             store: Store(
@@ -47,6 +78,8 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
                     PrinciplesFeature(
                         coordinator: self,
                         fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
+                        fetchSystemPrinciplesUseCase: DIContainer.resolve(FetchSystemPrinciplesUseCase.self),
+                        recommendedPrinciples: [],
                         tradeType: tradeType,
                         stock: stock,
                         tradeHistory: tradeHistory

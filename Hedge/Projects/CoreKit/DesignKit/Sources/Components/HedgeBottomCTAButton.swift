@@ -14,6 +14,7 @@ import SwiftUI
 /// - `.bg(_:)` - 배경 스타일 설정 (whiteGradient, transparent)
 /// - `.style(_:)` - 버튼 스타일 설정 (oneButton, twoButton)
 public struct HedgeBottomCTAButton: View {
+    private var state: HedgeBottomCTAButtonState
     private var background: HedgeBottomCTAButtonBG
     private var style: HedgeBottomCTAButtonStyle
     private var text: String?
@@ -21,6 +22,7 @@ public struct HedgeBottomCTAButton: View {
     public init(
         _ text: String? = nil,
     ) {
+        self.state = .active
         self.background = .whiteGradient
         self.style = .oneButton(
                 title: "버튼명",
@@ -35,12 +37,6 @@ public struct HedgeBottomCTAButton: View {
         ) {
             switch style {
             case .oneButton(let title, let onTapped):
-                // HedgeActionButton(title) {
-                //     onTapped()
-                // }
-                // .size(.large)
-                // .color(.primary)
-                
                 Button {
                     onTapped()
                 } label: {
@@ -57,10 +53,9 @@ public struct HedgeBottomCTAButton: View {
                     .padding(.vertical, 16)
                 }
                 .foregroundStyle(Color.hedgeUI.textWhite)
-                .background(Color.hedgeUI.brandPrimary)
+                .background(state.backgroundColor)
+                .disabled(state.isDisabeld)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                
-                
 
                 
             case .twoButton(let leftTitle, let rightTitle, let leftOnTapped, let rightOnTapped):
@@ -112,6 +107,14 @@ public struct HedgeBottomCTAButton: View {
         button.style = style
         return button
     }
+    
+    public func state(
+        _ state: HedgeBottomCTAButtonState
+    ) -> HedgeBottomCTAButton {
+        var button = self
+        button.state = state
+        return button
+    }
 }
 
 extension HedgeBottomCTAButton {
@@ -142,6 +145,30 @@ extension HedgeBottomCTAButton {
         }
     }
     
+    public enum HedgeBottomCTAButtonState {
+        case active
+        case disabled
+        
+        @ViewBuilder
+        var backgroundColor: some View {
+            switch self {
+            case .active:
+                Color.hedgeUI.brandPrimary
+            case .disabled:
+                Color.hedgeUI.brandDisabled
+            }
+        }
+        
+        var isDisabeld: Bool {
+            switch self {
+            case .active:
+                return false
+            case .disabled:
+                return true
+            }
+        }
+    }
+    
     /// 하단 CTA 버튼의 스타일을 정의하는 enum
     /// - `oneButton(title:onTapped:)`: 단일 버튼 스타일
     /// - `twoButton(leftTitle:rightTitle:leftOnTapped:rightOnTapped:)`: 두 개의 버튼 스타일
@@ -167,5 +194,6 @@ extension HedgeBottomCTAButton {
         .style(.oneButton(title: "123", onTapped: {
             
         }))
+        .state(.disabled)
     }
 }

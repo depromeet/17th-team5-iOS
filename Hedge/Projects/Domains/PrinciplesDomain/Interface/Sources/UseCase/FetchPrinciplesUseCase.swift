@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol FetchPrinciplesUseCase {
-    func execute(_ tradeType: String) async throws -> [PrincipleGroup]
+    func execute(_ tradeType: String?) async throws -> [PrincipleGroup]
 }

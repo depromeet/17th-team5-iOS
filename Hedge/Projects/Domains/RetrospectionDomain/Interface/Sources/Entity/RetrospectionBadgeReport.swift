@@ -1,10 +1,3 @@
-//
-//  RetrospectionBadgeReport.swift
-//  RetrospectionDomainInterface
-//
-//  Created by ChatGPT on 11/9/25.
-//
-
 import Foundation
 
 public struct RetrospectionBadgeReport: Equatable {
@@ -26,6 +19,10 @@ public struct RetrospectionBadgeReport: Equatable {
         self.silver = silver
         self.gold = gold
         self.percentage = percentage
+    }
+    
+    public static var mock: Self {
+        .init(hedge: 0, bronze: 0, silver: 0, gold: 0, percentage: 0)
     }
 }
 

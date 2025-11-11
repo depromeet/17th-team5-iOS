@@ -61,4 +61,16 @@ public extension TargetDependency.Feature {
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }
+
+    struct AddPrinciple {
+        private static let name = "AddPrincipleFeature"
+        public static let feature = featureDependency(target: name)
+        public static let interface = featureInterfaceDependency(target: name)
+    }
+
+    struct SelectPrinciple {
+        private static let name = "SelectPrincipleFeature"
+        public static let feature = featureDependency(target: name)
+        public static let interface = featureInterfaceDependency(target: name)
+    }
 }

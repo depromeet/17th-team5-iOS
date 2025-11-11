@@ -127,6 +127,7 @@ public struct TradeHistoryInputView: View {
                 }
                 
                 HedgeBottomCTAButton()
+                    .bg(.transparent)
                     .style(
                         .oneButton(
                             title: "다음",
@@ -135,7 +136,7 @@ public struct TradeHistoryInputView: View {
                             }
                         )
                     )
-                    .bg(.transparent)
+                    .state(store.state.isButtonActive ? .active : .disabled)
             }
         }
         .onAppear {
@@ -173,7 +174,7 @@ extension TradeHistoryInputView {
                 .type(.tradeDate)
                 .sheet(isPresented: $showDatePicker) {
                     VStack {
-                        DatePicker("날짜 선택", selection: $selectedDate, displayedComponents: .date)
+                        DatePicker("날짜 선택", selection: $selectedDate, in: ...Date(), displayedComponents: .date)
                             .datePickerStyle(.graphical)
                             .tint(Color.hedgeUI.brandPrimary)
                             .padding(.top, 10)

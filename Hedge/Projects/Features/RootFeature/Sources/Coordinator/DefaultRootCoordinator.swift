@@ -27,6 +27,8 @@ import PrincipleReviewFeature
 import FeedbackDomainInterface
 import SettingFeature
 import SettingFeatureInterface
+import SelectPrincipleFeature
+import SelectPrincipleFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     public var navigationController: UINavigationController
@@ -112,6 +114,17 @@ extension DefaultRootCoordinator {
         childCoordinators.append(principlesCoordinator)
     }
     
+    public func pushToPrinciples(_ recommendPrinciples: [String]) {
+        let principlesCoordinator = DefaultPrinciplesCoordinator(
+            navigationController: navigationController
+        )
+        principlesCoordinator.parentCoordinator = self
+        principlesCoordinator.principleDelegate = self
+        principlesCoordinator.start()
+        
+        childCoordinators.append(principlesCoordinator)
+    }
+    
     public func pushToFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
         let tradeFeedbackCoordinator = DefaultTradeFeedbackCoordinator(
             navigationController: self.navigationController,
@@ -159,6 +172,20 @@ extension DefaultRootCoordinator {
         settingCoordinator.start()
     }
     
+    public func pushToSelectPrinciple(title: String, id: Int, recommendedPrinciples: [String]) {
+        let selectCoordinator = DefaultSelectPrincipleCoordinator(
+            navigationController: navigationController,
+            groupTitle: title,
+            groupId: id,
+            recommendedPrinciples: recommendedPrinciples
+        )
+        selectCoordinator.parentCoordinator = self
+        selectCoordinator.finishDelegate = self
+        selectCoordinator.start()
+        
+        childCoordinators.append(selectCoordinator)
+    }
+    
     public func signOut() {
         self.childCoordinators.removeAll()
         self.finish()
@@ -179,5 +206,9 @@ extension DefaultRootCoordinator: PrincipleDelegate {
     public func choosePrincipleGroup(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
         
         pushToPrinciplesReview(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: group)
+    }
+    
+    public func pushSelectPrinciple(title: String, id: Int, recommendedPrinciples: [String]) {
+        pushToSelectPrinciple(title: title, id: id, recommendedPrinciples: recommendedPrinciples)
     }
 }

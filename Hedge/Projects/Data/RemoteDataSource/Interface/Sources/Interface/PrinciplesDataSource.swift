@@ -9,6 +9,7 @@
 import Foundation
 
 public protocol PrinciplesDataSource {
-    /// 주식 검색
     func fetch() async throws -> PrinciplesResponseDTO
+    func fetchSystemGroups() async throws -> PrincipleSystemGroupsResponseDTO
+    func fetchGroupDetail(groupId: Int) async throws -> PrincipleGroupDetailResponseDTO
 }
