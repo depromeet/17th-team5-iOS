@@ -1,10 +1,3 @@
-//
-//  FetchBadgeReport.swift
-//  RetrospectionDomain
-//
-//  Created by ChatGPT on 11/9/25.
-//
-
 import Foundation
 
 import RetrospectionDomainInterface

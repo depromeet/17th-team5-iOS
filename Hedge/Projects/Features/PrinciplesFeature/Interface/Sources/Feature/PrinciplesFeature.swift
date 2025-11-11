@@ -18,6 +18,7 @@ import PrinciplesDomainInterface
 public struct PrinciplesFeature {
     private let coordinator: PrinciplesCoordinator
     private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
+    private let fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase
     private let tradeType: TradeType
     private let stock: StockSearch
     private let tradeHistory: TradeHistory
@@ -25,12 +26,14 @@ public struct PrinciplesFeature {
     public init(
         coordinator: PrinciplesCoordinator,
         fetchPrinciplesUseCase: FetchPrinciplesUseCase,
+        fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase,
         tradeType: TradeType,
         stock: StockSearch,
         tradeHistory: TradeHistory
     ) {
         self.coordinator = coordinator
         self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
+        self.fetchSystemPrinciplesUseCase = fetchSystemPrinciplesUseCase
         self.tradeType = tradeType
         self.stock = stock
         self.tradeHistory = tradeHistory
@@ -85,12 +88,14 @@ public struct PrinciplesFeature {
     }
     
     public enum InnerAction {
-        case fetchPrincipleGroupsSuccess([PrincipleGroup])
+        case fetchCustomPrincipleGroupsSuccess([PrincipleGroup])
+        case fetchSystemPrincipleGroupsSuccess([PrincipleGroup])
         case failure(Error)
     }
     
     public enum AsyncAction {
-        case fetchPrincipleGroups
+        case fetchCustomPrincipleGroups
+        case fetchSystemPrincipleGroups
     }
     
     public enum ScopeAction { }
@@ -135,7 +140,10 @@ extension PrinciplesFeature {
     ) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .send(.async(.fetchPrincipleGroups))
+            return .merge(
+                .send(.async(.fetchCustomPrincipleGroups)),
+                .send(.async(.fetchSystemPrincipleGroups))
+            )
             
         case .closeButtonTapped:
             coordinator.dismiss(animated: true)
@@ -168,14 +176,16 @@ extension PrinciplesFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
-        case .fetchPrincipleGroupsSuccess(let principleGroups):
-            let principleGroups = principleGroups.filter { !$0.principles.isEmpty }
-            
-            state.principleGroups = principleGroups
-            state.systemPrincipleGroups = principleGroups.filter { $0.groupType == .system }
-            state.customPrincipleGroups = principleGroups.filter { $0.groupType == .custom }
+        case .fetchCustomPrincipleGroupsSuccess(let principleGroups):
+            let filtered = principleGroups.filter { !$0.principles.isEmpty }
+            state.customPrincipleGroups = filtered
+            updateCombinedPrincipleGroups(&state)
             return .none
-            
+        case .fetchSystemPrincipleGroupsSuccess(let principleGroups):
+            let filtered = principleGroups.filter { !$0.principles.isEmpty }
+            state.systemPrincipleGroups = filtered
+            updateCombinedPrincipleGroups(&state)
+            return .none
         case .failure(let error):
             print("Failed to fetch principle groups: \(error)")
             return .none
@@ -188,11 +198,20 @@ extension PrinciplesFeature {
         _ action: AsyncAction
     ) -> Effect<Action> {
         switch action {
-        case .fetchPrincipleGroups:
+        case .fetchCustomPrincipleGroups:
             return .run { [tradeType] send in
                 do {
                     let response = try await fetchPrinciplesUseCase.execute(tradeType.toRequest)
-                    await send(.inner(.fetchPrincipleGroupsSuccess(response)))
+                    await send(.inner(.fetchCustomPrincipleGroupsSuccess(response)))
+                } catch {
+                    await send(.inner(.failure(error)))
+                }
+            }
+        case .fetchSystemPrincipleGroups:
+            return .run { [tradeType] send in
+                do {
+                    let response = try await fetchSystemPrinciplesUseCase.execute(tradeType.toRequest)
+                    await send(.inner(.fetchSystemPrincipleGroupsSuccess(response)))
                 } catch {
                     await send(.inner(.failure(error)))
                 }
@@ -214,6 +233,18 @@ extension PrinciplesFeature {
         _ action: DelegateAction
     ) -> Effect<Action> {
         return .none
+    }
+}
+
+private extension PrinciplesFeature {
+    func updateCombinedPrincipleGroups(_ state: inout State) {
+        let combined = state.systemPrincipleGroups + state.customPrincipleGroups
+        state.principleGroups = combined
+        
+        if let selectedId = state.selectedGroupId,
+           combined.contains(where: { $0.id == selectedId }) == false {
+            state.selectedGroupId = nil
+        }
     }
 }
 

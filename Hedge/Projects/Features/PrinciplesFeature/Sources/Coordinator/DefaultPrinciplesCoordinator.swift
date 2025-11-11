@@ -47,6 +47,7 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
                     PrinciplesFeature(
                         coordinator: self,
                         fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self),
+                        fetchSystemPrinciplesUseCase: DIContainer.resolve(FetchSystemPrinciplesUseCase.self),
                         tradeType: tradeType,
                         stock: stock,
                         tradeHistory: tradeHistory
