@@ -67,7 +67,6 @@ public struct HedgeTradeTextField: View {
             if let segmentItems = type.segmentItems {
                 HedgeSegmentControl(selectedIndex: $selectedIndex, items: segmentItems)
                     .onChange(of: selectedIndex) {
-                        inputText = ""
                         handleTap()
                     }
             }
