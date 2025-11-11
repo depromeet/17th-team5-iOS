@@ -27,5 +27,9 @@ public struct RetrospectionBadgeReport: Equatable {
         self.gold = gold
         self.percentage = percentage
     }
+    
+    public static var mock: Self {
+        .init(hedge: 0, bronze: 0, silver: 0, gold: 0, percentage: 0)
+    }
 }
 
