@@ -73,7 +73,7 @@ private extension LoginView {
         } label: {
             HStack {
                 Spacer()
-                Image.hedgeUI.kakaoLogo
+                Image.hedgeUI.kakaologo
                     .resizable()
                     .frame(width: 24, height: 24)
                 Text("카카오로 시작하기")
