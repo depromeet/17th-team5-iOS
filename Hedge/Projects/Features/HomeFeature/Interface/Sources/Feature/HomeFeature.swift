@@ -175,6 +175,9 @@ extension HomeFeature {
             
         case .fetchRetrospectionsFailure(let error):
             state.isLoadingRetrospections = false
+            // TODO:
+            UserDefaults.standard.removeObject(forKey: "accessToken")
+            UserDefaults.standard.removeObject(forKey: "refreshToken")
             print("Failed to fetch retrospections: \(error)")
             return .send(.delegate(.finish))
             
@@ -194,6 +197,9 @@ extension HomeFeature {
             return .none
             
         case .fetchBadgeReportFailure(let error):
+            // TODO:
+            UserDefaults.standard.removeObject(forKey: "accessToken")
+            UserDefaults.standard.removeObject(forKey: "refreshToken")
             print("Failed to fetch badge report: \(error)")
             return .none
         }
