@@ -57,7 +57,6 @@ public struct TradeFeedbackFeature {
         case backButtonTapped
         case nextTapped
         case completeButtonTapped
-        case addPrincipleButtonTapped
     }
     public enum InnerAction {
         case fetchFeedbackSuccess(FeedbackData)
@@ -112,9 +111,6 @@ extension TradeFeedbackFeature {
             return .none
         case .backButtonTapped:
             coordinator.popToPrev()
-            return .none
-        case .addPrincipleButtonTapped:
-            coordinator.pushToPrinciples(state.feedback.next)
             return .none
         case .nextTapped:
             return .none

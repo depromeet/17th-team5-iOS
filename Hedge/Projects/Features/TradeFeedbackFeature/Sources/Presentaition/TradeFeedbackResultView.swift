@@ -291,22 +291,6 @@ struct TradeFeedbackResultView: View {
                         bullet(recommendation)
                     }
                 }
-                
-                Button(action: {
-                    store.send(.view(.addPrincipleButtonTapped))
-                })
-                {
-                    Text("원칙 추가해보기")
-                        .font(FontModel.body1Semibold)
-                        .foregroundColor(.white)
-                        .frame(height: 42)
-                        .frame(minWidth: 67, maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.hedgeUI.brandPrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .padding(.top, 20)
             }
             .padding(.vertical, 18)
         }
