@@ -22,7 +22,8 @@ public struct DefaultRetrospectionDataSource: RetrospectionDataSource {
     }
     
     public func fetch() async throws -> RetrospectionResponseDTO {
-        try await provider.request(RetrospectionTarget.fetch)
+        let dto: RetrospectionResponseDTO = try await provider.request(RetrospectionTarget.fetch)
+        return dto
     }
     
     public func fetchBadgeReport() async throws -> BadgeReportResponseDTO {

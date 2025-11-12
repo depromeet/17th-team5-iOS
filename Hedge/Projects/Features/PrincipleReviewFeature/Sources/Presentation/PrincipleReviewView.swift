@@ -26,32 +26,30 @@ public struct PrincipleReviewView: View {
     }
     
     public var body: some View {
-        ZStack {
-            mainContent
-                .disabled(store.state.isSubmitting)
+        if store.state.isSubmitting {
+            Color.white
+                .ignoresSafeArea()
             
-            if store.state.isSubmitting {
-                Color.white
-                    .ignoresSafeArea()
-                
-                Circle()
-                    .trim(from: 0.0, to: 0.35)
-                    .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
-                    .frame(width: 32, height: 32)
-                    .rotationEffect(.degrees(-90))
-                    .rotationEffect(.degrees(isAnimating ? 360 : 0))
-                    .animation(
-                        .linear(duration: 0.8)
-                            .repeatForever(autoreverses: false),
-                        value: isAnimating
-                    )
-                    .onAppear { isAnimating = true }
-                    .onDisappear { isAnimating = false }
-            }
+            Circle()
+                .trim(from: 0.0, to: 0.35)
+                .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                .frame(width: 32, height: 32)
+                .rotationEffect(.degrees(-90))
+                .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                .animation(
+                    .linear(duration: 0.8)
+                    .repeatForever(autoreverses: false),
+                    value: isAnimating
+                )
+                .onAppear { isAnimating = true }
+                .onDisappear { isAnimating = false }
+        } else {
+            mainContent
         }
     }
     
     private var mainContent: some View {
+        
         VStack(spacing: 0) {
             if isFocused == false {
                 navigationBar
@@ -62,12 +60,6 @@ public struct PrincipleReviewView: View {
                     .padding(.horizontal, 20)
                 
                 HedgeSpacer(height: 16)
-                    
-                Text("지키셨나요?")
-                    .foregroundStyle(Color.hedgeUI.grey900)
-                    .font(FontModel.body3Medium)
-                    .padding(.horizontal, 20)
-                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             
             TabView(selection: $currentPageIndex) {
@@ -110,7 +102,7 @@ public struct PrincipleReviewView: View {
                 primaryTitle: "확인",
                 onPrimary: {
                     send(.cautionModalTapped)
-        }))
+                }))
         .hedgeModal(
             isPresented: $store.state.backCautionModalPresented,
             title: "정말 이전으로 갈까요?",
@@ -142,10 +134,8 @@ public struct PrincipleReviewView: View {
                     
                     pageFloatingView
                 }
-                .ignoresSafeArea()
             }
         }
-        .ignoresSafeArea(edges: .bottom)
         .safeAreaInset(edge: .bottom) {
             if focusWithAnimation {
                 keyboardResourceButtonView
@@ -290,20 +280,29 @@ public struct PrincipleReviewView: View {
         VStack(alignment: .leading,
                spacing: 4) {
             
-            HStack(spacing: 0) {
+            Text("지키셨나요?")
+                .foregroundStyle(Color.hedgeUI.grey900)
+                .font(FontModel.body3Medium)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            HStack(alignment: .top, spacing: 0) {
                 Text(store.principles[index].principle)
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .font(FontModel.h1Semibold)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
                 
-                Spacer()
+                Spacer(minLength: 8)
                 
                 Rectangle()
                     .frame(width: 12, height: 0)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.clear)
                 
                 Image.hedgeUI.arrowDown
                     .renderingMode(.template)
                     .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .padding(.top, 4)
                     .onTapGesture {
                         send(.pricipleToggleButtonTapped,
                              animation: .easeInOut(duration: 0.3))
@@ -313,6 +312,7 @@ public struct PrincipleReviewView: View {
         }
                .padding(.vertical, 10)
                .padding(.horizontal, 20)
+               .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     @ViewBuilder

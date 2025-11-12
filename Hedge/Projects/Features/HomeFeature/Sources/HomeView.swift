@@ -241,6 +241,7 @@ extension HomeView {
                         .font(FontModel.h2Semibold)
                         .foregroundStyle(Color.hedgeUI.textAssistive)
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
                 }
             } else {
                 HStack(spacing: 16) {
