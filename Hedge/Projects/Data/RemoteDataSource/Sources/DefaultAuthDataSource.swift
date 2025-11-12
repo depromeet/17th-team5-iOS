@@ -15,9 +15,11 @@ import RemoteDataSourceInterface
 
 public struct DefaultAuthDataSource: AuthDataSource {
     private let provider: Provider
+    private let authProvider: Provider
     
     public init() {
         self.provider = Provider.plain
+        self.authProvider = Provider.authorized
     }
     
     public func social(_ request: SocialLoginRequestDTO) async throws -> SocialLoginResponseDTO {
@@ -25,7 +27,7 @@ public struct DefaultAuthDataSource: AuthDataSource {
     }
     
     public func withdraw(_ request: AuthCodeRequestDTO?) async throws {
-        try await provider.request(AuthTarget.withdraw(request))
+        try await authProvider.request(AuthTarget.withdraw(request))
     }
 }
 

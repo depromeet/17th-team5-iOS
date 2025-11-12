@@ -35,6 +35,7 @@ public struct LoginIntent: LoginIntentProtocol {
             Log.error("apple login casting error")
             return
         }
+        Log.debug(authorizationCodeString)
         
         Task { @MainActor in
             do {

@@ -13,6 +13,8 @@ import AuthDomainInterface
 import SettingFeatureInterface
 
 public final class SettingViewModel: ObservableObject {
+    @Published var presentAlert: Bool = false
+    
     weak var coordinator: SettingCoordinator?
     private let authRepository: AuthRepository
     

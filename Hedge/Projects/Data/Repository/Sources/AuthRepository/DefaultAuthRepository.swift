@@ -42,6 +42,7 @@ public final class DefaultAuthRepository: AuthRepository {
         
         let response = try await authDataSource.social(request)
         let token = AuthToken(accessToken: response.accessToken, refreshToken: response.refreshToken)
+        print(token)
         userDataSource.updateLoginType(type: provider.rawValue)
         tokenDataSource.updateToken(token: token)
     }
