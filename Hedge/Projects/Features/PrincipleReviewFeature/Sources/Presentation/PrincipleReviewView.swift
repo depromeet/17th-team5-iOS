@@ -434,8 +434,8 @@ public struct PrincipleReviewView: View {
                             if let image = photoItem.loadedImage {
                                 image
                                     .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 120)
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 120, height: 120)
                                     .clipped()
                                     .cornerRadius(18)
                             } else {
