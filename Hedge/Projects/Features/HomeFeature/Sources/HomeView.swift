@@ -243,7 +243,7 @@ extension HomeView {
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
             } else {
-                HStack(spacing: 2) {
+                HStack(spacing: 16) {
                     // 주식 종목 리스트 (왼쪽)
                     ScrollView {
                         GeometryReader { proxy in
