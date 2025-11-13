@@ -27,7 +27,7 @@ public struct DefaultAuthDataSource: AuthDataSource {
     }
     
     public func withdraw(_ request: AuthCodeRequestDTO?) async throws {
-        try await authProvider.request(AuthTarget.withdraw(request))
+        try await provider.request(AuthTarget.withdraw(request))
     }
 }
 

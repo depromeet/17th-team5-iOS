@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Ios_HedgeAppLogo.png",
+      "filename" : "Ios_HedgeAppLogo_위치 수정.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,6 @@
           "value" : "dark"
         }
       ],
-      "filename" : "Ios_HedgeAppLogo 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +24,6 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "Ios_HedgeAppLogo 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

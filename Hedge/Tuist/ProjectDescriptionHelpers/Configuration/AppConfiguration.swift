@@ -15,7 +15,7 @@ public struct AppConfiguration {
     let workspaceName = "Hedge"
     let projectName: String = "Hedge"
     let organizationName = "HedgeCompany"
-    let shortVersion: String = "1.0.0"
+    let shortVersion: String = "1.0.1"
     let bundleIdentifier: String = "com.og.hedge"
     let displayName: String = "햇제"
     let destination: Set<Destination> = [.iPhone]
