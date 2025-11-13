@@ -161,29 +161,6 @@ extension PrinciplesFeature {
             return .none
             
         case .confirmButtonTapped:
-            
-            switch state.viewType {
-                
-            case .select:
-                guard let tradeType, let stock, let tradeHistory else {
-                    return .none
-                }
-                
-                coordinator.dismiss(animated: false)
-                if let principleGroup = state.principleGroups.first(where: { principleGroup in
-                    principleGroup.id == state.selectedGroupId
-                }) {
-                    coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
-                }
-            case .management:
-                guard let selectedPrincipleGroup = state.principleGroups.filter({ $0.id == state.selectedGroupId }).first else { return .none }
-                guard let groupId = state.selectedGroupId else { return .none }
-                let title = selectedPrincipleGroup.groupName
-                
-                coordinator.dismiss(animated: false)
-                coordinator.principleDelegate?.pushSelectPrinciple(title: title, id: groupId, recommendedPrinciples: recommendedPrinciples)
-            }
-            
             return .none
         }
     }

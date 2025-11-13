@@ -9,8 +9,12 @@
 import UIKit
 import SwiftUI
 
+import ComposableArchitecture
+
 import Core
 import RetrospectionFeatureInterface
+import RetrospectionDomainInterface
+import Shared
 
 public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
     public var navigationController: UINavigationController
@@ -19,12 +23,28 @@ public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
     public weak var parentCoordinator: RootCoordinator?
     public weak var finishDelegate: CoordinatorFinishDelegate?
     
-    public init(navigationController: UINavigationController) {
+    private let retrospectionId: Int
+    
+    public init(navigationController: UINavigationController, retrospectionId: Int) {
         self.navigationController = navigationController
+        self.retrospectionId = retrospectionId
     }
     
     public func start() {
-        let view = RetrospectionView()
+        let useCase = DIContainer.resolve(FetchRetrospectionDetailUseCase.self)
+        
+        let feature = RetrospectionFeature(
+            coordinator: self,
+            fetchRetrospectionDetailUseCase: useCase
+        )
+        
+        let view = RetrospectionView(
+            store: Store(
+                initialState: RetrospectionFeature.State(retrospectionId: retrospectionId),
+                reducer: { feature }
+            )
+        )
+        
         let hostingController = UIHostingController(rootView: view)
         navigationController.pushViewController(hostingController, animated: true)
     }

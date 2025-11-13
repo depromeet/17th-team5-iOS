@@ -139,8 +139,8 @@ extension TabBarFeature {
         case .homeAction(.delegate(.pushToSetting)):
             coordinator.pushToSetting()
             return .none
-        case .homeAction(.delegate(.pushToRetrospection)):
-            coordinator.pushToRetrospection()
+        case .homeAction(.delegate(.pushToRetrospection(let id))):
+            coordinator.pushToRetrospection(id)
             return .none
         case .homeAction(.delegate(.finish)):
             coordinator.finish()

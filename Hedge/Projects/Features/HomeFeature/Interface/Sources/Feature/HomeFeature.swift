@@ -64,7 +64,7 @@ public struct HomeFeature {
         case principleTabTapped
         case restrospectionSelectButtonTapped
         case pushToSetting
-        case retrospectionButtonTapped
+        case retrospectionButtonTapped(Int)
         
         case badgePopupTapped(Bool)
     }
@@ -83,7 +83,7 @@ public struct HomeFeature {
     public enum DelegateAction {
         case pushToStockSearch(TradeType)
         case pushToSetting
-        case pushToRetrospection
+        case pushToRetrospection(Int)
         case finish
     }
     
@@ -159,8 +159,8 @@ extension HomeFeature {
             return .run { send in
                 await send(.delegate(.pushToSetting))
             }
-        case .retrospectionButtonTapped:
-            return .send(.delegate(.pushToRetrospection))
+        case .retrospectionButtonTapped(let id):
+            return .send(.delegate(.pushToRetrospection(id)))
         }
     }
     

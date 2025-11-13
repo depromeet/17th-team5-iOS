@@ -413,7 +413,7 @@ extension HomeView {
             .padding(.top, 2)
         }
         .onTapGesture {
-            send(.retrospectionButtonTapped)
+            send(.retrospectionButtonTapped(retrospection.id))
         }
     }
     

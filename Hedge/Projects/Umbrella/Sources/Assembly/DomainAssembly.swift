@@ -110,6 +110,14 @@ public struct DomainAssembly: Assembly {
             return FetchBadgeReport(repository: repository)
         }
         
+        container.register(FetchRetrospectionDetailUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return FetchRetrospectionDetail(repository: repository)
+        }
+        
         container.register(SaveUserDefaultsUseCase.self) { _ in
             SaveUserDefaults()
         }

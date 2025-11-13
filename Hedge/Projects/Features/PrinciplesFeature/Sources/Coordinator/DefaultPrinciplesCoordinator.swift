@@ -25,7 +25,6 @@ public final class DefaultPrinciplesCoordinator: PrinciplesCoordinator {
     public var type: CoordinatorType = .principles
     public weak var parentCoordinator: RootCoordinator?
     public weak var finishDelegate: CoordinatorFinishDelegate?
-    public weak var principleDelegate: PrincipleDelegate?
     
     public var recommendedPrinciples: [String] = []
     public var tradeType: TradeType?
