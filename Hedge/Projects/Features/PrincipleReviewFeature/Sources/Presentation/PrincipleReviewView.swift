@@ -26,25 +26,28 @@ public struct PrincipleReviewView: View {
     }
     
     public var body: some View {
-        if store.state.isSubmitting {
-            Color.white
-                .ignoresSafeArea()
-            
-            Circle()
-                .trim(from: 0.0, to: 0.35)
-                .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
-                .frame(width: 32, height: 32)
-                .rotationEffect(.degrees(-90))
-                .rotationEffect(.degrees(isAnimating ? 360 : 0))
-                .animation(
-                    .linear(duration: 0.8)
-                    .repeatForever(autoreverses: false),
-                    value: isAnimating
-                )
-                .onAppear { isAnimating = true }
-                .onDisappear { isAnimating = false }
-        } else {
-            mainContent
+        Group {
+            if store.state.isSubmitting {
+                ZStack(alignment: .center) {
+                    Color.hedgeUI.backgroundWhite
+                    
+                    Circle()
+                        .trim(from: 0.0, to: 0.35)
+                        .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                        .frame(width: 32, height: 32)
+                        .rotationEffect(.degrees(-90))
+                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                        .animation(
+                            .linear(duration: 0.8)
+                            .repeatForever(autoreverses: false),
+                            value: isAnimating
+                        )
+                        .onAppear { isAnimating = true }
+                        .onDisappear { isAnimating = false }
+                }
+            } else {
+                mainContent
+            }
         }
     }
     
@@ -68,6 +71,7 @@ public struct PrincipleReviewView: View {
                         .tag(index)
                 }
             }
+            // .edgesIgnoringSafeArea(.bottom)
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .onChange(of: currentPageIndex) { _, newValue in
@@ -117,29 +121,32 @@ public struct PrincipleReviewView: View {
                     send(.backCancelButttonTapped)
                 })
         )
-        .overlay(alignment: .bottom) {
-            if !focusWithAnimation {
-                ZStack() {
-                    // 그라데이션 배경
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.white.opacity(0),
-                            Color.white.opacity(0.2),
-                            Color.white.opacity(0.98)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 82)
-                    
-                    pageFloatingView
+        .overlay {
+            VStack {
+                Spacer()
+                
+                if focusWithAnimation {
+                    keyboardResourceButtonView
+                } else {
+                    ZStack {
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(0),
+                                Color.white.opacity(0.2),
+                                Color.white.opacity(1)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 82)
+                        .allowsHitTesting(false)
+                        // .ignoresSafeArea(edges: .bottom)
+                        
+                        pageFloatingView
+                            // .ignoresSafeArea(edges: .bottom)
+                    }
+                    .padding(.zero)
                 }
-            }
-        }
-        .safeAreaInset(edge: .bottom) {
-            if focusWithAnimation {
-                keyboardResourceButtonView
-                    .background(Color.white)    // 필요 시 배경
             }
         }
     }
@@ -219,12 +226,6 @@ public struct PrincipleReviewView: View {
             }
             
             textInputView
-            
-            Spacer()
-            
-            // if focusWithAnimation {
-            //     keyboardResourceButtonView
-            // }
         }
     }
     
@@ -468,7 +469,7 @@ public struct PrincipleReviewView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
-        .padding(.bottom, 8)
+        .padding(.bottom, 20)
         .scrollIndicators(.hidden)
     }
     
