@@ -50,15 +50,8 @@ public struct RetrospectionView: View {
                 
                 HedgeSpacer(height: 16)
                 
-                principleSection
-                
-                HedgeSpacer(height: 16)
-                
-                reasonSection
-                
-                HedgeSpacer(height: 24)
-                
-                linkSection
+                // 페이징 영역
+                pagingContentSection
             }
         }
         .background(Color.hedgeUI.backgroundWhite)
@@ -69,14 +62,13 @@ public struct RetrospectionView: View {
         HedgeNavigationBar(
             title: nil,
             buttonText: "삭제",
-            color: .secondary,
-            state: .active,
+            state: .disabled,
             onLeftButtonTap: {
-                // 뒤로가기
+            // 뒤로가기
             },
             onRightButtonTap: {
-                // 삭제
-            }
+            // 삭제
+        }
         )
     }
     
@@ -84,10 +76,14 @@ public struct RetrospectionView: View {
     private var topSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             // 종목 정보
-            HStack(spacing: 8) {
+            HStack(spacing: 4) {
                 Image.hedgeUI.stockThumbnailDemo
                     .resizable()
                     .frame(width: 22, height: 22)
+                
+                Rectangle()
+                    .frame(width: 4)
+                    .foregroundStyle(Color.clear)
                 
                 Text(mockStockName)
                     .foregroundStyle(Color.hedgeUI.textTitle)
@@ -110,17 +106,16 @@ public struct RetrospectionView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 16)
+        .padding(.vertical, 10)
     }
     
     // MARK: - AI 피드백 보기 버튼
     private var aiFeedbackButton: some View {
         HStack(spacing: 8) {
             // 뱃지 이미지
-            Image.hedgeUI.silver
+            Image.hedgeUI.silverBadge
                 .resizable()
-                .frame(width: 24, height: 24)
+                .frame(width: 25, height: 24)
             
             Text("AI 피드백 보기")
                 .foregroundStyle(Color.hedgeUI.textSecondary)
@@ -132,13 +127,14 @@ public struct RetrospectionView: View {
                 .renderingMode(.template)
                 .foregroundStyle(Color.hedgeUI.textAssistive)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.leading, 14)
+        .padding(.trailing, 10)
+        .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color.hedgeUI.neutralBgSecondary)
         )
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .onTapGesture {
             // TODO: AI 피드백 화면으로 이동
         }
@@ -154,18 +150,95 @@ public struct RetrospectionView: View {
             Text("/\(totalPages)")
                 .foregroundStyle(Color.hedgeUI.textAssistive)
                 .font(FontModel.label1Medium)
+            
+            Rectangle()
+                .frame(width: 6)
+                .foregroundStyle(Color.clear)
+            
+            Rectangle()
+                .frame(width: 1, height: 12)
+                .foregroundStyle(Color.hedgeUI.textDisabled)
+            
+            Rectangle()
+                .frame(width: 6)
+                .foregroundStyle(Color.clear)
+            
+            Text("여기에 원칙 그룹 타이틀이 들어가요")
+                .foregroundStyle(Color.hedgeUI.textAssistive)
+                .font(FontModel.label2Medium)
+            
+            Spacer()
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 100)
-                .fill(Color.hedgeUI.neutralBgSecondary)
-        )
+        .padding(.horizontal, 20)
+    }
+    
+    // MARK: - 페이징 콘텐츠 섹션
+    private var pagingContentSection: some View {
+        GeometryReader { geometry in
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        ForEach(0..<totalPages, id: \.self) { index in
+                            VStack(spacing: 0) {
+                                principleSection(for: index)
+                                
+                                HedgeSpacer(height: 16)
+                                
+                                reasonSection(for: index)
+                                
+                                HedgeSpacer(height: 24)
+                                
+                                imageSection(for: index)
+                                
+                                HedgeSpacer(height: 16)
+                                
+                                linkSection(for: index)
+                            }
+                            .frame(width: geometry.size.width)
+                            .id(index)
+                        }
+                    }
+                    .background(
+                        GeometryReader { scrollGeometry in
+                            Color.clear
+                                .preference(
+                                    key: ScrollOffsetPreferenceKey.self,
+                                    value: scrollGeometry.frame(in: .named("scroll")).minX
+                                )
+                        }
+                    )
+                }
+                .coordinateSpace(name: "scroll")
+                .scrollTargetBehavior(.paging)
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
+                    let pageWidth = geometry.size.width
+                    let newPageIndex = Int(round(-offset / pageWidth))
+                    let clampedIndex = max(0, min(newPageIndex, totalPages - 1))
+                    if clampedIndex != currentPageIndex {
+                        currentPageIndex = clampedIndex
+                    }
+                }
+                .onChange(of: currentPageIndex) { _, newValue in
+                    withAnimation {
+                        proxy.scrollTo(newValue, anchor: .leading)
+                    }
+                }
+            }
+        }
+        .frame(height: calculatePagingContentHeight())
+    }
+    
+    // MARK: - Scroll Offset Preference Key
+    private struct ScrollOffsetPreferenceKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
+        }
     }
     
     // MARK: - 원칙 섹션
-    private var principleSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
+    private func principleSection(for index: Int) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .top, spacing: 0) {
                 Text(mockPrinciple)
                     .foregroundStyle(Color.hedgeUI.textTitle)
@@ -187,27 +260,62 @@ public struct RetrospectionView: View {
                     .foregroundStyle(Color.hedgeUI.brandDarken)
                     .font(FontModel.body3Semibold)
             }
-            .padding(.top, 4)
         }
         .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     // MARK: - 이유 섹션
-    private var reasonSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(mockReason)
-                .foregroundStyle(Color.hedgeUI.textPrimary)
-                .font(FontModel.body3Regular)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
+    private func reasonSection(for index: Int) -> some View {
+        Text(mockReason)
+            .foregroundStyle(Color.hedgeUI.textPrimary)
+            .font(FontModel.body3Regular)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    // MARK: - 이미지 섹션
+    private func imageSection(for index: Int) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(alignment: .top, spacing: 12) {
+                Rectangle()
+                    .fill(Color.hedgeUI.neutralBgSecondary)
+                    .frame(width: 120, height: 120)
+                    .cornerRadius(18)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(lineWidth: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    }
+                
+                Rectangle()
+                    .fill(Color.hedgeUI.neutralBgSecondary)
+                    .frame(width: 120, height: 120)
+                    .cornerRadius(18)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(lineWidth: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    }
+                
+                Rectangle()
+                    .fill(Color.hedgeUI.neutralBgSecondary)
+                    .frame(width: 120, height: 120)
+                    .cornerRadius(18)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(lineWidth: 1)
+                            .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                    }
+            }
         }
-        .padding(.horizontal, 20)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.leading, 20)
     }
     
     // MARK: - 링크 섹션
-    private var linkSection: some View {
+    private func linkSection(for index: Int) -> some View {
         VStack(spacing: 12) {
             // 링크 카드 1
             linkCard(
@@ -224,6 +332,12 @@ public struct RetrospectionView: View {
             )
         }
         .padding(.horizontal, 20)
+    }
+    
+    // MARK: - 페이징 콘텐츠 높이 계산
+    private func calculatePagingContentHeight() -> CGFloat {
+        // 대략적인 높이 계산 (실제 콘텐츠에 맞게 조정 필요)
+        return 600
     }
     
     // MARK: - 링크 카드
@@ -264,7 +378,6 @@ public struct RetrospectionView: View {
             
             Spacer()
         }
-        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.hedgeUI.backgroundWhite)

@@ -59,12 +59,12 @@ public struct HomeFeature {
     public enum View {
         case onAppear
         case companyTapped(String)
-        case retrospectTapped(TradeType)
+        case retrospectStartButtonTapped(TradeType)
         case homeTabTapped
         case principleTabTapped
-        case restrospectionButtonTapped
+        case restrospectionSelectButtonTapped
         case pushToSetting
-        case pushToRetrospection
+        case retrospectionButtonTapped
         
         case badgePopupTapped(Bool)
     }
@@ -83,6 +83,7 @@ public struct HomeFeature {
     public enum DelegateAction {
         case pushToStockSearch(TradeType)
         case pushToSetting
+        case pushToRetrospection
         case finish
     }
     
@@ -135,14 +136,14 @@ extension HomeFeature {
                 .send(.async(.fetchRetrospections)),
                 .send(.async(.fetchBadgeReport))
             )
-        case .restrospectionButtonTapped:
+        case .restrospectionSelectButtonTapped:
             state.retrospectionButtonActive.toggle()
             return .send(.inner(.deleteLastRetrospectionID))
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
             return .send(.inner(.deleteLastRetrospectionID))
-        case .retrospectTapped(let type):
+        case .retrospectStartButtonTapped(let type):
             state.retrospectionButtonActive = false
             return .send(.delegate(.pushToStockSearch(type)))
         case .homeTabTapped:
@@ -158,9 +159,8 @@ extension HomeFeature {
             return .run { send in
                 await send(.delegate(.pushToSetting))
             }
-        case .pushToRetrospection:
-            
-            return .none
+        case .retrospectionButtonTapped:
+            return .send(.delegate(.pushToRetrospection))
         }
     }
     
@@ -274,6 +274,8 @@ extension HomeFeature {
             // 실제 처리는 TabBarFeature에서 담당
             return .none
         case .pushToSetting:
+            return .none
+        case .pushToRetrospection:
             return .none
         case .finish:
             return .none

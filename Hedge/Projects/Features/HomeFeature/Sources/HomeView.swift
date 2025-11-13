@@ -413,7 +413,7 @@ extension HomeView {
             .padding(.top, 2)
         }
         .onTapGesture {
-            send(.pushToRetrospection)
+            send(.retrospectionButtonTapped)
         }
     }
     
@@ -448,7 +448,7 @@ extension HomeView {
                     
                     VStack(spacing: 0) {
                         Button {
-                            send(.retrospectTapped(.buy))
+                            send(.retrospectStartButtonTapped(.buy))
                         } label: {
                             Text("매수 회고하기".colorText(target: "매수", color: Color.hedgeUI.tradeBuy))
                                 .font(FontModel.body2Semibold)
@@ -461,7 +461,7 @@ extension HomeView {
                             .color(Color.hedgeUI.neutralBgSecondary)
                         
                         Button {
-                            send(.retrospectTapped(.sell))
+                            send(.retrospectStartButtonTapped(.sell))
                         } label: {
                             Text("매도 회고하기".colorText(target: "매도", color: Color.hedgeUI.tradeSell))
                                 .font(FontModel.body2Semibold)
@@ -503,7 +503,7 @@ extension HomeView {
                     .animation(.easeInOut(duration: 0.3), value: store.state.retrospectionButtonActive)
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            send(.restrospectionButtonTapped)
+                            send(.restrospectionSelectButtonTapped)
                             rotationAngle += 180
                         }
                     }

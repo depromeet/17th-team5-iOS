@@ -29,6 +29,8 @@ import SettingFeature
 import SettingFeatureInterface
 import SelectPrincipleFeature
 import SelectPrincipleFeatureInterface
+import RetrospectionFeature
+import RetrospectionFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     public var navigationController: UINavigationController
@@ -159,6 +161,16 @@ extension DefaultRootCoordinator {
         childCoordinators.append(settingCoordinator)
         
         settingCoordinator.start()
+    }
+    
+    public func pushToRetrospection() {
+        let retrospectionCoordinator = DefaultRetrospectionCoordinator(navigationController: navigationController)
+        retrospectionCoordinator.finishDelegate = self
+        retrospectionCoordinator.parentCoordinator = self
+        
+        childCoordinators.append(retrospectionCoordinator)
+        
+        retrospectionCoordinator.start()
     }
     
     public func pushToSelectPrinciple(title: String, id: Int, recommendedPrinciples: [String]) {

@@ -8,3 +8,8 @@
 
 import Foundation
 
+import Core
+
+public protocol RetrospectionCoordinator: Coordinator {
+    func popToPrev()
+}
