@@ -380,10 +380,21 @@ extension HomeView {
     @ViewBuilder
     private func retrospectItemView(retrospection: Retrospection) -> some View {
         VStack(alignment: .leading, spacing: 0) {
+            
+            var isLast: Bool = (store.lastRetrospectionID == retrospection.id)
+            
             // 금액 • 주수
-            Text("\(formatPrice(retrospection.price))원 • \(retrospection.volume)주")
-                .font(FontModel.h2Semibold)
-                .foregroundStyle(Color.hedgeUI.textTitle)
+            HStack(alignment: .top, spacing: 2) {
+                Text("\(formatPrice(retrospection.price))원 • \(retrospection.volume)주")
+                    .font(FontModel.h2Semibold)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                
+                if isLast {
+                    Circle()
+                        .foregroundStyle(Color.hedgeUI.brandPrimary)
+                        .frame(width: 6, height: 6)
+                }
+            }
             
             // 매수/매도 + 날짜
             HStack(spacing: 5) {

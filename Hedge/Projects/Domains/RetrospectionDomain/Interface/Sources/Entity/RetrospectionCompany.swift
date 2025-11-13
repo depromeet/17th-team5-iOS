@@ -14,6 +14,7 @@ public struct RetrospectionCompany: Equatable, Hashable {
     public let symbol: String
     public let market: String
     public let retrospections: [Retrospection]
+    public var isLast: Bool = false
     
     public init(
         companyName: String,

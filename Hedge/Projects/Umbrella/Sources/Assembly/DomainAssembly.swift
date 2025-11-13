@@ -23,6 +23,8 @@ import LinkDomainInterface
 import LinkDomain
 import RetrospectionDomainInterface
 import RetrospectionDomain
+import UserDefaultsDomainInterface
+import UserDefaultsDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -106,6 +108,18 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchBadgeReport(repository: repository)
+        }
+        
+        container.register(SaveUserDefaultsUseCase.self) { _ in
+            SaveUserDefaults()
+        }
+        
+        container.register(GetUserDefaultsUseCase.self) { _ in
+            GetUserDefaults()
+        }
+        
+        container.register(DeleteUserDefaultsUseCase.self) { _ in
+            DeleteUserDefaults()
         }
     }
 }

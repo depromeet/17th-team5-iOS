@@ -3,18 +3,25 @@ import ComposableArchitecture
 
 import Core
 import RetrospectionDomainInterface
+import UserDefaultsDomainInterface
 
 @Reducer
 public struct HomeFeature {
     private let fetchRetrospectionUseCase: RetrospectionUseCase
     private let fetchBadgeReportUseCase: FetchBadgeReportUseCase
+    private let getUserDefaultsUseCase: GetUserDefaultsUseCase
+    private let deleteUserDefaultsUseCase: DeleteUserDefaultsUseCase
     
     public init(
         fetchRetrospectionUseCase: RetrospectionUseCase,
-        fetchBadgeReportUseCase: FetchBadgeReportUseCase
+        fetchBadgeReportUseCase: FetchBadgeReportUseCase,
+        getUserDefaultsUseCase: GetUserDefaultsUseCase,
+        deleteUserDefaultsUseCase: DeleteUserDefaultsUseCase
     ) {
         self.fetchRetrospectionUseCase = fetchRetrospectionUseCase
         self.fetchBadgeReportUseCase = fetchBadgeReportUseCase
+        self.getUserDefaultsUseCase = getUserDefaultsUseCase
+        self.deleteUserDefaultsUseCase = deleteUserDefaultsUseCase
     }
     
     @ObservableState
@@ -23,6 +30,7 @@ public struct HomeFeature {
         public var selectedType: TabType = .home
         public var retrospectionCompanies: [RetrospectionCompany] = []
         public var lastRetrospectionComapnyName: String?
+        public var lastRetrospectionID: Int?
         public var selectedCompanyName: String?
         public var isBadgePopupPresented: Bool = false
         public var isLoadingRetrospections: Bool = false
@@ -64,6 +72,7 @@ public struct HomeFeature {
         case fetchRetrospectionsFailure(Error)
         case fetchBadgeReportSuccess(RetrospectionBadgeReport)
         case fetchBadgeReportFailure(Error)
+        case deleteLastRetrospectionID
     }
     public enum AsyncAction {
         case fetchRetrospections
@@ -127,11 +136,11 @@ extension HomeFeature {
             )
         case .restrospectionButtonTapped:
             state.retrospectionButtonActive.toggle()
-            return .none
+            return .send(.inner(.deleteLastRetrospectionID))
         case .companyTapped(let selectedSymbol):
             state.selectedCompanyName = selectedSymbol
             updateGroupedRetrospections(for: selectedSymbol, state: &state)
-            return .none
+            return .send(.inner(.deleteLastRetrospectionID))
         case .retrospectTapped(let type):
             state.retrospectionButtonActive = false
             return .send(.delegate(.pushToStockSearch(type)))
@@ -157,6 +166,9 @@ extension HomeFeature {
         _ action: InnerAction
     ) -> Effect<Action> {
         switch action {
+        case .deleteLastRetrospectionID:
+            state.lastRetrospectionID = nil
+            return .none
         case .fetchRetrospectionsSuccess(let companies):
             state.retrospectionCompanies = companies
             
@@ -164,6 +176,11 @@ extension HomeFeature {
                 state.selectedCompanyName = lastRetrospectionComapnyName
             } else {
                 state.selectedCompanyName = companies.first?.companyName
+            }
+            
+            if let lastRetrospectionID: Int? = getUserDefaultsUseCase.execute(.retrospectionID) {
+                state.lastRetrospectionID = lastRetrospectionID
+                deleteUserDefaultsUseCase.execute(.retrospectionID)
             }
             
             if let selectedSymbol = state.selectedCompanyName {

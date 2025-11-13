@@ -19,6 +19,7 @@ import StockDomainInterface
 import LinkDomainInterface
 import RetrospectionDomainInterface
 import FeedbackDomainInterface
+import UserDefaultsDomainInterface
 import Shared
 
 public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator {
@@ -57,7 +58,8 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
                             fetchLinkUseCase: DIContainer.resolve(FetchLinkUseCase.self),
                             uploadImageUseCase: DIContainer.resolve(UploadRetrospectionImageUseCase.self),
                             createRetrospectionUseCase: DIContainer.resolve(CreateRetrospectionUseCase.self),
-                            fetchFeedbackUseCase: DIContainer.resolve(FetchFeedbackUseCase.self)
+                            fetchFeedbackUseCase: DIContainer.resolve(FetchFeedbackUseCase.self),
+                            saveUserDefaultsUseCase: DIContainer.resolve(SaveUserDefaultsUseCase.self)
                         )
                     }
                 )
