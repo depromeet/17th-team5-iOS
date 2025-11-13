@@ -381,7 +381,7 @@ extension HomeView {
     private func retrospectItemView(retrospection: Retrospection) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            var isLast: Bool = (store.lastRetrospectionID == retrospection.id)
+            let isLast: Bool = (store.lastRetrospectionID == retrospection.id)
             
             // 금액 • 주수
             HStack(alignment: .top, spacing: 2) {
@@ -411,6 +411,9 @@ extension HomeView {
                     .foregroundStyle(Color.hedgeUI.textAlternative)
             }
             .padding(.top, 2)
+        }
+        .onTapGesture {
+            send(.pushToRetrospection)
         }
     }
     

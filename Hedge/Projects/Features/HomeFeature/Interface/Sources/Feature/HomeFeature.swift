@@ -64,6 +64,7 @@ public struct HomeFeature {
         case principleTabTapped
         case restrospectionButtonTapped
         case pushToSetting
+        case pushToRetrospection
         
         case badgePopupTapped(Bool)
     }
@@ -157,6 +158,9 @@ extension HomeFeature {
             return .run { send in
                 await send(.delegate(.pushToSetting))
             }
+        case .pushToRetrospection:
+            
+            return .none
         }
     }
     
