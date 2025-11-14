@@ -73,31 +73,40 @@ public struct PrincipleReviewView: View {
                                 singleReviewView(for: index)
                                     .frame(width: geometry.size.width)
                                     .id(index)
-                            }
-                        }
-                        .background(
-                            GeometryReader { scrollGeometry in
-                                Color.clear
-                                    .preference(
-                                        key: ScrollOffsetPreferenceKey.self,
-                                        value: scrollGeometry.frame(in: .named("scroll")).minX
+                                    .background(
+                                        GeometryReader { itemGeometry in
+                                            Color.clear
+                                                .preference(
+                                                    key: ScrollOffsetPreferenceKey.self,
+                                                    value: [index: itemGeometry.frame(in: .named("scroll")).minX]
+                                                )
+                                        }
                                     )
                             }
-                        )
+                        }
                     }
                     .coordinateSpace(name: "scroll")
                     .scrollTargetBehavior(.paging)
-                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                        let pageWidth = geometry.size.width
-                        let newPageIndex = Int(round(-offset / pageWidth))
-                        let clampedIndex = max(0, min(newPageIndex, store.principles.count - 1))
-                        if clampedIndex != currentPageIndex {
-                            currentPageIndex = clampedIndex
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offsets in
+                        guard !offsets.isEmpty else { return }
+                        
+                        // 화면 중앙에 가장 가까운 아이템 찾기
+                        let screenCenter = geometry.size.width / 2
+                        var closestIndex = currentPageIndex
+                        var minDistance: CGFloat = .infinity
+                        
+                        for (index, offset) in offsets {
+                            // 아이템의 중앙 위치 계산
+                            let itemCenter = offset + geometry.size.width / 2
+                            let distance = abs(itemCenter - screenCenter)
+                            if distance < minDistance {
+                                minDistance = distance
+                                closestIndex = index
+                            }
                         }
-                    }
-                    .onChange(of: currentPageIndex) { _, newValue in
-                        withAnimation {
-                            proxy.scrollTo(newValue, anchor: .leading)
+                        
+                        if closestIndex != currentPageIndex {
+                            currentPageIndex = closestIndex
                         }
                     }
                     .ignoresSafeArea(edges: .bottom)
@@ -632,57 +641,57 @@ public struct PrincipleReviewView: View {
     }
     
     private var pageFloatingView: some View {
-        // 메인 카드 컨테이너
-        HStack(spacing: 12) {
-            // 왼쪽 아이콘 영역
-            ZStack {
-                // 🔥 이모지가 있는 원형 배경
-                Circle()
-                    .fill(Color.hedgeUI.neutralBgSecondary)
-                    .frame(width: 24, height: 24)
-                    .overlay {
-                        Text("🔥")
-                            .font(FontModel.caption1Semibold)
-                    }
-                
-                // 초록색 원형 인디케이터
-                Circle()
-                    .trim(from: 0.0, to: store.endAngle)
-                    .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                    .frame(width: 24, height: 24)
-                    .rotationEffect(.degrees(-90))
-            }
-            
-            // 페이지 인디케이터 영역
-            HStack(spacing: 8) {
-                // 페이지 인디케이터들
-                ForEach(0..<store.principles.count, id: \.self) { index in
+            // 메인 카드 컨테이너
+            HStack(spacing: 12) {
+                // 왼쪽 아이콘 영역
+                ZStack {
+                    // 🔥 이모지가 있는 원형 배경
                     Circle()
-                        .fill(index == currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
-                        .frame(width: 6, height: 6)
+                        .fill(Color.hedgeUI.neutralBgSecondary)
+                        .frame(width: 24, height: 24)
+                        .overlay {
+                            Text("🔥")
+                                .font(FontModel.caption1Semibold)
+                        }
+                    
+                    // 초록색 원형 인디케이터
+                    Circle()
+                        .trim(from: 0.0, to: store.endAngle)
+                        .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                        .frame(width: 24, height: 24)
+                        .rotationEffect(.degrees(-90))
+                }
+                
+                // 페이지 인디케이터 영역
+                HStack(spacing: 8) {
+                    // 페이지 인디케이터들
+                    ForEach(0..<store.principles.count, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
+                            .frame(width: 6, height: 6)
+                    }
                 }
             }
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 29)
-                .fill(Color.white)
-                .shadow(
-                    color: Color.black.opacity(0.1),
-                    radius: 30,
-                    x: 0,
-                    y: 6
-                )
-        )
-        .padding(.horizontal, 0)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 29)
+                    .fill(Color.white)
+                    .shadow(
+                        color: Color.black.opacity(0.1),
+                        radius: 30,
+                        x: 0,
+                        y: 6
+                    )
+            )
+            .padding(.horizontal, 0)
     }
     
     // MARK: - Scroll Offset Preference Key
     private struct ScrollOffsetPreferenceKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-            value = nextValue()
+        static var defaultValue: [Int: CGFloat] = [:]
+        static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+            value.merge(nextValue(), uniquingKeysWith: { _, new in new })
         }
     }
 }
