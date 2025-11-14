@@ -34,6 +34,10 @@ public struct DefaultRetrospectionDataSource: RetrospectionDataSource {
         try await provider.request(RetrospectionTarget.fetchDetail(retrospectionId: retrospectionId))
     }
     
+    public func deleteRetrospection(retrospectionId: Int) async throws -> RetrospectionDeleteResponseDTO {
+        try await provider.request(RetrospectionTarget.delete(retrospectionId: retrospectionId))
+    }
+    
     public func uploadImage(
         domain: String,
         fileData: Data,
@@ -59,6 +63,7 @@ enum RetrospectionTarget {
     case fetch
     case badgeReport
     case fetchDetail(retrospectionId: Int)
+    case delete(retrospectionId: Int)
     case upload(domain: String)
     case create(RetrospectionCreateRequestDTO)
 }
@@ -71,6 +76,8 @@ extension RetrospectionTarget: TargetType {
         case .badgeReport:
             return Configuration.baseURL + "/api/v1/reports"
         case .fetchDetail:
+            return Configuration.baseURL + "/api/v1/retrospections"
+        case .delete:
             return Configuration.baseURL + "/api/v1/retrospections"
         case .upload(let domain):
             return Configuration.baseURL + "/api/v1/\(domain)"
@@ -91,6 +98,8 @@ extension RetrospectionTarget: TargetType {
             return .get
         case .fetchDetail:
             return .get
+        case .delete:
+            return .delete
         case .upload:
             return .post
         case .create:
@@ -105,6 +114,8 @@ extension RetrospectionTarget: TargetType {
         case .badgeReport:
             return ""
         case .fetchDetail(let retrospectionId):
+            return "/\(retrospectionId)"
+        case .delete(let retrospectionId):
             return "/\(retrospectionId)"
         case .upload:
             return "/images/upload"
@@ -121,6 +132,8 @@ extension RetrospectionTarget: TargetType {
             return nil
         case .fetchDetail:
             return nil
+        case .delete:
+            return nil
         case .upload:
             return nil
         case .create(let request):
@@ -135,6 +148,8 @@ extension RetrospectionTarget: TargetType {
         case .badgeReport:
             return makeEncoder(contentType: .json)
         case .fetchDetail:
+            return makeEncoder(contentType: .json)
+        case .delete:
             return makeEncoder(contentType: .json)
         case .upload:
             return makeEncoder(contentType: .json)

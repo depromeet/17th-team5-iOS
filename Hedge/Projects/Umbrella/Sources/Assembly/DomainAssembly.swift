@@ -118,6 +118,14 @@ public struct DomainAssembly: Assembly {
             return FetchRetrospectionDetail(repository: repository)
         }
         
+        container.register(DeleteRetrospectionUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return DeleteRetrospection(repository: repository)
+        }
+        
         container.register(SaveUserDefaultsUseCase.self) { _ in
             SaveUserDefaults()
         }

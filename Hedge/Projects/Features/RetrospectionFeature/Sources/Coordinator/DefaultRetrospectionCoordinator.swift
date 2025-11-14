@@ -34,11 +34,13 @@ public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
     public func start() {
         let fetchRetrospectionDetailUseCase = DIContainer.resolve(FetchRetrospectionDetailUseCase.self)
         let fetchLinkUseCase = DIContainer.resolve(FetchLinkUseCase.self)
+        let deleteRetrospectionUseCase = DIContainer.resolve(DeleteRetrospectionUseCase.self)
         
         let feature = RetrospectionFeature(
             coordinator: self,
             fetchRetrospectionDetailUseCase: fetchRetrospectionDetailUseCase,
-            fetchLinkUseCase: fetchLinkUseCase
+            fetchLinkUseCase: fetchLinkUseCase,
+            deleteRetrospectionUseCase: deleteRetrospectionUseCase
         )
         
         let view = RetrospectionView(

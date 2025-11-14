@@ -41,6 +41,10 @@ public struct DefaultRetrospectionRepository: RetrospectionRepository {
         return response.data.toDomain()
     }
     
+    public func deleteRetrospection(retrospectionId: Int) async throws {
+        _ = try await dataSource.deleteRetrospection(retrospectionId: retrospectionId)
+    }
+    
     public func uploadImage(
         domain: String,
         fileData: Data,

@@ -23,19 +23,24 @@ public struct RetrospectionFeature {
     private let coordinator: RetrospectionCoordinator
     private let fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase
     private let fetchLinkUseCase: FetchLinkUseCase
+    private let deleteRetrospectionUseCase: DeleteRetrospectionUseCase
     
     public init(
         coordinator: RetrospectionCoordinator,
         fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase,
-        fetchLinkUseCase: FetchLinkUseCase
+        fetchLinkUseCase: FetchLinkUseCase,
+        deleteRetrospectionUseCase: DeleteRetrospectionUseCase
     ) {
         self.coordinator = coordinator
         self.fetchRetrospectionDetailUseCase = fetchRetrospectionDetailUseCase
         self.fetchLinkUseCase = fetchLinkUseCase
+        self.deleteRetrospectionUseCase = deleteRetrospectionUseCase
     }
     
     @ObservableState
     public struct State: Equatable {
+        public var isShow: Bool = false
+        
         public var retrospectionId: Int
         public var currentPageIndex: Int = 0
         
@@ -112,17 +117,22 @@ public struct RetrospectionFeature {
         case deleteButtonTapped
         case pageChanged(Int)
         case aiFeedbackButtonTapped
+        case deleteCancelButtonTapped
+        case deleteConfirmButtonTapped
     }
     
     public enum InnerAction {
         case fetchRetrospectionSuccess(RetrospectionDetail)
         case fetchRetrospectionFailure(Error)
         case updateLinkMetadata(pageIndex: Int, linkMetadata: LinkMetadata)
+        case deleteRetrospectionSuccess
+        case deleteRetrospectionFailure(Error)
     }
     
     public enum AsyncAction {
         case fetchRetrospection(Int)
         case fetchLinkMetadata(pageIndex: Int, urlString: String)
+        case deleteRetrospection(Int)
     }
     
     public enum ScopeAction { }
@@ -177,7 +187,7 @@ extension RetrospectionFeature {
             return .none
             
         case .deleteButtonTapped:
-            // TODO: 삭제 로직 구현
+            state.isShow = true
             return .none
             
         case .pageChanged(let newIndex):
@@ -187,6 +197,14 @@ extension RetrospectionFeature {
         case .aiFeedbackButtonTapped:
             // TODO: AI 피드백 화면으로 이동
             return .none
+            
+        case .deleteCancelButtonTapped:
+            state.isShow = false
+            return .none
+            
+        case .deleteConfirmButtonTapped:
+            state.isShow = false
+            return .send(.async(.deleteRetrospection(state.retrospectionId)))
         }
     }
     
@@ -254,6 +272,16 @@ extension RetrospectionFeature {
             updatedPage.links.append(linkMetadata)
             state.principlePages[pageIndex] = updatedPage
             return .none
+            
+        case .deleteRetrospectionSuccess:
+            coordinator.popToPrev()
+            return .none
+            
+        case .deleteRetrospectionFailure(let error):
+            Log.error("Failed to delete retrospection: \(error)")
+            // 실패해도 popToPrev
+            coordinator.popToPrev()
+            return .none
         }
     }
     
@@ -318,6 +346,16 @@ extension RetrospectionFeature {
                     await send(.inner(.updateLinkMetadata(pageIndex: pageIndex, linkMetadata: metadata)))
                 } catch {
                     Log.error("Failed to fetch link metadata: \(error)")
+                }
+            }
+            
+        case .deleteRetrospection(let retrospectionId):
+            return .run { [deleteRetrospectionUseCase] send in
+                do {
+                    try await deleteRetrospectionUseCase.execute(retrospectionId: retrospectionId)
+                    await send(.inner(.deleteRetrospectionSuccess))
+                } catch {
+                    await send(.inner(.deleteRetrospectionFailure(error)))
                 }
             }
         }

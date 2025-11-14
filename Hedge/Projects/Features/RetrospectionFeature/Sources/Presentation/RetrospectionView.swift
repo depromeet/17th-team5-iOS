@@ -54,6 +54,20 @@ public struct RetrospectionView: View {
                     .allowsHitTesting(false) // 터치 이벤트는 TabView로 전달
             }
         }
+        .hedgeModal(
+            isPresented: $store.state.isShow,
+            title: "해당 회고를 삭제할까요?",
+            subtitle: "한 번 삭제하면 되돌릴 수 없어요",
+            showIcon: false,
+            actions: .init(
+            primaryTitle: "삭제",
+            onPrimary: {
+                send(.deleteConfirmButtonTapped)
+            },
+            secondaryTitle: "취소",
+            onSecondary: {
+                send(.deleteCancelButtonTapped)
+            }))
         .ignoresSafeArea(.container, edges: .bottom)
     }
     
@@ -62,7 +76,7 @@ public struct RetrospectionView: View {
         HedgeNavigationBar(
             title: nil,
             buttonText: "삭제",
-            color: .secondary,
+            color: .primary,
             state: .active,
             onLeftButtonTap: {
                 send(.backButtonTapped)
