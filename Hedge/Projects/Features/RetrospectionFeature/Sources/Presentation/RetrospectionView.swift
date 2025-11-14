@@ -152,10 +152,10 @@ public struct RetrospectionView: View {
     
     private var badgeImage: Image {
         switch store.state.badgeLevel {
-        case .emerald: return Image.hedgeUI.emerald
-        case .gold: return Image.hedgeUI.gold
-        case .silver: return Image.hedgeUI.silver
-        case .bronze: return Image.hedgeUI.bronze
+        case .emerald: return Image.hedgeUI.emeraldBadge
+        case .gold: return Image.hedgeUI.goldBadge
+        case .silver: return Image.hedgeUI.silverBadge
+        case .bronze: return Image.hedgeUI.bronzeBadge
         }
     }
     
@@ -294,6 +294,23 @@ public struct RetrospectionView: View {
                     ForEach(page.imageURLs, id: \.self) { imageURL in
                         if let url = URL(string: imageURL) {
                             KFImage(url)
+                                .placeholder {
+                                    // 스켈레톤 UI와 로딩 인디케이터
+                                    ZStack {
+                                        Rectangle()
+                                            .fill(Color.hedgeUI.neutralBgSecondary)
+                                            .frame(width: 120, height: 120)
+                                            .cornerRadius(18)
+                                            .overlay {
+                                                RoundedRectangle(cornerRadius: 18)
+                                                    .stroke(lineWidth: 1)
+                                                    .foregroundStyle(Color.hedgeUI.neutralBgSecondary)
+                                            }
+                                        
+                                        ProgressView()
+                                            .tint(Color.hedgeUI.textAssistive)
+                                    }
+                                }
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 120, height: 120)
@@ -341,26 +358,43 @@ public struct RetrospectionView: View {
     
     // MARK: - 하단 페이징 인디케이터
     private var bottomPageIndicatorView: some View {
-        HStack(spacing: 8) {
-            ForEach(0..<store.state.totalPages, id: \.self) { index in
-                Circle()
-                    .fill(index == store.state.currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
-                    .frame(width: 6, height: 6)
+        ZStack(alignment: .bottom) {
+            // 그라디언트 배경 (뒤에 위치)
+            LinearGradient(
+                gradient: Gradient(stops: [
+                    .init(color: Color.white.opacity(0.0), location: 0.0),
+                    .init(color: Color.white.opacity(0.7), location: 0.21),
+                    .init(color: Color.white.opacity(0.98), location: 1.0)
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(maxWidth: .infinity)
+            .frame(height: 82)
+            
+            // 인디케이터 (바닥에 딱 붙음)
+            HStack(spacing: 8) {
+                ForEach(0..<store.state.totalPages, id: \.self) { index in
+                    Circle()
+                        .fill(index == store.state.currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
+                        .frame(width: 6, height: 6)
+                }
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 22)
+            .background(
+                RoundedRectangle(cornerRadius: 29)
+                    .fill(Color.hedgeUI.textAlternative)
+                    .shadow(
+                        color: Color.black.opacity(0.08),
+                        radius: 20,
+                        x: 0,
+                        y: 6
+                    )
+            )
+            .padding(.bottom, 32)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 22)
-        .background(
-            RoundedRectangle(cornerRadius: 29)
-                .fill(Color.hedgeUI.textAlternative)
-                .shadow(
-                    color: Color.black.opacity(0.08),
-                    radius: 20,
-                    x: 0,
-                    y: 6
-                )
-        )
-        .padding(.bottom, 32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
     
     // MARK: - 페이징 콘텐츠 높이 계산
@@ -371,8 +405,8 @@ public struct RetrospectionView: View {
     
     // MARK: - 링크 카드
     private func linkCard(imageURL: String?, title: String, source: String) -> some View {
-        HStack(alignment: .center, spacing: 16) {
-            // 이미지
+        HStack(alignment: .center, spacing: 0) {
+            // 이미지 - 왼쪽 끝에 딱 맞춤
             if let imageURL = imageURL,
                let url = URL(string: imageURL) {
                 AsyncImage(url: url) { image in
@@ -385,12 +419,26 @@ public struct RetrospectionView: View {
                 }
                 .frame(width: 98, height: 98)
                 .clipped()
-                .cornerRadius(8)
+                .clipShape(
+                    .rect(
+                        topLeadingRadius: 16,
+                        bottomLeadingRadius: 16,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 0
+                    )
+                )
             } else {
                 Rectangle()
                     .fill(Color.hedgeUI.neutralBgSecondary)
                     .frame(width: 98, height: 98)
-                    .cornerRadius(8)
+                    .clipShape(
+                        .rect(
+                            topLeadingRadius: 16,
+                            bottomLeadingRadius: 16,
+                            bottomTrailingRadius: 0,
+                            topTrailingRadius: 0
+                        )
+                    )
             }
             
             // 텍스트 정보
@@ -404,6 +452,8 @@ public struct RetrospectionView: View {
                     .font(FontModel.caption1Medium)
                     .foregroundStyle(Color.hedgeUI.textAlternative)
             }
+            .padding(.leading, 16)
+            .padding(.trailing, 16)
             
             Spacer()
         }
@@ -415,27 +465,6 @@ public struct RetrospectionView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1.2)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
-
-// #Preview {
-//     RetrospectionView(
-//         store: Store(
-//             initialState: RetrospectionFeature.State(),
-//             reducer: {
-//                 RetrospectionFeature(coordinator: PreviewRetrospectionCoordinator())
-//             }
-//         )
-//     )
-// }
-// 
-// private class PreviewRetrospectionCoordinator: RetrospectionCoordinator {
-//     var navigationController: UINavigationController = .init()
-//     var childCoordinators: [Coordinator] = []
-//     var type: CoordinatorType = .retrospection
-//     weak var parentCoordinator: RootCoordinator?
-//     weak var finishDelegate: CoordinatorFinishDelegate?
-//     
-//     func start() {}
-//     func popToPrev() {}
-// }
