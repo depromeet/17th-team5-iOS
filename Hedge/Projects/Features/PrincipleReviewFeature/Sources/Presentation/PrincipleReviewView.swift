@@ -65,15 +65,45 @@ public struct PrincipleReviewView: View {
                 HedgeSpacer(height: 16)
             }
             
-            TabView(selection: $currentPageIndex) {
-                ForEach(0..<store.principles.count, id: \.self) { index in
-                    singleReviewView(for: index)
-                        .tag(index)
+            GeometryReader { geometry in
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            ForEach(0..<store.principles.count, id: \.self) { index in
+                                singleReviewView(for: index)
+                                    .frame(width: geometry.size.width)
+                                    .id(index)
+                            }
+                        }
+                        .background(
+                            GeometryReader { scrollGeometry in
+                                Color.clear
+                                    .preference(
+                                        key: ScrollOffsetPreferenceKey.self,
+                                        value: scrollGeometry.frame(in: .named("scroll")).minX
+                                    )
+                            }
+                        )
+                    }
+                    .coordinateSpace(name: "scroll")
+                    .scrollTargetBehavior(.paging)
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
+                        let pageWidth = geometry.size.width
+                        let newPageIndex = Int(round(-offset / pageWidth))
+                        let clampedIndex = max(0, min(newPageIndex, store.principles.count - 1))
+                        if clampedIndex != currentPageIndex {
+                            currentPageIndex = clampedIndex
+                        }
+                    }
+                    .onChange(of: currentPageIndex) { _, newValue in
+                        withAnimation {
+                            proxy.scrollTo(newValue, anchor: .leading)
+                        }
+                    }
+                    .ignoresSafeArea(edges: .bottom)
                 }
             }
-            // .edgesIgnoringSafeArea(.bottom)
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
         .onChange(of: currentPageIndex) { _, newValue in
             send(.pageChanged(newValue))
         }
@@ -121,34 +151,33 @@ public struct PrincipleReviewView: View {
                     send(.backCancelButttonTapped)
                 })
         )
-        .overlay {
-            VStack {
-                Spacer()
-                
-                if focusWithAnimation {
-                    keyboardResourceButtonView
-                } else {
-                    ZStack {
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.white.opacity(0),
-                                Color.white.opacity(0.2),
-                                Color.white.opacity(1)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .frame(height: 82)
-                        .allowsHitTesting(false)
-                        // .ignoresSafeArea(edges: .bottom)
-                        
-                        pageFloatingView
-                            // .ignoresSafeArea(edges: .bottom)
-                    }
-                    .padding(.zero)
+        .overlay(alignment: .bottom) {
+            if focusWithAnimation {
+                keyboardResourceButtonView
+            } else {
+                ZStack(alignment: .bottom) {
+                    // 그라디언트 배경 (뒤에 위치)
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: Color.white.opacity(0.0), location: 0.0),
+                            .init(color: Color.white.opacity(0.7), location: 0.21),
+                            .init(color: Color.white.opacity(0.98), location: 1.0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 82)
+                    .allowsHitTesting(false)
+                    
+                    // pageFloatingView (바닥에 딱 붙음)
+                    pageFloatingView
+                        .padding(.bottom, 32)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             }
         }
+        .ignoresSafeArea(.container, edges: .bottom)
     }
     
     // MARK: - Single Review View
@@ -469,7 +498,7 @@ public struct PrincipleReviewView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
-        .padding(.bottom, 20)
+        // .padding(.bottom, 20)
         .scrollIndicators(.hidden)
     }
     
@@ -647,6 +676,13 @@ public struct PrincipleReviewView: View {
                 )
         )
         .padding(.horizontal, 0)
-        .padding(.bottom, 32)
+    }
+    
+    // MARK: - Scroll Offset Preference Key
+    private struct ScrollOffsetPreferenceKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
+        }
     }
 }
