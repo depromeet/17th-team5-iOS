@@ -204,6 +204,8 @@ public struct RetrospectionView: View {
                                 HedgeSpacer(height: 16)
                                 
                                 linkSection(for: index)
+                                
+                                Spacer()
                             }
                             .frame(width: geometry.size.width)
                             .id(index)

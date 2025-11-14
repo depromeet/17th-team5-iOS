@@ -14,6 +14,7 @@ import ComposableArchitecture
 import Core
 import RetrospectionFeatureInterface
 import RetrospectionDomainInterface
+import LinkDomainInterface
 import Shared
 
 public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
@@ -31,11 +32,13 @@ public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
     }
     
     public func start() {
-        let useCase = DIContainer.resolve(FetchRetrospectionDetailUseCase.self)
+        let fetchRetrospectionDetailUseCase = DIContainer.resolve(FetchRetrospectionDetailUseCase.self)
+        let fetchLinkUseCase = DIContainer.resolve(FetchLinkUseCase.self)
         
         let feature = RetrospectionFeature(
             coordinator: self,
-            fetchRetrospectionDetailUseCase: useCase
+            fetchRetrospectionDetailUseCase: fetchRetrospectionDetailUseCase,
+            fetchLinkUseCase: fetchLinkUseCase
         )
         
         let view = RetrospectionView(

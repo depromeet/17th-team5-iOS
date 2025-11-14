@@ -22,13 +22,16 @@ import LinkDomainInterface
 public struct RetrospectionFeature {
     private let coordinator: RetrospectionCoordinator
     private let fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase
+    private let fetchLinkUseCase: FetchLinkUseCase
     
     public init(
         coordinator: RetrospectionCoordinator,
-        fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase
+        fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase,
+        fetchLinkUseCase: FetchLinkUseCase
     ) {
         self.coordinator = coordinator
         self.fetchRetrospectionDetailUseCase = fetchRetrospectionDetailUseCase
+        self.fetchLinkUseCase = fetchLinkUseCase
     }
     
     @ObservableState
@@ -114,10 +117,12 @@ public struct RetrospectionFeature {
     public enum InnerAction {
         case fetchRetrospectionSuccess(RetrospectionDetail)
         case fetchRetrospectionFailure(Error)
+        case updateLinkMetadata(pageIndex: Int, linkMetadata: LinkMetadata)
     }
     
     public enum AsyncAction {
         case fetchRetrospection(Int)
+        case fetchLinkMetadata(pageIndex: Int, urlString: String)
     }
     
     public enum ScopeAction { }
@@ -217,25 +222,37 @@ extension RetrospectionFeature {
             state.principleGroupTitle = detail.principleCheckGroup.groupName
             
             // 페이지별 원칙 정보 업데이트
-            // 링크 메타데이터는 나중에 비동기로 가져올 수 있지만, 일단 빈 배열로 초기화
-            state.principlePages = detail.principleCheckGroup.principleChecks.map { check in
-                // LinkMetadata는 나중에 FetchLinkUseCase로 가져올 수 있음
-                // 일단 빈 LinkMetadata 배열로 초기화
-                let linkMetadata: [LinkMetadata] = []
-                
+            state.principlePages = detail.principleCheckGroup.principleChecks.enumerated().map { index, check in
                 return PrinciplePage(
                     principle: check.principle,
                     evaluation: mapPrincipleStatus(check.status),
                     reason: check.reason,
                     imageURLs: check.imageUrls,
-                    links: linkMetadata
+                    links: []
                 )
             }
             
-            return .none
+            // 각 페이지의 링크들을 비동기로 fetch
+            var effects: [Effect<Action>] = []
+            for (pageIndex, check) in detail.principleCheckGroup.principleChecks.enumerated() {
+                for linkUrl in check.links {
+                    effects.append(.send(.async(.fetchLinkMetadata(pageIndex: pageIndex, urlString: linkUrl))))
+                }
+            }
+            
+            return .merge(effects)
             
         case .fetchRetrospectionFailure(let error):
             Log.error("Failed to fetch retrospection: \(error)")
+            return .none
+            
+        case .updateLinkMetadata(let pageIndex, let linkMetadata):
+            guard pageIndex < state.principlePages.count else {
+                return .none
+            }
+            var updatedPage = state.principlePages[pageIndex]
+            updatedPage.links.append(linkMetadata)
+            state.principlePages[pageIndex] = updatedPage
             return .none
         }
     }
@@ -291,6 +308,16 @@ extension RetrospectionFeature {
                     await send(.inner(.fetchRetrospectionSuccess(detail)))
                 } catch {
                     await send(.inner(.fetchRetrospectionFailure(error)))
+                }
+            }
+            
+        case .fetchLinkMetadata(let pageIndex, let urlString):
+            return .run { [fetchLinkUseCase] send in
+                do {
+                    let metadata = try await fetchLinkUseCase.execute(urlString: urlString)
+                    await send(.inner(.updateLinkMetadata(pageIndex: pageIndex, linkMetadata: metadata)))
+                } catch {
+                    Log.error("Failed to fetch link metadata: \(error)")
                 }
             }
         }
