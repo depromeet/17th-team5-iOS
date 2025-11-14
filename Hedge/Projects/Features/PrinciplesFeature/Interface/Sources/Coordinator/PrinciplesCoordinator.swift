@@ -11,7 +11,16 @@ import Core
 import StockDomainInterface
 import PrinciplesDomainInterface
 
+public protocol PrincipleDelegate: AnyObject {
+    func choosePrincipleGroup(tradeType: TradeType,
+                              stock: StockSearch,
+                              tradeHistory: TradeHistory,
+                              group: PrincipleGroup)
+}
+
 public protocol PrinciplesCoordinator: Coordinator {
+    
+    var principleDelegate: PrincipleDelegate? { get set }
     
     func dismiss(animated: Bool)
 }

@@ -109,6 +109,7 @@ extension DefaultRootCoordinator {
             tradeHistory: tradeHistory
         )
         principlesCoordinator.parentCoordinator = self
+        principlesCoordinator.principleDelegate = self
         principlesCoordinator.start()
         
         childCoordinators.append(principlesCoordinator)
@@ -184,5 +185,12 @@ extension DefaultRootCoordinator: CoordinatorFinishDelegate {
         self.childCoordinators.removeAll{ $0.type == childCoordinator.type }
         
         navigationController.popViewController(animated: true)
+    }
+}
+
+extension DefaultRootCoordinator: PrincipleDelegate {
+    public func choosePrincipleGroup(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
+
+        pushToPrinciplesReview(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: group)
     }
 }

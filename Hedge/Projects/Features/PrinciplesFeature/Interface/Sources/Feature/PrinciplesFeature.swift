@@ -161,6 +161,16 @@ extension PrinciplesFeature {
             return .none
             
         case .confirmButtonTapped:
+            guard let tradeType, let stock, let tradeHistory else {
+                return .none
+            }
+            
+            coordinator.dismiss(animated: false)
+            if let principleGroup = state.principleGroups.first(where: { principleGroup in
+                principleGroup.id == state.selectedGroupId
+            }) {
+                coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
+            }
             return .none
         }
     }

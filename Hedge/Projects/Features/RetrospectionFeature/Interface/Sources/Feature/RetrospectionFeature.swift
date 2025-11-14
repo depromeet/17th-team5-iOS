@@ -192,6 +192,7 @@ extension RetrospectionFeature {
     ) -> Effect<Action> {
         switch action {
         case .fetchRetrospectionSuccess(let detail):
+            dump(detail)
             // Stock 정보 업데이트
             state.stockName = detail.companyName
             state.stockLogo = detail.companyLogo
