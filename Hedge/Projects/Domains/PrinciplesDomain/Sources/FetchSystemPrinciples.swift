@@ -16,6 +16,8 @@ public struct FetchSystemPrinciples: FetchSystemPrinciplesUseCase {
             groups = groups.filter { $0.principleType == tradeType }
         }
         
+        groups.filter { $0.groupType == .system }
+        
         return groups
     }
 }

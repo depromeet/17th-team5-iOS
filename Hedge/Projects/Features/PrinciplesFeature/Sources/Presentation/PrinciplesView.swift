@@ -88,7 +88,7 @@ public struct PrinciplesView: View {
             
             // Principle Items
             VStack(spacing: 0) {
-                ForEach(store.state.systemPrincipleGroups, id: \.id) { group in
+                ForEach(store.state.defaultPrincipleGroups, id: \.id) { group in
                     principleGroupItem(group: group)
                 }
             }
