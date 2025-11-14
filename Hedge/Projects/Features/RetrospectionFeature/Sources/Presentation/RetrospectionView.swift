@@ -47,6 +47,14 @@ public struct RetrospectionView: View {
         .onAppear {
             send(.onAppear)
         }
+        .overlay(alignment: .bottom) {
+            // 하단 페이징 인디케이터 (맨 앞 레이어)
+            if store.state.totalPages > 1 {
+                bottomPageIndicatorView
+                    .allowsHitTesting(false) // 터치 이벤트는 TabView로 전달
+            }
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
     }
     
     // MARK: - Navigation Bar
@@ -185,68 +193,35 @@ public struct RetrospectionView: View {
     
     // MARK: - 페이징 콘텐츠 섹션
     private var pagingContentSection: some View {
-        GeometryReader { geometry in
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 0) {
-                        ForEach(0..<store.state.totalPages, id: \.self) { index in
-                            VStack(spacing: 0) {
-                                principleSection(for: index)
-                                
-                                HedgeSpacer(height: 16)
-                                
-                                reasonSection(for: index)
-                                
-                                HedgeSpacer(height: 24)
-                                
-                                imageSection(for: index)
-                                
-                                HedgeSpacer(height: 16)
-                                
-                                linkSection(for: index)
-                                
-                                Spacer()
-                            }
-                            .frame(width: geometry.size.width)
-                            .id(index)
-                        }
-                    }
-                    .background(
-                        GeometryReader { scrollGeometry in
-                            Color.clear
-                                .preference(
-                                    key: ScrollOffsetPreferenceKey.self,
-                                    value: scrollGeometry.frame(in: .named("scroll")).minX
-                                )
-                        }
-                    )
-                }
-                .coordinateSpace(name: "scroll")
-                .scrollTargetBehavior(.paging)
-                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                    let pageWidth = geometry.size.width
-                    let newPageIndex = Int(round(-offset / pageWidth))
-                    let clampedIndex = max(0, min(newPageIndex, store.state.totalPages - 1))
-                    if clampedIndex != store.state.currentPageIndex {
-                        send(.pageChanged(clampedIndex))
+        TabView(selection: Binding(
+            get: { store.state.currentPageIndex },
+            set: { newValue in
+                send(.pageChanged(newValue))
+            }
+        )) {
+            ForEach(0..<store.state.totalPages, id: \.self) { index in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        principleSection(for: index)
+                        
+                        HedgeSpacer(height: 16)
+                        
+                        reasonSection(for: index)
+                        
+                        HedgeSpacer(height: 24)
+                        
+                        imageSection(for: index)
+                        
+                        HedgeSpacer(height: 16)
+                        
+                        linkSection(for: index)
                     }
                 }
-                .onChange(of: store.state.currentPageIndex) { _, newValue in
-                    withAnimation {
-                        proxy.scrollTo(newValue, anchor: .leading)
-                    }
-                }
+                .tag(index)
             }
         }
+        .tabViewStyle(.page(indexDisplayMode: .never))
         .frame(height: calculatePagingContentHeight())
-    }
-    
-    // MARK: - Scroll Offset Preference Key
-    private struct ScrollOffsetPreferenceKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-            value = nextValue()
-        }
     }
     
     // MARK: - 원칙 섹션
@@ -362,6 +337,30 @@ public struct RetrospectionView: View {
             }
             .padding(.horizontal, 20)
         )
+    }
+    
+    // MARK: - 하단 페이징 인디케이터
+    private var bottomPageIndicatorView: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<store.state.totalPages, id: \.self) { index in
+                Circle()
+                    .fill(index == store.state.currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
+                    .frame(width: 6, height: 6)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 22)
+        .background(
+            RoundedRectangle(cornerRadius: 29)
+                .fill(Color.hedgeUI.textAlternative)
+                .shadow(
+                    color: Color.black.opacity(0.08),
+                    radius: 20,
+                    x: 0,
+                    y: 6
+                )
+        )
+        .padding(.bottom, 32)
     }
     
     // MARK: - 페이징 콘텐츠 높이 계산
