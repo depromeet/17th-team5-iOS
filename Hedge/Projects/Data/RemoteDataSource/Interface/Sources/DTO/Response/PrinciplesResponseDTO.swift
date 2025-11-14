@@ -36,7 +36,7 @@ public struct PrincipleResponseDTO: Decodable {
 }
 
 extension PrincipleGroupResponseDTO {
-    public func toDomain(_ type: PrincipleGroup.GroupType) -> PrincipleGroup {
+    public func toDomain(_ type: PrincipleGroup.GroupType, imageId: Int? = nil, investorName: String? = nil) -> PrincipleGroup {
         
         return PrincipleGroup(
             id: self.id,
@@ -45,7 +45,9 @@ extension PrincipleGroupResponseDTO {
             thumbnail: self.thumbnail,
             groupType: type,
             displayOrder: self.displayOrder,
-            principles: self.principles.map { $0.toDomain() }
+            principles: self.principles.map { $0.toDomain() },
+            imageId: imageId,
+            investorName: investorName
         )
     }
 }

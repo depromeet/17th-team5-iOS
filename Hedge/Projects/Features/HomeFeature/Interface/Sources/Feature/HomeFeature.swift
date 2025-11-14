@@ -4,6 +4,7 @@ import ComposableArchitecture
 import Core
 import RetrospectionDomainInterface
 import UserDefaultsDomainInterface
+import PrinciplesDomainInterface
 
 @Reducer
 public struct HomeFeature {
@@ -11,17 +12,26 @@ public struct HomeFeature {
     private let fetchBadgeReportUseCase: FetchBadgeReportUseCase
     private let getUserDefaultsUseCase: GetUserDefaultsUseCase
     private let deleteUserDefaultsUseCase: DeleteUserDefaultsUseCase
+    private let fetchRecommendedPrinciplesUseCase: FetchRecommendedPrinciplesUseCase
+    private let fetchDefaultPrinciplesUseCase: FetchDefaultPrinciplesUseCase
+    private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
     
     public init(
         fetchRetrospectionUseCase: RetrospectionUseCase,
         fetchBadgeReportUseCase: FetchBadgeReportUseCase,
         getUserDefaultsUseCase: GetUserDefaultsUseCase,
-        deleteUserDefaultsUseCase: DeleteUserDefaultsUseCase
+        deleteUserDefaultsUseCase: DeleteUserDefaultsUseCase,
+        fetchRecommendedPrinciplesUseCase: FetchRecommendedPrinciplesUseCase,
+        fetchDefaultPrinciplesUseCase: FetchDefaultPrinciplesUseCase,
+        fetchPrinciplesUseCase: FetchPrinciplesUseCase
     ) {
         self.fetchRetrospectionUseCase = fetchRetrospectionUseCase
         self.fetchBadgeReportUseCase = fetchBadgeReportUseCase
         self.getUserDefaultsUseCase = getUserDefaultsUseCase
         self.deleteUserDefaultsUseCase = deleteUserDefaultsUseCase
+        self.fetchRecommendedPrinciplesUseCase = fetchRecommendedPrinciplesUseCase
+        self.fetchDefaultPrinciplesUseCase = fetchDefaultPrinciplesUseCase
+        self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
     }
     
     @ObservableState
@@ -36,6 +46,14 @@ public struct HomeFeature {
         public var isLoadingRetrospections: Bool = false
         public var badgeReport: RetrospectionBadgeReport?
         public var badgeTitle: String = "아직 모은 뱃지가 없어요"
+        
+        // 원칙 관련
+        public var recommendedPrincipleGroups: [PrincipleGroup] = []
+        public var systemPrincipleGroups: [PrincipleGroup] = []
+        public var customPrincipleGroups: [PrincipleGroup] = []
+        public var isLoadingPrinciples: Bool = false
+        public var selectedTradeType: TradeType = .buy
+        public var loadedPrincipleCount: Int = 0
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -67,6 +85,8 @@ public struct HomeFeature {
         case retrospectionButtonTapped(Int)
         
         case badgePopupTapped(Bool)
+        case buyTabTapped
+        case sellTabTapped
     }
     public enum InnerAction {
         case fetchRetrospectionsSuccess([RetrospectionCompany])
@@ -74,10 +94,17 @@ public struct HomeFeature {
         case fetchBadgeReportSuccess(RetrospectionBadgeReport)
         case fetchBadgeReportFailure(Error)
         case deleteLastRetrospectionID
+        case fetchRecommendedPrincipleGroupsSuccess([PrincipleGroup])
+        case fetchDefaultPrincipleGroupsSuccess([PrincipleGroup])
+        case fetchCustomPrincipleGroupsSuccess([PrincipleGroup])
+        case fetchPrincipleGroupsFailure(Error)
     }
     public enum AsyncAction {
         case fetchRetrospections
         case fetchBadgeReport
+        case fetchRecommendedPrincipleGroups
+        case fetchDefaultPrincipleGroups
+        case fetchCustomPrincipleGroups
     }
     public enum ScopeAction { }
     public enum DelegateAction {
@@ -132,9 +159,14 @@ extension HomeFeature {
             state.lastRetrospectionComapnyName = UserDefaults.standard.string(forKey: "companyName")
             UserDefaults.standard.removeObject(forKey: "companyName")
             state.isLoadingRetrospections = true
+            state.isLoadingPrinciples = true
+            state.loadedPrincipleCount = 0
             return .merge(
                 .send(.async(.fetchRetrospections)),
-                .send(.async(.fetchBadgeReport))
+                .send(.async(.fetchBadgeReport)),
+                .send(.async(.fetchRecommendedPrincipleGroups)),
+                .send(.async(.fetchDefaultPrincipleGroups)),
+                .send(.async(.fetchCustomPrincipleGroups))
             )
         case .restrospectionSelectButtonTapped:
             state.retrospectionButtonActive.toggle()
@@ -151,6 +183,12 @@ extension HomeFeature {
             return .none
         case .principleTabTapped:
             state.selectedType = .principle
+            return .none
+        case .buyTabTapped:
+            state.selectedTradeType = .buy
+            return .none
+        case .sellTabTapped:
+            state.selectedTradeType = .sell
             return .none
         case .badgePopupTapped(let isPresented):
             state.isBadgePopupPresented = isPresented
@@ -223,6 +261,38 @@ extension HomeFeature {
             UserDefaults.standard.removeObject(forKey: "refreshToken")
             print("Failed to fetch badge report: \(error)")
             return .none
+            
+        case .fetchRecommendedPrincipleGroupsSuccess(let groups):
+            state.recommendedPrincipleGroups = groups
+            state.loadedPrincipleCount += 1
+            // 3개 모두 로드되었는지 확인 (recommended, defaults, custom)
+            if state.loadedPrincipleCount >= 3 {
+                state.isLoadingPrinciples = false
+            }
+            return .none
+            
+        case .fetchDefaultPrincipleGroupsSuccess(let groups):
+            state.systemPrincipleGroups = groups
+            state.loadedPrincipleCount += 1
+            // 3개 모두 로드되었는지 확인
+            if state.loadedPrincipleCount >= 3 {
+                state.isLoadingPrinciples = false
+            }
+            return .none
+            
+        case .fetchCustomPrincipleGroupsSuccess(let groups):
+            state.customPrincipleGroups = groups
+            state.loadedPrincipleCount += 1
+            // 3개 모두 로드되었는지 확인
+            if state.loadedPrincipleCount >= 3 {
+                state.isLoadingPrinciples = false
+            }
+            return .none
+            
+        case .fetchPrincipleGroupsFailure(let error):
+            state.isLoadingPrinciples = false
+            print("Failed to fetch principle groups: \(error)")
+            return .none
         }
     }
     
@@ -248,6 +318,33 @@ extension HomeFeature {
                     await send(.inner(.fetchBadgeReportSuccess(report)))
                 } catch {
                     await send(.inner(.fetchBadgeReportFailure(error)))
+                }
+            }
+        case .fetchRecommendedPrincipleGroups:
+            return .run { send in
+                do {
+                    let groups = try await fetchRecommendedPrinciplesUseCase.execute(nil)
+                    await send(.inner(.fetchRecommendedPrincipleGroupsSuccess(groups)))
+                } catch {
+                    await send(.inner(.fetchPrincipleGroupsFailure(error)))
+                }
+            }
+        case .fetchDefaultPrincipleGroups:
+            return .run { send in
+                do {
+                    let groups = try await fetchDefaultPrinciplesUseCase.execute(nil)
+                    await send(.inner(.fetchDefaultPrincipleGroupsSuccess(groups)))
+                } catch {
+                    await send(.inner(.fetchPrincipleGroupsFailure(error)))
+                }
+            }
+        case .fetchCustomPrincipleGroups:
+            return .run { send in
+                do {
+                    let groups = try await fetchPrinciplesUseCase.execute(nil)
+                    await send(.inner(.fetchCustomPrincipleGroupsSuccess(groups)))
+                } catch {
+                    await send(.inner(.fetchPrincipleGroupsFailure(error)))
                 }
             }
         }

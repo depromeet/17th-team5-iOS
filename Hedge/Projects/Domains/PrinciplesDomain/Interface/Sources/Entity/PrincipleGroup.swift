@@ -22,6 +22,8 @@ public struct PrincipleGroup: Equatable, Hashable {
     public let groupType: GroupType
     public let displayOrder: Int?
     public let principles: [Principle]
+    public let imageId: Int?
+    public let investorName: String?
     
     public init(
         id: Int,
@@ -30,7 +32,9 @@ public struct PrincipleGroup: Equatable, Hashable {
         thumbnail: String,
         groupType: GroupType,
         displayOrder: Int?,
-        principles: [Principle]
+        principles: [Principle],
+        imageId: Int? = nil,
+        investorName: String? = nil
     ) {
         self.id = id
         self.groupName = groupName
@@ -39,6 +43,8 @@ public struct PrincipleGroup: Equatable, Hashable {
         self.groupType = groupType
         self.displayOrder = displayOrder
         self.principles = principles
+        self.imageId = imageId
+        self.investorName = investorName
     }
 }
 

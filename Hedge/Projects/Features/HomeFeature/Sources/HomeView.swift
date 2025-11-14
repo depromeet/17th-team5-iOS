@@ -3,8 +3,11 @@ import SwiftUI
 import DesignKit
 import HomeFeatureInterface
 import RetrospectionDomainInterface
+import PrinciplesDomainInterface
+import Core
 
 import ComposableArchitecture
+import Kingfisher
 
 @ViewAction(for: HomeFeature.self)
 public struct HomeView: View {
@@ -28,8 +31,14 @@ public struct HomeView: View {
             VStack(spacing: 0) {
                 topNavigationBar
                 tabArea
-                badgeArea
-                retrospectArea
+                
+                // 선택된 탭에 따라 다른 컨텐츠 표시
+                if store.state.selectedType == .home {
+                    badgeArea
+                    retrospectArea
+                } else {
+                    principleContentArea
+                }
                 
                 Spacer()
             }
@@ -562,6 +571,219 @@ extension HomeView {
                 .foregroundStyle(Color.hedgeUI.textAlternative)
                 .padding(.vertical, 1)
         }
+    }
+    
+    private var principleContentArea: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                // 추천 원칙 그룹 (상단 horizontal scroll)
+                if !store.state.recommendedPrincipleGroups.isEmpty {
+                    recommendedPrincipleSection
+                }
+                
+                // 매수/매도 탭
+                tradeTypeTabSection
+                
+                // 기본 원칙 그룹 (매수/매도 필터링)
+                let filteredSystemGroups = store.state.systemPrincipleGroups.filter { $0.principleType == store.state.selectedTradeType.toRequest }
+                if !filteredSystemGroups.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text("기본")
+                                .font(FontModel.h2Semibold)
+                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
+                            
+                            Spacer()
+                        }
+                        
+                        VStack(spacing: 0) {
+                            ForEach(filteredSystemGroups, id: \.id) { group in
+                                principleGroupCard(group: group)
+                            }
+                        }
+                    }
+                }
+                
+                HedgeSpacer(height: 16)
+                
+                HedgeSpacer(height: 1)
+                    .color(Color.hedgeUI.neutralBgSecondary)
+                
+                HedgeSpacer(height: 16)
+                
+                // 내가 만든 원칙 그룹 (매수/매도 필터링)
+                let filteredCustomGroups = store.state.customPrincipleGroups.filter { $0.principleType == store.state.selectedTradeType.toRequest }
+                if !filteredCustomGroups.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text("내가 만든")
+                                .font(FontModel.h2Semibold)
+                                .foregroundStyle(Color.hedgeUI.textTitle)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
+                            
+                            Spacer()
+                        }
+                        
+                        VStack(spacing: 0) {
+                            ForEach(filteredCustomGroups, id: \.id) { group in
+                                principleGroupCard(group: group)
+                            }
+                        }
+                    }
+                }
+                
+                if store.state.isLoadingPrinciples {
+                    HedgeSpacer(height: 100)
+                    Circle()
+                        .trim(from: 0.0, to: 0.35)
+                        .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                        .frame(width: 32, height: 32, alignment: .center)
+                        .rotationEffect(.degrees(-90))
+                        .modifier(ContinuousRotationEffect(isAnimating: store.state.isLoadingPrinciples))
+                } else if filteredSystemGroups.isEmpty && filteredCustomGroups.isEmpty && store.state.recommendedPrincipleGroups.isEmpty {
+                    HedgeSpacer(height: 100)
+                    Text("아직 원칙이 없어요")
+                        .font(FontModel.h2Semibold)
+                        .foregroundStyle(Color.hedgeUI.textAssistive)
+                }
+            }
+            .padding(.bottom, 32)
+        }
+    }
+    
+    private var recommendedPrincipleSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HedgeSpacer(height: 20)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(store.state.recommendedPrincipleGroups, id: \.id) { group in
+                        recommendedPrincipleCard(group: group)
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            
+            HedgeSpacer(height: 20)
+        }
+    }
+    
+    private func recommendedPrincipleCard(group: PrincipleGroup) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 12) {
+                // 프로필 이미지 또는 이모지
+                Circle()
+                    .fill(Color.hedgeUI.neutralBgSecondary)
+                    .frame(width: 24, height: 24)
+                    .overlay {
+                        KFImage(URL(string: group.thumbnail))
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                    }
+                
+                if let investorName = group.investorName {
+                    Text(investorName)
+                        .font(FontModel.label2Medium)
+                        .foregroundStyle(Color.hedgeUI.textTitle.opacity(0.7))
+                }
+            }
+            
+            Spacer()
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text(group.groupName)
+                    .font(FontModel.body3Semibold)
+                    .foregroundStyle(Color.hedgeUI.textTitle)
+                    .lineLimit(2)
+                
+                Text("원칙 \(group.principles.count)개")
+                    .font(FontModel.label2Medium)
+                    .foregroundStyle(Color.hedgeUI.brandDarken)
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 20)
+        .frame(width: 166)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
+        )
+    }
+    
+    private var tradeTypeTabSection: some View {
+        HStack(spacing: 8) {
+            Button {
+                send(.buyTabTapped)
+            } label: {
+                Text("매수")
+                    .font(FontModel.label1Semibold)
+                    .foregroundStyle(store.state.selectedTradeType == .buy ? Color.hedgeUI.neutralBgDefault : Color.hedgeUI.textPrimary)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 100)
+                            .fill(store.state.selectedTradeType == .buy ? Color.hedgeUI.textTitle : Color.hedgeUI.neutralBgSecondary)
+                    )
+            }
+            
+            Button {
+                send(.sellTabTapped)
+            } label: {
+                Text("매도")
+                    .font(FontModel.label1Semibold)
+                    .foregroundStyle(store.state.selectedTradeType == .sell ? Color.hedgeUI.neutralBgDefault : Color.hedgeUI.textPrimary)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 100)
+                            .fill(store.state.selectedTradeType == .sell ? Color.hedgeUI.textTitle : Color.hedgeUI.neutralBgSecondary)
+                    )
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+    }
+    
+    private func principleGroupCard(group: PrincipleGroup) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(Color.hedgeUI.neutralBgSecondary)
+                    .frame(width: 32, height: 32)
+                
+                Text(extractEmoji(from: group.groupName))
+                    .font(FontModel.body3Semibold)
+            }
+            
+            Text(group.groupName)
+                .font(FontModel.body3Semibold)
+                .foregroundStyle(Color.hedgeUI.textTitle)
+            
+            Spacer()
+            
+            Image.hedgeUI.arrowRightThin
+                .renderingMode(.template)
+                .resizable()
+                .frame(width: 24, height: 24)
+                .foregroundStyle(Color.hedgeUI.textDisabled)
+        }
+        .padding(.leading, 20)
+        .padding(.trailing, 12)
+        .padding(.vertical, 12)
+    }
+    
+    private func extractEmoji(from text: String) -> String {
+        // groupName에서 이모지 추출 (예: "🔥 이건 좀 지키자 제발" -> "🔥")
+        let emojiPattern = #"[\p{Emoji}]"#
+        if let range = text.range(of: emojiPattern, options: .regularExpression) {
+            return String(text[range])
+        }
+        return "📋"
     }
     
     private var badgePopup: some View {

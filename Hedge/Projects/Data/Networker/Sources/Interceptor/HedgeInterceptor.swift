@@ -28,6 +28,7 @@ public final class HedgeInterceptor: RequestInterceptor {
         let token = UserDefaults.standard.string(forKey: "accessToken")
         if let token {
             urlRequest.headers["Authorization"] = "Bearer " + token
+            // dump(urlRequest.headers)
         } else {
             print("[HedgeInterceptor] accessToken is nil, Authorization header not added")
         }
