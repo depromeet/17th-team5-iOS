@@ -40,7 +40,7 @@ extension FeedbackTarget: TargetType {
     var method: HTTPMethod {
         switch self {
         case .fetch:
-            return .post
+            return .get
         }
     }
     

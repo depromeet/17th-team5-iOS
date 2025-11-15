@@ -84,6 +84,7 @@ extension HedgeUI where Base == Image {
     // MARK: Logo
     public static var logo: Image { asset(#function) }
     public static var kakaologo: Image { asset(#function) }
+    public static var logoLarge: Image { asset(#function) }
     
     // MARK: Size xlarge
     public static var emerald: Image { asset(#function) }

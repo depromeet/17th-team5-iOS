@@ -17,6 +17,7 @@ import Shared
 import RetrospectionDomainInterface
 import StockDomainInterface
 import LinkDomainInterface
+import FeedbackDomainInterface
 
 @Reducer
 public struct RetrospectionFeature {
@@ -24,17 +25,20 @@ public struct RetrospectionFeature {
     private let fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase
     private let fetchLinkUseCase: FetchLinkUseCase
     private let deleteRetrospectionUseCase: DeleteRetrospectionUseCase
+    private let fetchFeedbackUseCase: FetchFeedbackUseCase
     
     public init(
         coordinator: RetrospectionCoordinator,
         fetchRetrospectionDetailUseCase: FetchRetrospectionDetailUseCase,
         fetchLinkUseCase: FetchLinkUseCase,
-        deleteRetrospectionUseCase: DeleteRetrospectionUseCase
+        deleteRetrospectionUseCase: DeleteRetrospectionUseCase,
+        fetchFeedbackUseCase: FetchFeedbackUseCase
     ) {
         self.coordinator = coordinator
         self.fetchRetrospectionDetailUseCase = fetchRetrospectionDetailUseCase
         self.fetchLinkUseCase = fetchLinkUseCase
         self.deleteRetrospectionUseCase = deleteRetrospectionUseCase
+        self.fetchFeedbackUseCase = fetchFeedbackUseCase
     }
     
     @ObservableState
@@ -127,12 +131,15 @@ public struct RetrospectionFeature {
         case updateLinkMetadata(pageIndex: Int, linkMetadata: LinkMetadata)
         case deleteRetrospectionSuccess
         case deleteRetrospectionFailure(Error)
+        case fetchFeedbackSuccess(FeedbackData)
+        case fetchFeedbackFailure(Error)
     }
     
     public enum AsyncAction {
         case fetchRetrospection(Int)
         case fetchLinkMetadata(pageIndex: Int, urlString: String)
         case deleteRetrospection(Int)
+        case fetchFeedback(Int)
     }
     
     public enum ScopeAction { }
@@ -195,8 +202,7 @@ extension RetrospectionFeature {
             return .none
             
         case .aiFeedbackButtonTapped:
-            // TODO: AI 피드백 화면으로 이동
-            return .none
+            return .send(.async(.fetchFeedback(state.retrospectionId)))
             
         case .deleteCancelButtonTapped:
             state.isShow = false
@@ -281,6 +287,14 @@ extension RetrospectionFeature {
             // 실패해도 popToPrev
             coordinator.popToPrev()
             return .none
+            
+        case .fetchFeedbackSuccess(let feedback):
+            coordinator.pushToTradeFeedback(feedback: feedback)
+            return .none
+            
+        case .fetchFeedbackFailure(let error):
+            Log.error("Failed to fetch feedback: \(error)")
+            return .none
         }
     }
     
@@ -355,6 +369,16 @@ extension RetrospectionFeature {
                     await send(.inner(.deleteRetrospectionSuccess))
                 } catch {
                     await send(.inner(.deleteRetrospectionFailure(error)))
+                }
+            }
+            
+        case .fetchFeedback(let retrospectionId):
+            return .run { [fetchFeedbackUseCase] send in
+                do {
+                    let feedback = try await fetchFeedbackUseCase.execute(id: retrospectionId)
+                    await send(.inner(.fetchFeedbackSuccess(feedback)))
+                } catch {
+                    await send(.inner(.fetchFeedbackFailure(error)))
                 }
             }
         }

@@ -30,7 +30,7 @@ public struct LoginView: View {
 private extension LoginView {
     var logoView: some View {
         VStack(spacing: 20) {
-            Image.hedgeUI.logo
+            Image.hedgeUI.logoLarge
                 .resizable()
                 .frame(width: 112, height: 124)
             
