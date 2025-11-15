@@ -87,6 +87,10 @@ public struct HomeFeature {
         case badgePopupTapped(Bool)
         case buyTabTapped
         case sellTabTapped
+        
+        case recommencedCardButtonTapped(PrincipleGroup)
+        case systemCardButtonTapped(PrincipleGroup)
+        case customCardButtonTapped(PrincipleGroup)
     }
     public enum InnerAction {
         case fetchRetrospectionsSuccess([RetrospectionCompany])
@@ -112,6 +116,7 @@ public struct HomeFeature {
         case pushToSetting
         case pushToRetrospection(Int)
         case finish
+        case pushToPrincipleDetail(PrincipleGroup, Bool)
     }
     
     public var body: some Reducer<State, Action> {
@@ -199,6 +204,12 @@ extension HomeFeature {
             }
         case .retrospectionButtonTapped(let id):
             return .send(.delegate(.pushToRetrospection(id)))
+        case .customCardButtonTapped(let principleGroup):
+            return .send(.delegate(.pushToPrincipleDetail(principleGroup, false)))
+        case .systemCardButtonTapped(let principleGroup):
+            return .send(.delegate(.pushToPrincipleDetail(principleGroup, false)))
+        case .recommencedCardButtonTapped(let principleGroup):
+            return .send(.delegate(.pushToPrincipleDetail(principleGroup, true)))
         }
     }
     
@@ -373,6 +384,8 @@ extension HomeFeature {
         case .pushToSetting:
             return .none
         case .pushToRetrospection:
+            return .none
+        case .pushToPrincipleDetail:
             return .none
         case .finish:
             return .none

@@ -95,4 +95,22 @@ public struct DefaultPrinciplesRepository: PrinciplesRepository {
             }
         }
     }
+    
+    public func createPrincipleGroup(
+        groupName: String,
+        displayOrder: Int,
+        principleType: String,
+        thumbnail: String,
+        principles: [(principle: String, description: String)]
+    ) async throws -> PrincipleGroup {
+        let request = CreatePrincipleGroupRequestDTO(
+            groupName: groupName,
+            displayOrder: displayOrder,
+            principleType: principleType,
+            thumbnail: thumbnail,
+            principles: principles.map { PrincipleItemDTO(principle: $0.principle, description: $0.description) }
+        )
+        let response = try await dataSource.createPrincipleGroup(request)
+        return response.data.toDomain(.custom)
+    }
 }

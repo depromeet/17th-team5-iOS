@@ -13,4 +13,11 @@ public protocol PrinciplesRepository {
     func fetchSystemPrincipleGroups() async throws -> [PrincipleGroup]
     func fetchRecommendedPrincipleGroups() async throws -> [PrincipleGroup]
     func fetchDefaultPrincipleGroups() async throws -> [PrincipleGroup]
+    func createPrincipleGroup(
+        groupName: String,
+        displayOrder: Int,
+        principleType: String,
+        thumbnail: String,
+        principles: [(principle: String, description: String)]
+    ) async throws -> PrincipleGroup
 }

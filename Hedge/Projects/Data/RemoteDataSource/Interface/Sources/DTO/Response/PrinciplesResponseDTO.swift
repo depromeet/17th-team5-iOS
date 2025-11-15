@@ -21,6 +21,7 @@ public struct PrincipleGroupResponseDTO: Decodable {
     public let groupName: String
     public let principleType: String
     public let thumbnail: String
+    public let imageId: Int?
     public let displayOrder: Int?
     public let principles: [PrincipleResponseDTO]
 }
@@ -37,6 +38,8 @@ public struct PrincipleResponseDTO: Decodable {
 
 extension PrincipleGroupResponseDTO {
     public func toDomain(_ type: PrincipleGroup.GroupType, imageId: Int? = nil, investorName: String? = nil) -> PrincipleGroup {
+        // imageId가 파라미터로 전달되면 우선 사용, 없으면 DTO의 imageId 사용
+        let finalImageId = imageId ?? self.imageId
         
         return PrincipleGroup(
             id: self.id,
@@ -46,7 +49,7 @@ extension PrincipleGroupResponseDTO {
             groupType: type,
             displayOrder: self.displayOrder,
             principles: self.principles.map { $0.toDomain() },
-            imageId: imageId,
+            imageId: finalImageId,
             investorName: investorName
         )
     }

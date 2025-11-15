@@ -269,9 +269,6 @@ extension HomeView {
                             ForEach(store.state.companyNames, id: \.self) { symbol in
                                 let isSelected = store.state.selectedCompanyName == symbol
                                 
-                                // dump(store.state.retrospectionCompanies)
-                                // print(symbol)
-                                
                                 HStack(spacing: 8) {
                                     if let company = store.state.retrospectionCompanies.first(where: { $0.companyName == symbol }) {
                                         KFImage(URL(string: company.image))
@@ -610,6 +607,9 @@ extension HomeView {
                         VStack(spacing: 0) {
                             ForEach(filteredSystemGroups, id: \.id) { group in
                                 principleGroupCard(group: group)
+                                    .onTapGesture {
+                                        send(.systemCardButtonTapped(group))
+                                    }
                             }
                         }
                     }
@@ -639,6 +639,9 @@ extension HomeView {
                         VStack(spacing: 0) {
                             ForEach(filteredCustomGroups, id: \.id) { group in
                                 principleGroupCard(group: group)
+                                    .onTapGesture {
+                                        send(.customCardButtonTapped(group))
+                                    }
                             }
                         }
                     }
@@ -764,6 +767,9 @@ extension HomeView {
             x: 0,
             y: 6
         )
+        .onTapGesture {
+            send(.recommencedCardButtonTapped(group))
+        }
     }
     
     private var tradeTypeTabSection: some View {

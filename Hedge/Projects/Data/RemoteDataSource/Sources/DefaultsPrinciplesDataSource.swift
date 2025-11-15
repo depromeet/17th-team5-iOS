@@ -32,20 +32,23 @@ public struct DefaultsPrinciplesDataSource: PrinciplesDataSource {
     public func fetchGroupDetail(groupId: Int) async throws -> PrincipleGroupDetailResponseDTO {
         try await provider.request(PrinciplesFetchTarget.detail(groupId: groupId))
     }
+    
+    public func createPrincipleGroup(_ request: CreatePrincipleGroupRequestDTO) async throws -> CreatePrincipleGroupResponseDTO {
+        try await provider.request(PrinciplesFetchTarget.create(request))
+    }
 }
 
 enum PrinciplesFetchTarget {
     case fetch
     case system
     case detail(groupId: Int)
+    case create(CreatePrincipleGroupRequestDTO)
 }
 
 extension PrinciplesFetchTarget: TargetType {
     var baseURL: String {
         switch self {
-        case .fetch, .detail:
-            return Configuration.baseURL + "/api/v1/principle-groups"
-        case .system:
+        case .fetch, .detail, .system, .create:
             return Configuration.baseURL + "/api/v1/principle-groups"
         }
     }
@@ -58,6 +61,8 @@ extension PrinciplesFetchTarget: TargetType {
         switch self {
         case .fetch, .system, .detail:
             return .get
+        case .create:
+            return .post
         }
     }
     
@@ -69,6 +74,8 @@ extension PrinciplesFetchTarget: TargetType {
             return "/systems"
         case .detail(let groupId):
             return "/\(groupId)"
+        case .create:
+            return ""
         }
     }
     
@@ -76,12 +83,14 @@ extension PrinciplesFetchTarget: TargetType {
         switch self {
         case .fetch, .system, .detail:
             return nil
+        case .create(let request):
+            return .body(request)
         }
     }
     
     var encoding: any Alamofire.ParameterEncoding {
         switch self {
-        case .fetch, .system, .detail:
+        case .fetch, .system, .detail, .create:
             return makeEncoder(contentType: .json)
         }
     }

@@ -29,8 +29,8 @@ public struct Provider: ProviderProtocol {
     /// Token이 없을 때 요청하는 Provider
     public static let plain: Provider = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 10
-        configuration.timeoutIntervalForResource = 10
+        configuration.timeoutIntervalForRequest = 20
+        configuration.timeoutIntervalForResource = 20
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.urlCache = nil
         
@@ -42,8 +42,8 @@ public struct Provider: ProviderProtocol {
     /// 인증 세션
     public static let authorized: Provider = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 10
-        configuration.timeoutIntervalForResource = 10
+        configuration.timeoutIntervalForRequest = 20
+        configuration.timeoutIntervalForResource = 20
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.urlCache = nil
         
@@ -64,6 +64,15 @@ public struct Provider: ProviderProtocol {
                 .response
             
             if let error = response.error {
+                let statusCode = response.response?.statusCode ?? -1
+                if statusCode >= 400 {
+                    print("❌ [Provider] Request failed with status code: \(statusCode)")
+                    if let data = response.data,
+                       let body = String(data: data, encoding: .utf8),
+                       !body.isEmpty {
+                        print("❌ [Provider] Error Response Body: \(body)")
+                    }
+                }
                 throw makeHedgeError(error, data: response.data)
             }
             

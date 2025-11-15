@@ -149,6 +149,9 @@ extension TabBarFeature {
         case .homeAction(.delegate(.finish)):
             coordinator.finish()
             return .none
+        case .homeAction(.delegate(.pushToPrincipleDetail(let principleGroup, let isRecommneded))):
+            coordinator.pushToPrincipleDetail(principleGroup: principleGroup, isRecommended: isRecommneded)
+            return .none
         default:
             return .none
         }

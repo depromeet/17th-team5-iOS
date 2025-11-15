@@ -12,4 +12,5 @@ public protocol PrinciplesDataSource {
     func fetch() async throws -> PrinciplesResponseDTO
     func fetchSystemGroups() async throws -> PrincipleSystemGroupsResponseDTO
     func fetchGroupDetail(groupId: Int) async throws -> PrincipleGroupDetailResponseDTO
+    func createPrincipleGroup(_ request: CreatePrincipleGroupRequestDTO) async throws -> CreatePrincipleGroupResponseDTO
 }

@@ -29,6 +29,8 @@ import SettingFeature
 import SettingFeatureInterface
 import RetrospectionFeature
 import RetrospectionFeatureInterface
+import PrincipleDetailFeature
+import PrincipleDetailFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     
@@ -167,6 +169,20 @@ extension DefaultRootCoordinator {
         childCoordinators.append(retrospectionCoordinator)
         
         retrospectionCoordinator.start()
+    }
+    
+    public func pushToPrincipleDetail(principleGroup: PrincipleGroup, isRecommended: Bool) {
+        let principleDetailCoordinator = DefaultPrincipleDetailCoordinator(
+            navigationController: navigationController,
+            principleGroup: principleGroup,
+            isRecommended: isRecommended
+        )
+        principleDetailCoordinator.finishDelegate = self
+        principleDetailCoordinator.parentCoordinator = self
+        
+        childCoordinators.append(principleDetailCoordinator)
+        
+        principleDetailCoordinator.start()
     }
     
     public func signOut() {
