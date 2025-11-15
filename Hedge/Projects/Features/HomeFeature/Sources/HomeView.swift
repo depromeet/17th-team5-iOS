@@ -858,26 +858,26 @@ extension HomeView {
             VStack(alignment: .leading, spacing: 24) {
                 badgePopupRow(
                     image: Image.hedgeUI.emerald,
-                    title: "감각의 전성기",
-                    description: "시장의 흐름을 넓고 깊게 이해하며, 스스로의 기준으로 움직였어요"
+                    title: "최고의 매매",
+                    description: "판단, 타이밍, 리스크까지 완성도 높게 매매했어요. 이건 실력이 만든 결과입니다."
                 )
                 
                 badgePopupRow(
                     image: Image.hedgeUI.gold,
-                    title: "안정의 흐름",
-                    description: "근거 있는 판단으로 흔들림 없이 결정했어요"
+                    title: "좋은 시도의 매매",
+                    description: "시장 판단과 실행이 대부분 잘 맞았습니다. 비슷한 흐름에서 다시 써볼 수 있는 전략이에요."
                 )
                 
                 badgePopupRow(
                     image: Image.hedgeUI.silver,
-                    title: "유연의 구간",
-                    description: "계획과는 조금 달랐지만 상황에 맞게 판단을 잘 조정했어요"
+                    title: "조금 아쉬운 매매",
+                    description: "아이디어는 있었지만 타이밍이나 리스크 관리가 아쉬웠어요. 조금 더 정교하게 다듬어봐요."
                 )
                 
                 badgePopupRow(
                     image: Image.hedgeUI.bronze,
-                    title: "성찰의 시간기",
-                    description: "기대와 다른 결과였지만, 이번 회고로 배움을 쌓고 있어요"
+                    title: "아쉬운 매매",
+                    description: "시장 흐름이나 판단 근거가 부족했어요. 다음엔 분석부터 다시 점검해보세요."
                 )
             }
             
