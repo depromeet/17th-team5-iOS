@@ -15,11 +15,13 @@ import PrincipleReviewFeature
 import LinkDomainInterface
 import Shared
 import SwiftUI
+import SplashFeature
 
 import KakaoSDKAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
+    var splashWindow: UIWindow?
     var appCoordinator: AppCoordinator?
     
     func scene(
@@ -41,10 +43,24 @@ extension SceneDelegate {
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
+        // SplashView를 별도 window로 표시
+        let splashView = SplashView()
+        let splashViewController = UIHostingController(rootView: splashView)
+        splashWindow = UIWindow(windowScene: windowScene)
+        splashWindow?.rootViewController = splashViewController
+        splashWindow?.windowLevel = .normal + 1
+        splashWindow?.makeKeyAndVisible()
+        
+        // 1.5초 후 coordinator 시작 및 SplashWindow 제거
         appCoordinator = DefaultAppCoordinator(
             navigationController: navigationController
         )
-        appCoordinator?.start()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.splashWindow?.isHidden = true
+            self?.splashWindow = nil
+            self?.appCoordinator?.start()
+        }
     }
     
     func scene(

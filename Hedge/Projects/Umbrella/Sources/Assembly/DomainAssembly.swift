@@ -46,6 +46,14 @@ public struct DomainAssembly: Assembly {
             return FetchFeedback(feedbackRepository: repository)
         }
         
+        container.register(CreateFeedbackUseCase.self) { resolver in
+            guard let repository = resolver.resolve(FeedbackRepository.self) else {
+                fatalError("Could not resolve FeedbackRepository")
+            }
+            
+            return CreateFeedback(feedbackRepository: repository)
+        }
+        
         container.register(FetchPrinciplesUseCase.self) { resolver in
             guard let principlesRepository = resolver.resolve(PrinciplesRepository.self) else {
                 fatalError("Could not resolve StockRepository")

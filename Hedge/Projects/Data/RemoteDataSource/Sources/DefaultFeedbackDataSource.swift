@@ -22,10 +22,15 @@ public struct DefaultFeedbackDataSource: FeedbackDataSource {
     public func fetchFeedback(retrospectionId: Int) async throws -> FeedbackResponseDTO {
         try await provider.request(FeedbackTarget.fetch(retrospectionId: retrospectionId))
     }
+    
+    public func createFeedback(retrospectionId: Int) async throws -> FeedbackResponseDTO {
+        try await provider.request(FeedbackTarget.create(retrospectionId: retrospectionId))
+    }
 }
 
 enum FeedbackTarget {
     case fetch(retrospectionId: Int)
+    case create(retrospectionId: Int)
 }
 
 extension FeedbackTarget: TargetType {
@@ -41,18 +46,25 @@ extension FeedbackTarget: TargetType {
         switch self {
         case .fetch:
             return .get
+        case .create:
+            return .post
         }
     }
     
     var path: String {
         switch self {
-        case .fetch(let retrospectionId):
+        case .fetch(let retrospectionId), .create(let retrospectionId):
             return "/\(retrospectionId)/feedback"
         }
     }
     
     var parameters: Networker.RequestParams? {
-        return nil
+        switch self {
+        case .fetch:
+            return nil
+        case .create:
+            return nil
+        }
     }
     
     var encoding: any ParameterEncoding {

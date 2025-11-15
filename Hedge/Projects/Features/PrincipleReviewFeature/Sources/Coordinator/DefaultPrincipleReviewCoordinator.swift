@@ -58,7 +58,7 @@ public final class DefaultPrincipleReviewCoordinator: PrincipleReviewCoordinator
                             fetchLinkUseCase: DIContainer.resolve(FetchLinkUseCase.self),
                             uploadImageUseCase: DIContainer.resolve(UploadRetrospectionImageUseCase.self),
                             createRetrospectionUseCase: DIContainer.resolve(CreateRetrospectionUseCase.self),
-                            fetchFeedbackUseCase: DIContainer.resolve(FetchFeedbackUseCase.self),
+                            createFeedbackUseCase: DIContainer.resolve(CreateFeedbackUseCase.self),
                             saveUserDefaultsUseCase: DIContainer.resolve(SaveUserDefaultsUseCase.self)
                         )
                     }

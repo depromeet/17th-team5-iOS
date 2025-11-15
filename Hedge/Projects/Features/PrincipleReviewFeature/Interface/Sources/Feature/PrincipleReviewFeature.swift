@@ -22,7 +22,7 @@ public struct PrincipleReviewFeature {
     private let fetchLinkUseCase: FetchLinkUseCase
     private let uploadImageUseCase: UploadRetrospectionImageUseCase
     private let createRetrospectionUseCase: CreateRetrospectionUseCase
-    private let fetchFeedbackUseCase: FetchFeedbackUseCase
+    private let createFeedbackUseCase: CreateFeedbackUseCase
     private let saveUserDefaultsUseCase: SaveUserDefaultsUseCase
     
     public init(
@@ -30,14 +30,14 @@ public struct PrincipleReviewFeature {
         fetchLinkUseCase: FetchLinkUseCase,
         uploadImageUseCase: UploadRetrospectionImageUseCase,
         createRetrospectionUseCase: CreateRetrospectionUseCase,
-        fetchFeedbackUseCase: FetchFeedbackUseCase,
+        createFeedbackUseCase: CreateFeedbackUseCase,
         saveUserDefaultsUseCase: SaveUserDefaultsUseCase
     ) {
         self.coordinator = coordinator
         self.fetchLinkUseCase = fetchLinkUseCase
         self.uploadImageUseCase = uploadImageUseCase
         self.createRetrospectionUseCase = createRetrospectionUseCase
-        self.fetchFeedbackUseCase = fetchFeedbackUseCase
+        self.createFeedbackUseCase = createFeedbackUseCase
         self.saveUserDefaultsUseCase = saveUserDefaultsUseCase
     }
     
@@ -568,9 +568,11 @@ extension PrincipleReviewFeature {
                 }
             }
         case .fetchFeedback(let retrospectionId):
-            return .run { [fetchFeedbackUseCase] send in
+            return .run { [createFeedbackUseCase] send in
                 do {
-                    let feedback = try await fetchFeedbackUseCase.execute(id: retrospectionId)
+                    print(retrospectionId)
+                    let feedback = try await createFeedbackUseCase.execute(id: retrospectionId)
+                    dump(feedback)
                     await send(.inner(.fetchFeedbackSuccess(feedback)))
                 } catch {
                     await send(.inner(.fetchFeedbackFailure(error)))

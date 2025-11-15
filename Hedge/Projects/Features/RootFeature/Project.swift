@@ -21,5 +21,6 @@ let project = Project.configure(
         .Feature.PrincipleReview.feature,
         .Feature.Setting.feature,
         .Feature.Retrospection.feature,
+        .Feature.Splash.feature,
     ]
 )

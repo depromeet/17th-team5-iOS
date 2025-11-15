@@ -31,8 +31,6 @@ private extension LoginView {
     var logoView: some View {
         VStack(spacing: 20) {
             Image.hedgeUI.logoLarge
-                .resizable()
-                .frame(width: 112, height: 124)
             
             Text("AI 피드백을 통해 나만의\n투자 원칙을 만드는 투자 회고 서비스")
                 .multilineTextAlignment(.center)
