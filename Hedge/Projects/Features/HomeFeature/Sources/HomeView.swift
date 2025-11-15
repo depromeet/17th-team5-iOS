@@ -269,10 +269,19 @@ extension HomeView {
                             ForEach(store.state.companyNames, id: \.self) { symbol in
                                 let isSelected = store.state.selectedCompanyName == symbol
                                 
+                                // dump(store.state.retrospectionCompanies)
+                                // print(symbol)
+                                
                                 HStack(spacing: 8) {
-                                    Image.hedgeUI.stockThumbnailDemo
-                                        .resizable()
-                                        .frame(width: 24, height: 24)
+                                    if let company = store.state.retrospectionCompanies.first(where: { $0.companyName == symbol }) {
+                                        KFImage(URL(string: company.image))
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                    } else {
+                                        Image.hedgeUI.stockThumbnailDemo
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                    }
                                     
                                     Text(symbol)
                                         .font(FontModel.body3Medium)

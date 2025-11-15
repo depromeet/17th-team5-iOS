@@ -12,7 +12,7 @@ public struct SplashView: View {
             
             LinearGradient(gradient: Gradient(stops: [
                 .init(color: Color.init(hex: "#29F980").opacity(0.16), location: 0.0),
-                .init(color: Color.init(hex: "#29F980").opacity(0.0), location: 1),
+                .init(color: Color.init(hex: "#29F980").opacity(0.0), location: 0.7),
             ]
             ),
                            startPoint: .top,

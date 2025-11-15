@@ -29,8 +29,10 @@ public struct Provider: ProviderProtocol {
     /// Token이 없을 때 요청하는 Provider
     public static let plain: Provider = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 5
-        configuration.timeoutIntervalForResource = 5
+        configuration.timeoutIntervalForRequest = 10
+        configuration.timeoutIntervalForResource = 10
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.urlCache = nil
         
         let monitor = NetworkEventMonitor()
         let session = Session(configuration: configuration, eventMonitors: [monitor])
@@ -40,8 +42,10 @@ public struct Provider: ProviderProtocol {
     /// 인증 세션
     public static let authorized: Provider = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 5
-        configuration.timeoutIntervalForResource = 5
+        configuration.timeoutIntervalForRequest = 10
+        configuration.timeoutIntervalForResource = 10
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.urlCache = nil
         
         let monitor = NetworkEventMonitor()
         let session = Session(

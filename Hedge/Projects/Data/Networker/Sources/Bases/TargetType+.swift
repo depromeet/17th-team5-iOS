@@ -86,6 +86,8 @@ public extension TargetType {
         headers.add(name: "App-Version", value: version)
         headers.add(name: "App-Build", value: buildVersion)
         headers.add(name: "Time-Zone", value: currentTimeZone)
+        headers.add(name: "Cache-Control", value: "no-cache, no-store, must-revalidate")
+        headers.add(name: "Pragma", value: "no-cache")
         
         return headers
     }
