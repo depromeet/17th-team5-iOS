@@ -77,7 +77,10 @@ public struct PrincipleDetailFeature {
     
     public enum ScopeAction { }
     
-    public enum DelegateAction { }
+    @CasePathable
+    public enum DelegateAction {
+        case principleGroupCreated
+    }
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -168,8 +171,7 @@ extension PrincipleDetailFeature {
     ) -> Effect<Action> {
         switch action {
         case .createPrincipleGroupSuccess:
-            coordinator.popToPrev()
-            return .none
+            return .send(.delegate(.principleGroupCreated))
             
         case .createPrincipleGroupFailure(let error):
             // HedgeError의 상세 정보 로깅
@@ -226,7 +228,11 @@ extension PrincipleDetailFeature {
         _ state: inout State,
         _ action: DelegateAction
     ) -> Effect<Action> {
-        return .none
+        switch action {
+        case .principleGroupCreated:
+            coordinator.onPrincipleGroupCreated()
+            return .none
+        }
     }
 }
 

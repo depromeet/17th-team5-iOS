@@ -22,6 +22,7 @@ public final class DefaultPrincipleDetailCoordinator: PrincipleDetailCoordinator
     public var type: CoordinatorType = .principleDetail
     public weak var parentCoordinator: RootCoordinator?
     public weak var finishDelegate: CoordinatorFinishDelegate?
+    public weak var principleDetailDelegate: PrincipleDetailCoordinatorDelegate?
     
     private let principleGroup: PrincipleGroup
     private let isRecommended: Bool
@@ -40,21 +41,26 @@ public final class DefaultPrincipleDetailCoordinator: PrincipleDetailCoordinator
             createPrincipleGroupUseCase: createPrincipleGroupUseCase
         )
         
-        let view = PrincipleDetailView(
-            store: Store(
-                initialState: PrincipleDetailFeature.State(
-                    principleGroup: principleGroup,
-                    isRecommended: isRecommended
-                ),
-                reducer: { feature }
-            )
+        let store = Store(
+            initialState: PrincipleDetailFeature.State(
+                principleGroup: principleGroup,
+                isRecommended: isRecommended
+            ),
+            reducer: { feature }
         )
         
+        let view = PrincipleDetailView(store: store)
         let hostingController = UIHostingController(rootView: view)
         navigationController.pushViewController(hostingController, animated: true)
     }
     
     public func popToPrev() {
+        finish()
+    }
+    
+    public func onPrincipleGroupCreated() {
+        // 원칙 그룹 생성 성공 시 원칙 탭으로 전환하고 토스트 표시
+        principleDetailDelegate?.switchToPrincipleTabAndShowToast()
         finish()
     }
 }

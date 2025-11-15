@@ -43,6 +43,14 @@ public struct HomeView: View {
                 Spacer()
             }
             .ignoresSafeArea(edges: .bottom)
+            .hedgeToast(
+                isPresented: Binding(
+                    get: { store.state.showPrincipleCreatedToast },
+                    set: { _ in send(.showPrincipleCreatedToast) }
+                ),
+                message: "새로운 회고 템플릿이 추가되었습니다",
+                type: .positive
+            )
             
             startArea
             

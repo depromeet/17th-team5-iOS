@@ -12,6 +12,8 @@ import Core
 import PrinciplesDomainInterface
 
 public protocol PrincipleDetailCoordinator: Coordinator {
+    var principleDetailDelegate: PrincipleDetailCoordinatorDelegate? { get set }
     func popToPrev()
+    func onPrincipleGroupCreated()
 }
 

@@ -152,7 +152,13 @@ extension TabBarFeature {
         case .homeAction(.delegate(.pushToPrincipleDetail(let principleGroup, let isRecommneded))):
             coordinator.pushToPrincipleDetail(principleGroup: principleGroup, isRecommended: isRecommneded)
             return .none
-        default:
+        // homeAction의 view, inner, async, scope, binding은 delegateCore에서 처리하지 않음
+        // 이들은 ifLet을 통해 HomeFeature로 자동 전달됨
+        case .homeAction(.view(_)):
+            return .none
+        case .homeAction(.inner(_)):
+            return .none
+        case .homeAction(.async(_)):
             return .none
         }
     }

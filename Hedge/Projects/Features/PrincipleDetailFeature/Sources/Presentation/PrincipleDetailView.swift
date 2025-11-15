@@ -78,7 +78,6 @@ public struct PrincipleDetailView: View {
                         .padding(.leading, 20)
                         .padding(.trailing, 20)
                     }
-                    .buttonStyle(.plain)
 
                     Button {
                         send(.sellButtonTapped)
@@ -100,7 +99,6 @@ public struct PrincipleDetailView: View {
                         .padding(.leading, 20)
                         .padding(.trailing, 20)
                     }
-                    .buttonStyle(.plain)
                     
                     HedgeBottomCTAButton()
                         .state(store.state.selectedTradeType != nil ? .active : .disabled)
