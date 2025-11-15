@@ -8,8 +8,11 @@
 
 import Foundation
 
+import FeedbackDomainInterface
 import Core
 
 public protocol RetrospectionCoordinator: Coordinator {
     func popToPrev()
+    
+    func pushToTradeFeedback(feedback: FeedbackData)
 }

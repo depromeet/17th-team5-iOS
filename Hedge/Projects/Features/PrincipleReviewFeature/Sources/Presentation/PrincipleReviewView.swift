@@ -166,22 +166,24 @@ public struct PrincipleReviewView: View {
             } else {
                 ZStack(alignment: .bottom) {
                     // 그라디언트 배경 (뒤에 위치)
-                    LinearGradient(
-                        gradient: Gradient(stops: [
-                            .init(color: Color.white.opacity(0.0), location: 0.0),
-                            .init(color: Color.white.opacity(0.7), location: 0.21),
-                            .init(color: Color.white.opacity(0.98), location: 1.0)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 82)
-                    .allowsHitTesting(false)
-                    
-                    // pageFloatingView (바닥에 딱 붙음)
-                    pageFloatingView
-                        .padding(.bottom, 32)
+                    if !store.state.linkModalShown && !store.state.cautionModalPresented && !store.state.backCautionModalPresented {
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: Color.white.opacity(0.0), location: 0.0),
+                                .init(color: Color.white.opacity(0.7), location: 0.21),
+                                .init(color: Color.white.opacity(0.98), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 82)
+                        .allowsHitTesting(false)
+                        
+                        // pageFloatingView (바닥에 딱 붙음)
+                        pageFloatingView
+                            .padding(.bottom, 32)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             }
@@ -589,7 +591,7 @@ public struct PrincipleReviewView: View {
                 if let imageURL = metadata.imageURL,
                    let url = URL(string: imageURL) {
                     AsyncImage(url: url) { image in
-                        image
+                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                     } placeholder: {

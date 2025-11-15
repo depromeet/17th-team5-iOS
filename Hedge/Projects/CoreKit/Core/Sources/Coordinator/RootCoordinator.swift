@@ -17,7 +17,7 @@ public protocol RootCoordinator: Coordinator {
     func pushToTradeHistory(tradeType: TradeType, stock: StockSearch)
     func pushToPrinciples(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory)
     func pushToPrinciplesReview(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup)
-    func pushToFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: Core.TradeHistory, feedback: FeedbackData)
+    func pushToFeedback(feedback: FeedbackData)
     func popToHome()
     func pushToSetting()
     func pushToRetrospection(_ id: Int)

@@ -9,6 +9,8 @@
 import Foundation
 
 public struct FeedbackData: Equatable {
+    public let companyName: String
+    public let companyLogo: String
     public let symbol: String
     public let price: Int
     public let volume: Int
@@ -22,6 +24,8 @@ public struct FeedbackData: Equatable {
     public let next: [String]
     
     public init(
+        companyName: String,
+        companyLogo: String,
         symbol: String,
         price: Int,
         volume: Int,
@@ -34,6 +38,8 @@ public struct FeedbackData: Equatable {
         fix: [String],
         next: [String]
     ) {
+        self.companyName = companyName
+        self.companyLogo = companyLogo
         self.symbol = symbol
         self.price = price
         self.volume = volume

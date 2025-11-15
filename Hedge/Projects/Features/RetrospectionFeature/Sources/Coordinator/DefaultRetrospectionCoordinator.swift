@@ -15,6 +15,7 @@ import Core
 import RetrospectionFeatureInterface
 import RetrospectionDomainInterface
 import LinkDomainInterface
+import FeedbackDomainInterface
 import Shared
 
 public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
@@ -52,6 +53,10 @@ public final class DefaultRetrospectionCoordinator: RetrospectionCoordinator {
         
         let hostingController = UIHostingController(rootView: view)
         navigationController.pushViewController(hostingController, animated: true)
+    }
+    
+    public func pushToTradeFeedback(feedback: FeedbackData) {
+        parentCoordinator?.pushToFeedback(feedback: feedback)
     }
     
     public func popToPrev() {

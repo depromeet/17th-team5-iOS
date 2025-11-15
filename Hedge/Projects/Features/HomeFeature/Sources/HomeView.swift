@@ -656,8 +656,6 @@ extension HomeView {
     
     private var recommendedPrincipleSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HedgeSpacer(height: 20)
-            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(store.state.recommendedPrincipleGroups, id: \.id) { group in
@@ -665,9 +663,8 @@ extension HomeView {
                     }
                 }
                 .padding(.horizontal, 20)
+                .padding(.vertical, 20)
             }
-            
-            HedgeSpacer(height: 20)
         }
     }
     
@@ -709,7 +706,54 @@ extension HomeView {
         .frame(width: 166)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
+                .fill(Color.hedgeUI.backgroundWhite)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color.hedgeUI.neutralBgSecondary, lineWidth: 1)
+                )
+        )
+        .overlay {
+            ZStack {
+                Capsule()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color.hedgeUI.shadowGreen,
+                                     Color.clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 137.5
+                        )
+                    )
+                    .frame(width: 355, height: 274)
+                    .opacity(0.32)
+                    .blur(radius: 84.6)
+                    .offset(x: -124, y: -160)
+                    .allowsHitTesting(false)
+                
+                Capsule()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.hedgeUI.shadowBlue,
+                                Color.clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 137.5
+                        )
+                    )
+                    .frame(width: 355, height: 274)
+                    .opacity(0.48)
+                    .blur(radius: 84.6)
+                    .offset(x: 124, y: -160)
+                    .allowsHitTesting(false)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(
+            color: Color(hex: "#0D0F26").opacity(0.08),
+            radius: 10,
+            x: 0,
+            y: 6
         )
     }
     

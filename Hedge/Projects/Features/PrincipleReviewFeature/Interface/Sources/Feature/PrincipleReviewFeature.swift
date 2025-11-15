@@ -473,7 +473,7 @@ extension PrincipleReviewFeature {
             state.isSubmitting = false
             state.feedback = feedbackData
             
-            coordinator.pushToTradeFeedback(tradeType: state.tradeType, stock: state.stock, tradeHistory: state.tradeHistory, feedback: feedbackData)
+            coordinator.pushToTradeFeedback(feedback: feedbackData)
             
             return .none
         case .fetchFeedbackFailure(let error):

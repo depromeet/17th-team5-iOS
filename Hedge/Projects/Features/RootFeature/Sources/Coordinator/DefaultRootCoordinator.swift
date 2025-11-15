@@ -115,12 +115,9 @@ extension DefaultRootCoordinator {
         childCoordinators.append(principlesCoordinator)
     }
     
-    public func pushToFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+    public func pushToFeedback(feedback: FeedbackData) {
         let tradeFeedbackCoordinator = DefaultTradeFeedbackCoordinator(
             navigationController: self.navigationController,
-            tradeType: tradeType,
-            stock: stock,
-            tradeHistory: tradeHistory,
             feedback: feedback
         )
         tradeFeedbackCoordinator.parentCoordinator = self
