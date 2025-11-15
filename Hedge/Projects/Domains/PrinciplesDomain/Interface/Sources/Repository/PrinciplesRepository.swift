@@ -11,4 +11,6 @@ import Foundation
 public protocol PrinciplesRepository {
     func fetch() async throws -> [PrincipleGroup]
     func fetchSystemPrincipleGroups() async throws -> [PrincipleGroup]
+    func fetchRecommendedPrincipleGroups() async throws -> [PrincipleGroup]
+    func fetchDefaultPrincipleGroups() async throws -> [PrincipleGroup]
 }

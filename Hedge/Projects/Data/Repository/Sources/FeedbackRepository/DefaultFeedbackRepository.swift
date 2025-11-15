@@ -14,5 +14,10 @@ public struct DefaultFeedbackRepository: FeedbackRepository {
         let response = try await dataSource.fetchFeedback(retrospectionId: id)
         return response.data.toDomain()
     }
+    
+    public func create(id: Int) async throws -> FeedbackData {
+        let response = try await dataSource.createFeedback(retrospectionId: id)
+        return response.data.toDomain()
+    }
 }
 

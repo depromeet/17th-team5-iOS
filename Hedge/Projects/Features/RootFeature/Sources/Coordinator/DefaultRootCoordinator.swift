@@ -27,10 +27,11 @@ import PrincipleReviewFeature
 import FeedbackDomainInterface
 import SettingFeature
 import SettingFeatureInterface
-import SelectPrincipleFeature
-import SelectPrincipleFeatureInterface
+import RetrospectionFeature
+import RetrospectionFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
+    
     public var navigationController: UINavigationController
     public weak var finishDelegate: CoordinatorFinishDelegate?
     public var type: Core.CoordinatorType = .root
@@ -114,23 +115,9 @@ extension DefaultRootCoordinator {
         childCoordinators.append(principlesCoordinator)
     }
     
-    public func pushToPrinciples(_ recommendPrinciples: [String]) {
-        let principlesCoordinator = DefaultPrinciplesCoordinator(
-            navigationController: navigationController
-        )
-        principlesCoordinator.parentCoordinator = self
-        principlesCoordinator.principleDelegate = self
-        principlesCoordinator.start()
-        
-        childCoordinators.append(principlesCoordinator)
-    }
-    
-    public func pushToFeedback(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
+    public func pushToFeedback(feedback: FeedbackData) {
         let tradeFeedbackCoordinator = DefaultTradeFeedbackCoordinator(
             navigationController: self.navigationController,
-            tradeType: tradeType,
-            stock: stock,
-            tradeHistory: tradeHistory,
             feedback: feedback
         )
         tradeFeedbackCoordinator.parentCoordinator = self
@@ -172,18 +159,14 @@ extension DefaultRootCoordinator {
         settingCoordinator.start()
     }
     
-    public func pushToSelectPrinciple(title: String, id: Int, recommendedPrinciples: [String]) {
-        let selectCoordinator = DefaultSelectPrincipleCoordinator(
-            navigationController: navigationController,
-            groupTitle: title,
-            groupId: id,
-            recommendedPrinciples: recommendedPrinciples
-        )
-        selectCoordinator.parentCoordinator = self
-        selectCoordinator.finishDelegate = self
-        selectCoordinator.start()
+    public func pushToRetrospection(_ id: Int) {
+        let retrospectionCoordinator = DefaultRetrospectionCoordinator(navigationController: navigationController, retrospectionId: id)
+        retrospectionCoordinator.finishDelegate = self
+        retrospectionCoordinator.parentCoordinator = self
         
-        childCoordinators.append(selectCoordinator)
+        childCoordinators.append(retrospectionCoordinator)
+        
+        retrospectionCoordinator.start()
     }
     
     public func signOut() {
@@ -204,11 +187,7 @@ extension DefaultRootCoordinator: CoordinatorFinishDelegate {
 
 extension DefaultRootCoordinator: PrincipleDelegate {
     public func choosePrincipleGroup(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
-        
+
         pushToPrinciplesReview(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: group)
-    }
-    
-    public func pushSelectPrinciple(title: String, id: Int, recommendedPrinciples: [String]) {
-        pushToSelectPrinciple(title: title, id: id, recommendedPrinciples: recommendedPrinciples)
     }
 }

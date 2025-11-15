@@ -23,6 +23,8 @@ import LinkDomainInterface
 import LinkDomain
 import RetrospectionDomainInterface
 import RetrospectionDomain
+import UserDefaultsDomainInterface
+import UserDefaultsDomain
 
 public struct DomainAssembly: Assembly {
     public init() {}
@@ -44,6 +46,14 @@ public struct DomainAssembly: Assembly {
             return FetchFeedback(feedbackRepository: repository)
         }
         
+        container.register(CreateFeedbackUseCase.self) { resolver in
+            guard let repository = resolver.resolve(FeedbackRepository.self) else {
+                fatalError("Could not resolve FeedbackRepository")
+            }
+            
+            return CreateFeedback(feedbackRepository: repository)
+        }
+        
         container.register(FetchPrinciplesUseCase.self) { resolver in
             guard let principlesRepository = resolver.resolve(PrinciplesRepository.self) else {
                 fatalError("Could not resolve StockRepository")
@@ -58,6 +68,22 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchSystemPrinciples(repository: principlesRepository)
+        }
+        
+        container.register(FetchRecommendedPrinciplesUseCase.self) { resolver in
+            guard let principlesRepository = resolver.resolve(PrinciplesRepository.self) else {
+                fatalError("Could not resolve PrinciplesRepository")
+            }
+            
+            return FetchRecommendedPrinciples(repository: principlesRepository)
+        }
+        
+        container.register(FetchDefaultPrinciplesUseCase.self) { resolver in
+            guard let principlesRepository = resolver.resolve(PrinciplesRepository.self) else {
+                fatalError("Could not resolve PrinciplesRepository")
+            }
+            
+            return FetchDefaultPrinciples(repository: principlesRepository)
         }
         
         container.register(AnalysisUseCase.self) { resolver in
@@ -106,6 +132,34 @@ public struct DomainAssembly: Assembly {
             }
             
             return FetchBadgeReport(repository: repository)
+        }
+        
+        container.register(FetchRetrospectionDetailUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return FetchRetrospectionDetail(repository: repository)
+        }
+        
+        container.register(DeleteRetrospectionUseCase.self) { resolver in
+            guard let repository = resolver.resolve(RetrospectionRepository.self) else {
+                fatalError("Could not resolve RetrospectionRepository")
+            }
+            
+            return DeleteRetrospection(repository: repository)
+        }
+        
+        container.register(SaveUserDefaultsUseCase.self) { _ in
+            SaveUserDefaults()
+        }
+        
+        container.register(GetUserDefaultsUseCase.self) { _ in
+            GetUserDefaults()
+        }
+        
+        container.register(DeleteUserDefaultsUseCase.self) { _ in
+            DeleteUserDefaults()
         }
     }
 }

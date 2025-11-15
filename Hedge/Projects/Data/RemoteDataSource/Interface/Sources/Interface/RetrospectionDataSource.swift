@@ -13,6 +13,10 @@ public protocol RetrospectionDataSource {
     
     func fetchBadgeReport() async throws -> BadgeReportResponseDTO
     
+    func fetchDetail(retrospectionId: Int) async throws -> RetrospectionDetailResponseDTO
+    
+    func deleteRetrospection(retrospectionId: Int) async throws -> RetrospectionDeleteResponseDTO
+    
     func uploadImage(
         domain: String,
         fileData: Data,

@@ -26,32 +26,33 @@ public struct PrincipleReviewView: View {
     }
     
     public var body: some View {
-        ZStack {
-            mainContent
-                .disabled(store.state.isSubmitting)
-            
+        Group {
             if store.state.isSubmitting {
-                Color.white
-                    .ignoresSafeArea()
-                
-                Circle()
-                    .trim(from: 0.0, to: 0.35)
-                    .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
-                    .frame(width: 32, height: 32)
-                    .rotationEffect(.degrees(-90))
-                    .rotationEffect(.degrees(isAnimating ? 360 : 0))
-                    .animation(
-                        .linear(duration: 0.8)
+                ZStack(alignment: .center) {
+                    Color.hedgeUI.backgroundWhite
+                    
+                    Circle()
+                        .trim(from: 0.0, to: 0.35)
+                        .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                        .frame(width: 32, height: 32)
+                        .rotationEffect(.degrees(-90))
+                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                        .animation(
+                            .linear(duration: 0.8)
                             .repeatForever(autoreverses: false),
-                        value: isAnimating
-                    )
-                    .onAppear { isAnimating = true }
-                    .onDisappear { isAnimating = false }
+                            value: isAnimating
+                        )
+                        .onAppear { isAnimating = true }
+                        .onDisappear { isAnimating = false }
+                }
+            } else {
+                mainContent
             }
         }
     }
     
     private var mainContent: some View {
+        
         VStack(spacing: 0) {
             if isFocused == false {
                 navigationBar
@@ -62,22 +63,56 @@ public struct PrincipleReviewView: View {
                     .padding(.horizontal, 20)
                 
                 HedgeSpacer(height: 16)
-                    
-                Text("지키셨나요?")
-                    .foregroundStyle(Color.hedgeUI.grey900)
-                    .font(FontModel.body3Medium)
-                    .padding(.horizontal, 20)
-                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             
-            TabView(selection: $currentPageIndex) {
-                ForEach(0..<store.principles.count, id: \.self) { index in
-                    singleReviewView(for: index)
-                        .tag(index)
+            GeometryReader { geometry in
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            ForEach(0..<store.principles.count, id: \.self) { index in
+                                singleReviewView(for: index)
+                                    .frame(width: geometry.size.width)
+                                    .id(index)
+                                    .background(
+                                        GeometryReader { itemGeometry in
+                                            Color.clear
+                                                .preference(
+                                                    key: ScrollOffsetPreferenceKey.self,
+                                                    value: [index: itemGeometry.frame(in: .named("scroll")).minX]
+                                                )
+                                        }
+                                    )
+                            }
+                        }
+                    }
+                    .coordinateSpace(name: "scroll")
+                    .scrollTargetBehavior(.paging)
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offsets in
+                        guard !offsets.isEmpty else { return }
+                        
+                        // 화면 중앙에 가장 가까운 아이템 찾기
+                        let screenCenter = geometry.size.width / 2
+                        var closestIndex = currentPageIndex
+                        var minDistance: CGFloat = .infinity
+                        
+                        for (index, offset) in offsets {
+                            // 아이템의 중앙 위치 계산
+                            let itemCenter = offset + geometry.size.width / 2
+                            let distance = abs(itemCenter - screenCenter)
+                            if distance < minDistance {
+                                minDistance = distance
+                                closestIndex = index
+                            }
+                        }
+                        
+                        if closestIndex != currentPageIndex {
+                            currentPageIndex = closestIndex
+                        }
+                    }
+                    .ignoresSafeArea(edges: .bottom)
                 }
             }
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
         .onChange(of: currentPageIndex) { _, newValue in
             send(.pageChanged(newValue))
         }
@@ -110,7 +145,7 @@ public struct PrincipleReviewView: View {
                 primaryTitle: "확인",
                 onPrimary: {
                     send(.cautionModalTapped)
-        }))
+                }))
         .hedgeModal(
             isPresented: $store.state.backCautionModalPresented,
             title: "정말 이전으로 갈까요?",
@@ -126,32 +161,34 @@ public struct PrincipleReviewView: View {
                 })
         )
         .overlay(alignment: .bottom) {
-            if !focusWithAnimation {
-                ZStack() {
-                    // 그라데이션 배경
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.white.opacity(0),
-                            Color.white.opacity(0.2),
-                            Color.white.opacity(0.98)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 82)
-                    
-                    pageFloatingView
-                }
-                .ignoresSafeArea()
-            }
-        }
-        .ignoresSafeArea(edges: .bottom)
-        .safeAreaInset(edge: .bottom) {
             if focusWithAnimation {
                 keyboardResourceButtonView
-                    .background(Color.white)    // 필요 시 배경
+            } else {
+                ZStack(alignment: .bottom) {
+                    // 그라디언트 배경 (뒤에 위치)
+                    if !store.state.linkModalShown && !store.state.cautionModalPresented && !store.state.backCautionModalPresented {
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: Color.white.opacity(0.0), location: 0.0),
+                                .init(color: Color.white.opacity(0.7), location: 0.21),
+                                .init(color: Color.white.opacity(0.98), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 82)
+                        .allowsHitTesting(false)
+                        
+                        // pageFloatingView (바닥에 딱 붙음)
+                        pageFloatingView
+                            .padding(.bottom, 32)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             }
         }
+        .ignoresSafeArea(.container, edges: .bottom)
     }
     
     // MARK: - Single Review View
@@ -229,12 +266,6 @@ public struct PrincipleReviewView: View {
             }
             
             textInputView
-            
-            Spacer()
-            
-            // if focusWithAnimation {
-            //     keyboardResourceButtonView
-            // }
         }
     }
     
@@ -290,20 +321,29 @@ public struct PrincipleReviewView: View {
         VStack(alignment: .leading,
                spacing: 4) {
             
-            HStack(spacing: 0) {
+            Text("지키셨나요?")
+                .foregroundStyle(Color.hedgeUI.grey900)
+                .font(FontModel.body3Medium)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            HStack(alignment: .top, spacing: 0) {
                 Text(store.principles[index].principle)
                     .foregroundStyle(Color.hedgeUI.grey900)
                     .font(FontModel.h1Semibold)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
                 
-                Spacer()
+                Spacer(minLength: 8)
                 
                 Rectangle()
                     .frame(width: 12, height: 0)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.clear)
                 
                 Image.hedgeUI.arrowDown
                     .renderingMode(.template)
                     .foregroundStyle(Color.hedgeUI.textAssistive)
+                    .padding(.top, 4)
                     .onTapGesture {
                         send(.pricipleToggleButtonTapped,
                              animation: .easeInOut(duration: 0.3))
@@ -313,6 +353,7 @@ public struct PrincipleReviewView: View {
         }
                .padding(.vertical, 10)
                .padding(.horizontal, 20)
+               .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     @ViewBuilder
@@ -434,8 +475,8 @@ public struct PrincipleReviewView: View {
                             if let image = photoItem.loadedImage {
                                 image
                                     .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 120)
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 120, height: 120)
                                     .clipped()
                                     .cornerRadius(18)
                             } else {
@@ -468,7 +509,7 @@ public struct PrincipleReviewView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 24)
-        .padding(.bottom, 8)
+        // .padding(.bottom, 20)
         .scrollIndicators(.hidden)
     }
     
@@ -550,7 +591,7 @@ public struct PrincipleReviewView: View {
                 if let imageURL = metadata.imageURL,
                    let url = URL(string: imageURL) {
                     AsyncImage(url: url) { image in
-                        image
+                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                     } placeholder: {
@@ -602,50 +643,57 @@ public struct PrincipleReviewView: View {
     }
     
     private var pageFloatingView: some View {
-        // 메인 카드 컨테이너
-        HStack(spacing: 12) {
-            // 왼쪽 아이콘 영역
-            ZStack {
-                // 🔥 이모지가 있는 원형 배경
-                Circle()
-                    .fill(Color.hedgeUI.neutralBgSecondary)
-                    .frame(width: 24, height: 24)
-                    .overlay {
-                        Text("🔥")
-                            .font(FontModel.caption1Semibold)
-                    }
-                
-                // 초록색 원형 인디케이터
-                Circle()
-                    .trim(from: 0.0, to: store.endAngle)
-                    .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                    .frame(width: 24, height: 24)
-                    .rotationEffect(.degrees(-90))
-            }
-            
-            // 페이지 인디케이터 영역
-            HStack(spacing: 8) {
-                // 페이지 인디케이터들
-                ForEach(0..<store.principles.count, id: \.self) { index in
+            // 메인 카드 컨테이너
+            HStack(spacing: 12) {
+                // 왼쪽 아이콘 영역
+                ZStack {
+                    // 🔥 이모지가 있는 원형 배경
                     Circle()
-                        .fill(index == currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
-                        .frame(width: 6, height: 6)
+                        .fill(Color.hedgeUI.neutralBgSecondary)
+                        .frame(width: 24, height: 24)
+                        .overlay {
+                            Text("🔥")
+                                .font(FontModel.caption1Semibold)
+                        }
+                    
+                    // 초록색 원형 인디케이터
+                    Circle()
+                        .trim(from: 0.0, to: store.endAngle)
+                        .stroke(Color.hedgeUI.brandPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                        .frame(width: 24, height: 24)
+                        .rotationEffect(.degrees(-90))
+                }
+                
+                // 페이지 인디케이터 영역
+                HStack(spacing: 8) {
+                    // 페이지 인디케이터들
+                    ForEach(0..<store.principles.count, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentPageIndex ? Color.hedgeUI.brandPrimary : Color.hedgeUI.brandDisabled)
+                            .frame(width: 6, height: 6)
+                    }
                 }
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 29)
+                    .fill(Color.white)
+                    .shadow(
+                        color: Color.black.opacity(0.1),
+                        radius: 30,
+                        x: 0,
+                        y: 6
+                    )
+            )
+            .padding(.horizontal, 0)
+    }
+    
+    // MARK: - Scroll Offset Preference Key
+    private struct ScrollOffsetPreferenceKey: PreferenceKey {
+        static var defaultValue: [Int: CGFloat] = [:]
+        static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+            value.merge(nextValue(), uniquingKeysWith: { _, new in new })
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 29)
-                .fill(Color.white)
-                .shadow(
-                    color: Color.black.opacity(0.1),
-                    radius: 30,
-                    x: 0,
-                    y: 6
-                )
-        )
-        .padding(.horizontal, 0)
-        .padding(.bottom, 32)
     }
 }

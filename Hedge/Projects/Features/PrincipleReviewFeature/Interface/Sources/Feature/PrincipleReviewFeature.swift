@@ -14,6 +14,7 @@ import StockDomainInterface
 import PrinciplesDomainInterface
 import RetrospectionDomainInterface
 import FeedbackDomainInterface
+import UserDefaultsDomainInterface
 
 @Reducer
 public struct PrincipleReviewFeature {
@@ -21,20 +22,23 @@ public struct PrincipleReviewFeature {
     private let fetchLinkUseCase: FetchLinkUseCase
     private let uploadImageUseCase: UploadRetrospectionImageUseCase
     private let createRetrospectionUseCase: CreateRetrospectionUseCase
-    private let fetchFeedbackUseCase: FetchFeedbackUseCase
+    private let createFeedbackUseCase: CreateFeedbackUseCase
+    private let saveUserDefaultsUseCase: SaveUserDefaultsUseCase
     
     public init(
         coordinator: PrincipleReviewCoordinator,
         fetchLinkUseCase: FetchLinkUseCase,
         uploadImageUseCase: UploadRetrospectionImageUseCase,
         createRetrospectionUseCase: CreateRetrospectionUseCase,
-        fetchFeedbackUseCase: FetchFeedbackUseCase
+        createFeedbackUseCase: CreateFeedbackUseCase,
+        saveUserDefaultsUseCase: SaveUserDefaultsUseCase
     ) {
         self.coordinator = coordinator
         self.fetchLinkUseCase = fetchLinkUseCase
         self.uploadImageUseCase = uploadImageUseCase
         self.createRetrospectionUseCase = createRetrospectionUseCase
-        self.fetchFeedbackUseCase = fetchFeedbackUseCase
+        self.createFeedbackUseCase = createFeedbackUseCase
+        self.saveUserDefaultsUseCase = saveUserDefaultsUseCase
     }
     
     @ObservableState
@@ -459,6 +463,7 @@ extension PrincipleReviewFeature {
         case .createRetrospectionSuccess(let result):
             state.isSubmitting = true
             state.submissionResult = result
+            saveUserDefaultsUseCase.execute(value: result.id, .retrospectionID)
             return .send(.async(.fetchFeedback(result.id)))
         case .createRetrospectionFailure(let error):
             state.isSubmitting = false
@@ -468,7 +473,7 @@ extension PrincipleReviewFeature {
             state.isSubmitting = false
             state.feedback = feedbackData
             
-            coordinator.pushToTradeFeedback(tradeType: state.tradeType, stock: state.stock, tradeHistory: state.tradeHistory, feedback: feedbackData)
+            coordinator.pushToTradeFeedback(feedback: feedbackData)
             
             return .none
         case .fetchFeedbackFailure(let error):
@@ -563,9 +568,11 @@ extension PrincipleReviewFeature {
                 }
             }
         case .fetchFeedback(let retrospectionId):
-            return .run { [fetchFeedbackUseCase] send in
+            return .run { [createFeedbackUseCase] send in
                 do {
-                    let feedback = try await fetchFeedbackUseCase.execute(id: retrospectionId)
+                    print(retrospectionId)
+                    let feedback = try await createFeedbackUseCase.execute(id: retrospectionId)
+                    dump(feedback)
                     await send(.inner(.fetchFeedbackSuccess(feedback)))
                 } catch {
                     await send(.inner(.fetchFeedbackFailure(error)))

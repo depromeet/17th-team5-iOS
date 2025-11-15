@@ -62,14 +62,14 @@ public extension TargetDependency.Feature {
         public static let interface = featureInterfaceDependency(target: name)
     }
 
-    struct AddPrinciple {
-        private static let name = "AddPrincipleFeature"
+    struct Retrospection {
+        private static let name = "RetrospectionFeature"
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }
 
-    struct SelectPrinciple {
-        private static let name = "SelectPrincipleFeature"
+    struct Splash {
+        private static let name = "SplashFeature"
         public static let feature = featureDependency(target: name)
         public static let interface = featureInterfaceDependency(target: name)
     }

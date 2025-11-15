@@ -50,6 +50,11 @@ extension HedgeUI where Base == Image {
     public static var image: Image { asset(#function) }
     public static var link: Image { asset(#function) }
     public static var setting: Image { asset(#function) }
+    public static var emeraldBadge: Image { asset(#function) }
+    public static var goldBadge: Image { asset(#function) }
+    public static var silverBadge: Image { asset(#function) }
+    public static var bronzeBadge: Image { asset(#function) }
+    public static var memo: Image { asset(#function) }
     
     // MARK: Size 28
     public static var closeBottomSheet: Image { asset(#function) }
@@ -78,7 +83,8 @@ extension HedgeUI where Base == Image {
     
     // MARK: Logo
     public static var logo: Image { asset(#function) }
-    public static var kakaoLogo: Image { asset(#function) }
+    public static var kakaologo: Image { asset(#function) }
+    public static var logoLarge: Image { asset(#function) }
     
     // MARK: Size xlarge
     public static var emerald: Image { asset(#function) }

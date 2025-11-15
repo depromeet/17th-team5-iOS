@@ -10,4 +10,5 @@ import Foundation
 
 public protocol FeedbackRepository {
     func fetch(id: Int) async throws -> FeedbackData
+    func create(id: Int) async throws -> FeedbackData
 }

@@ -19,6 +19,7 @@ public struct PrincipleSystemGroupDTO: Decodable {
     public let thumbnail: String
     public let principleType: String?
     public let principleCount: Int?
+    public let imageId: Int?
     public let investorName: String?
 }
 
@@ -29,8 +30,8 @@ public struct PrincipleGroupDetailResponseDTO: Decodable {
 }
 
 public extension PrincipleGroupDetailResponseDTO {
-    func toDomain(groupType: PrincipleGroup.GroupType) -> PrincipleGroup {
-        data.toDomain(groupType)
+    func toDomain(groupType: PrincipleGroup.GroupType, imageId: Int? = nil, investorName: String? = nil) -> PrincipleGroup {
+        data.toDomain(groupType, imageId: imageId, investorName: investorName)
     }
 }
 

@@ -49,4 +49,10 @@ public extension TargetDependency.Domain {
         public static let implement = domainDependency(target: name)
         public static let interface = domainInterfaceDependency(target: name)
     }
+
+    struct UserDefaults {
+        private static let name = "UserDefaultsDomain"
+        public static let implement = domainDependency(target: name)
+        public static let interface = domainInterfaceDependency(target: name)
+    }
 }

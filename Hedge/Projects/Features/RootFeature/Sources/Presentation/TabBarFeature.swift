@@ -13,6 +13,8 @@ import Shared
 import HomeFeatureInterface
 import HomeFeature
 import RetrospectionDomainInterface
+import UserDefaultsDomainInterface
+import PrinciplesDomainInterface
 
 @Reducer
 public struct TabBarFeature {
@@ -52,7 +54,12 @@ public struct TabBarFeature {
             .ifLet(\.homeState, action: \.delegate.homeAction) {
                 HomeFeature(
                     fetchRetrospectionUseCase: DIContainer.resolve(RetrospectionUseCase.self),
-                    fetchBadgeReportUseCase: DIContainer.resolve(FetchBadgeReportUseCase.self)
+                    fetchBadgeReportUseCase: DIContainer.resolve(FetchBadgeReportUseCase.self),
+                    getUserDefaultsUseCase: DIContainer.resolve(GetUserDefaultsUseCase.self),
+                    deleteUserDefaultsUseCase: DIContainer.resolve(DeleteUserDefaultsUseCase.self),
+                    fetchRecommendedPrinciplesUseCase: DIContainer.resolve(FetchRecommendedPrinciplesUseCase.self),
+                    fetchDefaultPrinciplesUseCase: DIContainer.resolve(FetchDefaultPrinciplesUseCase.self),
+                    fetchPrinciplesUseCase: DIContainer.resolve(FetchPrinciplesUseCase.self)
                 )
             }
     }
@@ -135,6 +142,9 @@ extension TabBarFeature {
             return .none
         case .homeAction(.delegate(.pushToSetting)):
             coordinator.pushToSetting()
+            return .none
+        case .homeAction(.delegate(.pushToRetrospection(let id))):
+            coordinator.pushToRetrospection(id)
             return .none
         case .homeAction(.delegate(.finish)):
             coordinator.finish()

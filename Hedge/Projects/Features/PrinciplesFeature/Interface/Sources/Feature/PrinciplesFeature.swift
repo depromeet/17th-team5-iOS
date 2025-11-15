@@ -18,7 +18,7 @@ import PrinciplesDomainInterface
 public struct PrinciplesFeature {
     private let coordinator: PrinciplesCoordinator
     private let fetchPrinciplesUseCase: FetchPrinciplesUseCase
-    private let fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase
+    private let fetchDefaultPrinciplesUseCase: FetchDefaultPrinciplesUseCase
     private let recommendedPrinciples: [String]
     private let tradeType: TradeType?
     private let stock: StockSearch?
@@ -27,7 +27,7 @@ public struct PrinciplesFeature {
     public init(
         coordinator: PrinciplesCoordinator,
         fetchPrinciplesUseCase: FetchPrinciplesUseCase,
-        fetchSystemPrinciplesUseCase: FetchSystemPrinciplesUseCase,
+        fetchDefaultPrinciplesUseCase: FetchDefaultPrinciplesUseCase,
         recommendedPrinciples: [String],
         tradeType: TradeType?,
         stock: StockSearch?,
@@ -35,7 +35,7 @@ public struct PrinciplesFeature {
     ) {
         self.coordinator = coordinator
         self.fetchPrinciplesUseCase = fetchPrinciplesUseCase
-        self.fetchSystemPrinciplesUseCase = fetchSystemPrinciplesUseCase
+        self.fetchDefaultPrinciplesUseCase = fetchDefaultPrinciplesUseCase
         self.recommendedPrinciples = recommendedPrinciples
         self.tradeType = tradeType
         self.stock = stock
@@ -50,7 +50,7 @@ public struct PrinciplesFeature {
     @ObservableState
     public struct State: Equatable {
         public var principleGroups: [PrincipleGroup] = []
-        public var systemPrincipleGroups: [PrincipleGroup] = []
+        public var defaultPrincipleGroups: [PrincipleGroup] = []
         public var customPrincipleGroups: [PrincipleGroup] = []
         public var selectedGroupId: Int?
         public var viewType: PrincipleViewType
@@ -92,13 +92,13 @@ public struct PrinciplesFeature {
     
     public enum InnerAction {
         case fetchCustomPrincipleGroupsSuccess([PrincipleGroup])
-        case fetchSystemPrincipleGroupsSuccess([PrincipleGroup])
+        case fetchDefaultPrincipleGroupsSuccess([PrincipleGroup])
         case failure(Error)
     }
     
     public enum AsyncAction {
         case fetchCustomPrincipleGroups
-        case fetchSystemPrincipleGroups
+        case fetchDefaultPrincipleGroups
     }
     
     public enum ScopeAction { }
@@ -145,7 +145,7 @@ extension PrinciplesFeature {
         case .onAppear:
             return .merge(
                 .send(.async(.fetchCustomPrincipleGroups)),
-                .send(.async(.fetchSystemPrincipleGroups))
+                .send(.async(.fetchDefaultPrincipleGroups))
             )
             
         case .closeButtonTapped:
@@ -161,29 +161,16 @@ extension PrinciplesFeature {
             return .none
             
         case .confirmButtonTapped:
-            
-            switch state.viewType {
-                
-            case .select:
-                guard let tradeType, let stock, let tradeHistory else {
-                    return .none
-                }
-                
-                coordinator.dismiss(animated: false)
-                if let principleGroup = state.principleGroups.first(where: { principleGroup in
-                    principleGroup.id == state.selectedGroupId
-                }) {
-                    coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
-                }
-            case .management:
-                guard let selectedPrincipleGroup = state.principleGroups.filter({ $0.id == state.selectedGroupId }).first else { return .none }
-                guard let groupId = state.selectedGroupId else { return .none }
-                let title = selectedPrincipleGroup.groupName
-                
-                coordinator.dismiss(animated: false)
-                coordinator.principleDelegate?.pushSelectPrinciple(title: title, id: groupId, recommendedPrinciples: recommendedPrinciples)
+            guard let tradeType, let stock, let tradeHistory else {
+                return .none
             }
             
+            coordinator.dismiss(animated: false)
+            if let principleGroup = state.principleGroups.first(where: { principleGroup in
+                principleGroup.id == state.selectedGroupId
+            }) {
+                coordinator.principleDelegate?.choosePrincipleGroup(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: principleGroup)
+            }
             return .none
         }
     }
@@ -199,9 +186,9 @@ extension PrinciplesFeature {
             state.customPrincipleGroups = filtered
             updateCombinedPrincipleGroups(&state)
             return .none
-        case .fetchSystemPrincipleGroupsSuccess(let principleGroups):
+        case .fetchDefaultPrincipleGroupsSuccess(let principleGroups):
             let filtered = principleGroups.filter { !$0.principles.isEmpty }
-            state.systemPrincipleGroups = filtered
+            state.defaultPrincipleGroups = filtered
             updateCombinedPrincipleGroups(&state)
             return .none
         case .failure(let error):
@@ -225,11 +212,11 @@ extension PrinciplesFeature {
                     await send(.inner(.failure(error)))
                 }
             }
-        case .fetchSystemPrincipleGroups:
+        case .fetchDefaultPrincipleGroups:
             return .run { [tradeType] send in
                 do {
-                    let response = try await fetchSystemPrinciplesUseCase.execute(tradeType?.toRequest)
-                    await send(.inner(.fetchSystemPrincipleGroupsSuccess(response)))
+                    let response = try await fetchDefaultPrinciplesUseCase.execute(tradeType?.toRequest)
+                    await send(.inner(.fetchDefaultPrincipleGroupsSuccess(response)))
                 } catch {
                     await send(.inner(.failure(error)))
                 }
@@ -256,7 +243,7 @@ extension PrinciplesFeature {
 
 private extension PrinciplesFeature {
     func updateCombinedPrincipleGroups(_ state: inout State) {
-        let combined = state.systemPrincipleGroups + state.customPrincipleGroups
+        let combined = state.defaultPrincipleGroups + state.customPrincipleGroups
         state.principleGroups = combined
         
         if let selectedId = state.selectedGroupId,

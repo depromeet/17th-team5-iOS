@@ -14,5 +14,4 @@ import StockDomainInterface
 public protocol TradeFeedbackCoordinator: Coordinator {
     func popToPrev()
     func popToHome()
-    func pushToPrinciples(_ recommendPrinciples: [String])
 }

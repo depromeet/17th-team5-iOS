@@ -28,16 +28,10 @@ public struct TradeFeedbackFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public var tradeType: TradeType
-        public var stock: StockSearch
-        public var tradeHistory: TradeHistory
         public var feedback: FeedbackData
         public var badgeGrade: BadgeGrade
         
-        public init(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, feedback: FeedbackData) {
-            self.tradeType = tradeType
-            self.stock = stock
-            self.tradeHistory = tradeHistory
+        public init(feedback: FeedbackData) {
             self.feedback = feedback
             self.badgeGrade = BadgeGrade(rawValue: feedback.badge) ?? .bronze
         }
@@ -57,7 +51,6 @@ public struct TradeFeedbackFeature {
         case backButtonTapped
         case nextTapped
         case completeButtonTapped
-        case addPrincipleButtonTapped
     }
     public enum InnerAction {
         case fetchFeedbackSuccess(FeedbackData)
@@ -113,14 +106,11 @@ extension TradeFeedbackFeature {
         case .backButtonTapped:
             coordinator.popToPrev()
             return .none
-        case .addPrincipleButtonTapped:
-            coordinator.pushToPrinciples(state.feedback.next)
-            return .none
         case .nextTapped:
             return .none
         case .completeButtonTapped:
             //companyName: state.stock.companyName
-            UserDefaults.standard.set(state.stock.companyName, forKey: "companyName")
+            UserDefaults.standard.set(state.feedback.companyName, forKey: "companyName")
             coordinator.popToHome()
             return .none
         }
@@ -134,19 +124,7 @@ extension TradeFeedbackFeature {
         switch action {
         case .fetchFeedbackSuccess(let response):
             Log.debug("\(response)")
-            state.feedback = FeedbackData(
-                symbol: response.symbol,
-                price: response.price,
-                volume: response.volume,
-                orderType: response.orderType,
-                keptCount: response.keptCount,
-                neutralCount: response.neutralCount,
-                notKeptCount: response.notKeptCount,
-                badge: response.badge,
-                keep: response.keep,
-                fix: response.fix,
-                next: response.next
-            )
+            state.feedback = response
             return .none
             
         case .fetchFeedbackFailure(let error):

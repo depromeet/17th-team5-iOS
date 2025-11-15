@@ -171,21 +171,26 @@ struct TradeFeedbackResultView: View {
         HedgeCard {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
-                    if let logo = store.state.stock.logo {
+                    let logo = store.state.feedback.companyLogo
                         KFImage(URL(string: logo)!)
+                        .placeholder {
+                            Image.hedgeUI.stockThumbnailDemo
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                        }
+                        .onFailureView({
+                            Image.hedgeUI.stockThumbnailDemo
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                        })
                             .resizable()
                             .frame(width: 28, height: 28)
-                    } else {
-                        Image.hedgeUI.stockThumbnailDemo
-                            .resizable()
-                            .frame(width: 28, height: 28)
-                    }
                     
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(store.stock.companyName)
+                        Text(store.state.feedback.companyName)
                             .font(FontModel.label2Medium)
                             .foregroundColor(Color.hedgeUI.textAlternative)
-                        Text("\(store.tradeHistory.tradingPrice) • \(store.tradeHistory.tradingQuantity) \(store.tradeType.rawValue)")
+                        Text("\(store.state.feedback.price) • \(store.state.feedback.volume) \(store.state.feedback.orderType == "SELL" ? "매도" : "매수")")
                             .font(FontModel.body2Semibold)
                             .foregroundColor(Color.hedgeUI.textPrimary)
                     }
@@ -291,22 +296,6 @@ struct TradeFeedbackResultView: View {
                         bullet(recommendation)
                     }
                 }
-                
-                Button(action: {
-                    store.send(.view(.addPrincipleButtonTapped))
-                })
-                {
-                    Text("원칙 추가해보기")
-                        .font(FontModel.body1Semibold)
-                        .foregroundColor(.white)
-                        .frame(height: 42)
-                        .frame(minWidth: 67, maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.hedgeUI.brandPrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .padding(.top, 20)
             }
             .padding(.vertical, 18)
         }

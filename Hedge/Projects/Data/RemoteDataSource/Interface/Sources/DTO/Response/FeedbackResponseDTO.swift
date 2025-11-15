@@ -9,6 +9,8 @@ public struct FeedbackResponseDTO: Decodable {
 }
 
 public struct FeedbackDataDTO: Decodable {
+    public let companyName: String?
+    public let companyLogo: String?
     public let symbol: String
     public let price: Int
     public let volume: Int
@@ -25,6 +27,8 @@ public struct FeedbackDataDTO: Decodable {
 public extension FeedbackDataDTO {
     func toDomain() -> FeedbackData {
         FeedbackData(
+            companyName: companyName ?? "",
+            companyLogo: companyLogo ?? "",
             symbol: symbol,
             price: price,
             volume: volume,

@@ -30,9 +30,7 @@ public struct LoginView: View {
 private extension LoginView {
     var logoView: some View {
         VStack(spacing: 20) {
-            Image.hedgeUI.logo
-                .resizable()
-                .frame(width: 112, height: 124)
+            Image.hedgeUI.logoLarge
             
             Text("AI 피드백을 통해 나만의\n투자 원칙을 만드는 투자 회고 서비스")
                 .multilineTextAlignment(.center)
@@ -73,7 +71,7 @@ private extension LoginView {
         } label: {
             HStack {
                 Spacer()
-                Image.hedgeUI.kakaoLogo
+                Image.hedgeUI.kakaologo
                     .resizable()
                     .frame(width: 24, height: 24)
                 Text("카카오로 시작하기")
