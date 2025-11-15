@@ -54,6 +54,7 @@ public struct HomeFeature {
         public var isLoadingPrinciples: Bool = false
         public var selectedTradeType: TradeType = .buy
         public var loadedPrincipleCount: Int = 0
+        public var showPrincipleCreatedToast: Bool = false
         
         // Company symbols만 따로 모은 프로퍼티
         public var companyNames: [String] {
@@ -87,6 +88,11 @@ public struct HomeFeature {
         case badgePopupTapped(Bool)
         case buyTabTapped
         case sellTabTapped
+        
+        case recommencedCardButtonTapped(PrincipleGroup)
+        case systemCardButtonTapped(PrincipleGroup)
+        case customCardButtonTapped(PrincipleGroup)
+        case showPrincipleCreatedToast
     }
     public enum InnerAction {
         case fetchRetrospectionsSuccess([RetrospectionCompany])
@@ -112,6 +118,7 @@ public struct HomeFeature {
         case pushToSetting
         case pushToRetrospection(Int)
         case finish
+        case pushToPrincipleDetail(PrincipleGroup, Bool)
     }
     
     public var body: some Reducer<State, Action> {
@@ -184,6 +191,16 @@ extension HomeFeature {
         case .principleTabTapped:
             state.selectedType = .principle
             return .none
+            
+        case .showPrincipleCreatedToast:
+            if state.showPrincipleCreatedToast {
+                // 토스트가 이미 표시 중이면 닫기
+                state.showPrincipleCreatedToast = false
+            } else {
+                // 토스트 표시
+                state.showPrincipleCreatedToast = true
+            }
+            return .none
         case .buyTabTapped:
             state.selectedTradeType = .buy
             return .none
@@ -199,6 +216,12 @@ extension HomeFeature {
             }
         case .retrospectionButtonTapped(let id):
             return .send(.delegate(.pushToRetrospection(id)))
+        case .customCardButtonTapped(let principleGroup):
+            return .send(.delegate(.pushToPrincipleDetail(principleGroup, false)))
+        case .systemCardButtonTapped(let principleGroup):
+            return .send(.delegate(.pushToPrincipleDetail(principleGroup, false)))
+        case .recommencedCardButtonTapped(let principleGroup):
+            return .send(.delegate(.pushToPrincipleDetail(principleGroup, true)))
         }
     }
     
@@ -373,6 +396,8 @@ extension HomeFeature {
         case .pushToSetting:
             return .none
         case .pushToRetrospection:
+            return .none
+        case .pushToPrincipleDetail:
             return .none
         case .finish:
             return .none

@@ -570,9 +570,7 @@ extension PrincipleReviewFeature {
         case .fetchFeedback(let retrospectionId):
             return .run { [createFeedbackUseCase] send in
                 do {
-                    print(retrospectionId)
                     let feedback = try await createFeedbackUseCase.execute(id: retrospectionId)
-                    dump(feedback)
                     await send(.inner(.fetchFeedbackSuccess(feedback)))
                 } catch {
                     await send(.inner(.fetchFeedbackFailure(error)))

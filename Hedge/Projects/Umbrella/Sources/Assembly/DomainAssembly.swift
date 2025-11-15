@@ -86,6 +86,14 @@ public struct DomainAssembly: Assembly {
             return FetchDefaultPrinciples(repository: principlesRepository)
         }
         
+        container.register(CreatePrincipleGroupUseCase.self) { resolver in
+            guard let principlesRepository = resolver.resolve(PrinciplesRepository.self) else {
+                fatalError("Could not resolve PrinciplesRepository")
+            }
+            
+            return CreatePrincipleGroup(principlesRepository: principlesRepository)
+        }
+        
         container.register(AnalysisUseCase.self) { resolver in
             guard let repository = resolver.resolve(AnalysisRepository.self) else {
                 fatalError("Could not resolve AnalysisRepository")

@@ -43,6 +43,14 @@ public struct HomeView: View {
                 Spacer()
             }
             .ignoresSafeArea(edges: .bottom)
+            .hedgeToast(
+                isPresented: Binding(
+                    get: { store.state.showPrincipleCreatedToast },
+                    set: { _ in send(.showPrincipleCreatedToast) }
+                ),
+                message: "새로운 회고 템플릿이 추가되었습니다",
+                type: .positive
+            )
             
             startArea
             
@@ -268,9 +276,6 @@ extension HomeView {
                         VStack(alignment: .center, spacing: 12) {
                             ForEach(store.state.companyNames, id: \.self) { symbol in
                                 let isSelected = store.state.selectedCompanyName == symbol
-                                
-                                // dump(store.state.retrospectionCompanies)
-                                // print(symbol)
                                 
                                 HStack(spacing: 8) {
                                     if let company = store.state.retrospectionCompanies.first(where: { $0.companyName == symbol }) {
@@ -610,6 +615,9 @@ extension HomeView {
                         VStack(spacing: 0) {
                             ForEach(filteredSystemGroups, id: \.id) { group in
                                 principleGroupCard(group: group)
+                                    .onTapGesture {
+                                        send(.systemCardButtonTapped(group))
+                                    }
                             }
                         }
                     }
@@ -639,6 +647,9 @@ extension HomeView {
                         VStack(spacing: 0) {
                             ForEach(filteredCustomGroups, id: \.id) { group in
                                 principleGroupCard(group: group)
+                                    .onTapGesture {
+                                        send(.customCardButtonTapped(group))
+                                    }
                             }
                         }
                     }
@@ -764,6 +775,9 @@ extension HomeView {
             x: 0,
             y: 6
         )
+        .onTapGesture {
+            send(.recommencedCardButtonTapped(group))
+        }
     }
     
     private var tradeTypeTabSection: some View {

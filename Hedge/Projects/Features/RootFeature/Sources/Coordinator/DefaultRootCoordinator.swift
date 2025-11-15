@@ -29,6 +29,8 @@ import SettingFeature
 import SettingFeatureInterface
 import RetrospectionFeature
 import RetrospectionFeatureInterface
+import PrincipleDetailFeature
+import PrincipleDetailFeatureInterface
 
 public final class DefaultRootCoordinator: RootCoordinator {
     
@@ -169,6 +171,21 @@ extension DefaultRootCoordinator {
         retrospectionCoordinator.start()
     }
     
+    public func pushToPrincipleDetail(principleGroup: PrincipleGroup, isRecommended: Bool) {
+        let principleDetailCoordinator = DefaultPrincipleDetailCoordinator(
+            navigationController: navigationController,
+            principleGroup: principleGroup,
+            isRecommended: isRecommended
+        )
+        principleDetailCoordinator.finishDelegate = self
+        principleDetailCoordinator.parentCoordinator = self
+        principleDetailCoordinator.principleDetailDelegate = self
+        
+        childCoordinators.append(principleDetailCoordinator)
+        
+        principleDetailCoordinator.start()
+    }
+    
     public func signOut() {
         self.childCoordinators.removeAll()
         self.finish()
@@ -189,5 +206,36 @@ extension DefaultRootCoordinator: PrincipleDelegate {
     public func choosePrincipleGroup(tradeType: TradeType, stock: StockSearch, tradeHistory: TradeHistory, group: PrincipleGroup) {
 
         pushToPrinciplesReview(tradeType: tradeType, stock: stock, tradeHistory: tradeHistory, group: group)
+    }
+}
+
+extension DefaultRootCoordinator: PrincipleDetailCoordinatorDelegate {
+    public func switchToPrincipleTab() {
+        // 홈 화면 탭을 원칙 탭으로 변경
+        guard let tabBarStore = tabBarStore else {
+            Log.error("tabBarStore is nil")
+            return
+        }
+        // homeState가 nil이면 생성
+        if tabBarStore.state.homeState == nil {
+            tabBarStore.send(.view(.onAppear))
+            // homeState 생성 후 action 전달을 위해 약간의 딜레이
+            DispatchQueue.main.async {
+                tabBarStore.send(.delegate(.homeAction(.view(.principleTabTapped))))
+            }
+        } else {
+            tabBarStore.send(.delegate(.homeAction(.view(.principleTabTapped))))
+        }
+    }
+    
+    public func switchToPrincipleTabAndShowToast() {
+        // 홈 화면 탭을 원칙 탭으로 변경
+        guard let tabBarStore = tabBarStore else {
+            Log.error("tabBarStore is nil")
+            return
+        }
+        
+        tabBarStore.send(.delegate(.homeAction(.view(.principleTabTapped))))
+        tabBarStore.send(.delegate(.homeAction(.view(.showPrincipleCreatedToast))))
     }
 }
